@@ -1,0 +1,13 @@
+## 6. Layout
+
+- Keep the sections and their order. Inside a section, alignment and proportions may change when that makes the screen clearer.
+- Apps and dashboards keep real app proportions. The shell fills the viewport, a sidebar of 240 to 280 and fluid content, usually capped around 1440 to 1600 wide, and the page is as long as its content, with more sections below the first screen. Never shrink an app into a narrow centered column. If the original was drawn as a small window on a backdrop, keep it visibly a window, with its frame and backdrop, and still give it desktop proportions inside.
+- The strongest landing hero is a scene. One generated image fills the hero from edge to edge, its subject sits on one side, and the headline sits on the calm empty part of the same image, with the product view rising from the bottom edge. Look at the hero in the references to see it.
+- Without a scene, use an asymmetric split, text on one side and the visual given at least half the width, or text over a large product view below it. Everything stacked and centered is the template default, keep it only for a short hero with no visual.
+- In a scene hero, the text block sits in the upper part, in the space between the navigation and the top of the product view, at its optical center, a little above the true middle.
+- In a split, center the text block vertically against the visual, so neither side leaves a big empty corner. If the visual is much taller, shorten it instead of pushing the text down. Floating cards and devices next to the text are hard to balance, prefer one solid visual. The spacing token from the navigation to the headline applies to stacked heroes, a split hero is centered instead.
+- Long headlines align left. Centered text works for one or two short lines.
+- One primary action and at most one secondary action next to it. Anything else moves out of the hero.
+- Navigation stays quiet. Logo, the existing links, one button. Log in is a quiet text link next to it, not a second button. A floating pill header is not required. On small screens the links collapse into one menu button.
+- Compose the first screen as a whole. The hero fills the viewport height without a dead empty band. If the content is shorter, center it or let the product view start low and run past the bottom edge, so the page invites a scroll.
+- On small screens everything stacks in reading order, the headline drops to the mobile size from the tokens and the visual comes after the actions. A dense preview gets simpler on mobile, with fewer rows and columns, instead of being zoomed down. No text in it goes below 11px.

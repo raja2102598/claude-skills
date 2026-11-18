@@ -1,0 +1,5 @@
+interface:
+  display_name: "Elephant-Goldfish Model"
+  short_description: "Draft designs and review with independent agents"
+policy:
+  allow_implicit_invocation: false
