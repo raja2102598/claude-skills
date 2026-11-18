@@ -10,11 +10,14 @@ Use the [component inventories](#component-inventories) to browse the names docu
 | Animate UI | [Animate UI installation](https://animate-ui.com/docs/installation) | Framework and registry setup for animated primitives. |
 | Animate UI | [Animate UI repository](https://github.com/imskyleen/animate-ui) | Source and license for animated UI primitives. |
 | Animate UI | [Animate UI skill instructions](https://github.com/imskyleen/animate-ui/tree/main/skills/animate-ui) | Upstream workflow for selecting and integrating Animate UI components. |
-| Arc UI | [Arc UI catalog](https://uiarc.dev/) | Animated React primitives, dashboard blocks and app patterns. Free and Pro entries. |
+| Arc UI | [Arc UI catalog](https://uiarc.dev/) | [Component inventory](#arc-ui) covering React primitives, charts, dashboard blocks and app patterns. |
 | Arc UI | [Arc UI Onboarding Checklist](https://uiarc.dev/components/onboarding-checklist) | Free React/shadcn workspace setup card with progress, expandable tasks, async actions and a hide control. Check the current license before reusing source. |
 | Baobun Studio | [Agents Guidelines](https://baobun.studio/demo/agents/guidelines) | Design reference for agent interfaces. Consult the relevant guidance on the source. |
+| Bencho | [Bencho catalog](https://bencho.dev/) | [React interaction previews](#bencho) for gauges, charts, navigation, toolbars and panels. |
 | beUI Pro | [beUI Pro catalog](https://pro.beui.dev/components) | Paid previews for chat composers, tool approvals, voice agents, agent plans and dashboards. |
 | Claude Code Templates | [Senior Frontend](https://www.aitmpl.com/component/skills/development/senior-frontend) | Review reference for responsive layout, UI states, accessibility and browser checks. |
+| Grainient | [Grainient catalog](https://grainient.supply/) | [Gradient and shader references](#grainient) for backgrounds and surface treatments. |
+| HorizonX | [HorizonX catalog](https://horizonx.so/) | [Template and component previews](#horizonx) for dashboards, assistant UI and effects. |
 | Kobra | [Kobra Plan Card](https://kobra.systems/components/plan-card) | Paid preview for reviewing agent tasks and approving a plan. |
 | Libraries.dev | [Libraries.dev Voice Position](https://libraries.dev/voice-position) | On-device iPhone model estimates speaker direction and rough distance from stereo microphone input. The SwiftUI kits are MIT and the model has separate terms. |
 | Libraries.dev | [Libraries.dev Voice Ring](https://libraries.dev/voice-ring) | React and SwiftUI voice visualizer for listening, speaking and processing. The React preview can take a supplied audio level. |
@@ -23,6 +26,7 @@ Use the [component inventories](#component-inventories) to browse the names docu
 | Rare UI | [Rare UI Inline AI Status](https://www.rareui.com/components/aistatus) | Inline status for thinking, researching, analyzing, writing, completion and errors, with optional details and elapsed time. |
 | Rare UI | [Rare UI Streaming Response](https://www.rareui.com/components/streamingresponse) | Incremental Markdown reveal with stop, copy, retry and rating interactions. |
 | Relay | [Relay Workflow OS demo](https://relay-workflow-os.vercel.app/) | Agent operations console with runs, timelines, workflows and human approvals. |
+| uberdesigner | [uberdesigner catalog](https://uberdesigner.ai/) | [UI component and template previews](#uberdesigner) for app shells, widgets and controls. |
 | UIStacks | [UIStacks components](https://uistacks.dev/components) | Component catalog reference. Inspect the relevant preview before adapting it. |
 | Wensity UI | [Progressive Image Loading](https://ui.wensity.com/components/progressive-image-loading) | Aspect-ratio-preserving image placeholders and a transition when the image loads. |
 | Wensity UI | [Wensity ChatGPT Orb](https://ui.wensity.com/components/chatgpt-orb) | Soft animated ink inside a circle. Reference for a compact assistant mark or launcher visual. |
@@ -646,6 +650,35 @@ Public catalog snapshot checked on 18 November 2026. Component families are list
 - [User menu](https://uiarc.dev/components/user-menu), [Vector search](https://uiarc.dev/components/vector-search), [Voice orb](https://uiarc.dev/components/voice-orb), [Voice recorder](https://uiarc.dev/components/voice-recorder), [Waffle chart](https://uiarc.dev/components/waffle-chart)
 - [Wallet card](https://uiarc.dev/components/blocks/wallet-card), [Wallet stack](https://uiarc.dev/components/wallet-stack), [Webhook tester](https://uiarc.dev/components/blocks/webhook-tester), [Webhooks](https://uiarc.dev/components/blocks/webhooks), [Week calendar](https://uiarc.dev/components/screens/week-calendar)
 - [Window range](https://uiarc.dev/components/window-range), [Workspace sidebar](https://uiarc.dev/components/blocks/workspace-sidebar)
+
+### HorizonX
+
+Selected public previews from the HorizonX template and component catalog. Inspect dashboards for screen composition and tools for individual behaviors.
+
+- [Kurage Dashboard](https://horizonx.so/explore/kurage-dashboard), [NexusFlow Dashboard](https://horizonx.so/explore/nexusflow-dashboard), [Thermal Vitals Dashboard](https://horizonx.so/explore/thermal-vitals-dashboard)
+- [Assistant Pill](https://horizonx.so/tools/assistant-pill), [HorizonX Glow](https://horizonx.so/tools/horizonx-glow)
+
+### Grainient
+
+Selected gradient collections and tools for surface treatments, backgrounds and shaders.
+
+- [Astral Gradients](https://grainient.supply/collections/astral-gradients), [Temporal Gradients](https://grainient.supply/collections/temporal-gradients), [Dither Gradient II](https://grainient.supply/collections/dither-gradient-ii)
+- [Hero Gradients V3](https://grainient.supply/collections/hero-gradients-v3), [Animated Gradients](https://grainient.supply/animated-gradientes), [Shader Editor](https://shader.grainient.supply/)
+
+### uberdesigner
+
+Selected previews from the [UI component library](https://uberdesigner.ai/library?kind=ui) for workspace layout, widgets, navigation and motion. The library offers free and Pro entries.
+
+- [desk shelf](https://uberdesigner.ai/t/desk-shelf), [paper widgets](https://uberdesigner.ai/t/paper-widgets), [spotlight tabs](https://uberdesigner.ai/t/spotlight-tabs)
+- [command k](https://uberdesigner.ai/t/command-k), [energy morph](https://uberdesigner.ai/t/energy-morph)
+
+### Bencho
+
+Selected React component and micro-interaction previews from the Bencho gallery.
+
+- **Data and status.** [Score gauge](https://bencho.dev/blocks/gauge), [Market chart](https://bencho.dev/blocks/market-chart), [Context meter](https://bencho.dev/blocks/context-meter), [Status picker](https://bencho.dev/blocks/status-picker), [Progress tracker](https://bencho.dev/blocks/progress-tracker)
+- **Navigation and layout.** [Jelly tabs](https://bencho.dev/blocks/jelly-tabs), [Tab bar](https://bencho.dev/blocks/tab-bar), [Resizable panels](https://bencho.dev/blocks/resizable-panels), [Split view](https://bencho.dev/blocks/split-view)
+- **Actions and feedback.** [Selection actions](https://bencho.dev/blocks/selection-actions), [Spec inspector](https://bencho.dev/blocks/spec-inspector), [Toast stack](https://bencho.dev/blocks/toast-stack), [Budget slider](https://bencho.dev/blocks/budget-slider)
 
 ### beUI Pro
 

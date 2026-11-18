@@ -41,6 +41,16 @@ These options cover full UI systems, component registries, and focused packages.
 | [AI Elements](https://ui.shadcn.com/docs/ai-elements) | React, shadcn/ui | Chat and agent UI components for prompts, messages, and showing tool activity. Use the current shadcn/ui docs. |
 | [CopilotKit](https://docs.copilotkit.ai/) | React, Vue, Angular | Embedded or standalone AI chat with frontend actions, shared state and agent integration. Evaluate the runtime alongside the UI. |
 
+## Design reference catalogs
+
+Use the public previews to find layout, component behavior, or visual treatments. The linked inventories list named examples and their preview URLs.
+
+- [Arc UI](ui-reference-index.md#arc-ui) for React dashboard components, charts and app patterns.
+- [Bencho](ui-reference-index.md#bencho) for React gauges, tabs, status controls and micro-interactions.
+- [Grainient](ui-reference-index.md#grainient) for named gradient collections, backgrounds and shaders.
+- [HorizonX](ui-reference-index.md#horizonx) for dashboard templates, assistant UI and effects.
+- [uberdesigner](ui-reference-index.md#uberdesigner) for app shells, widgets, navigation and templates.
+
 ## Focused packages
 
 ### UI components & primitives
