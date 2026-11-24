@@ -5,7 +5,7 @@ import "./ai-button.css";
 /*
  * AI action button, motion-faithful to Wensity "AI Button" (Gradient cell). Click runs a fake async action:
  * idle sparkle "Write with AI" -> stop square + shimmering "Reading the page" (2.2 s) -> "Writing" (2.0 s)
- * -> check + "Done" (1.85 s) -> idle. Each swap blurs the old content out and the new one in (~280 ms);
+ * -> check + "Done" (1.8 s) -> idle. Each swap blurs the old content out and the new one in (~280 ms);
  * the button width follows the new label ~300 ms later with a fast ease-out. Click while running = stop.
  */
 type Phase = "idle" | "reading" | "writing" | "done";
@@ -16,12 +16,14 @@ const CONTENT: Record<Phase, { label: string }> = {
   done: { label: "Done" },
 };
 const NEXT: Partial<Record<Phase, [Phase, number]>> = {
-  reading: ["writing", 2212],
-  writing: ["done", 1988],
-  done: ["idle", 1844],
+  reading: ["writing", 2200],
+  writing: ["done", 2000],
+  done: ["idle", 1800],
 };
-// delay from the swap to the width change: 335 / 313 / 408 / 471 ms measured on the reference
-const WIDTH_DELAY: Record<Phase, number> = { reading: 335, writing: 313, done: 408, idle: 471 };
+// Delay from the label swap to the width change: the reference waits for the old label's exit (about 330 ms on the real
+// clock, 313-471 ms measured under load). `?gap=0` removes it, matching the reference when its WAAPI exit is collapsed
+// by the virtual clock (used for the compare capture only).
+const GAP = (() => { try { const g = new URLSearchParams(location.search).get("gap"); return g === null ? 330 : Number(g); } catch { return 330; } })();
 
 function Icon({ phase }: { phase: Phase }) {
   if (phase === "idle") return <Sparkles className="aib-spark" strokeWidth={2.2} fill="currentColor" />;
