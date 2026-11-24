@@ -145,7 +145,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "agent-memory",
     load: () => import("../src/clones/agent-memory/index.tsx"),
     meta: () => import("../src/clones/agent-memory/meta.ts"),
-    reference: "Arc UI · Agent memory", candidates: 2, rounds: 3, timing: "fails limits, capture stalls hid timing", runnerUp: "Arc UI Agent routines",
+    reference: "Arc UI · Agent memory", candidates: 2, rounds: 6, timing: "5 flows pass; filter tail 100 ms short", runnerUp: "Arc UI Agent routines",
   },
   {
     slug: "agent-timeline",

@@ -32,6 +32,37 @@ function Collapse({ open, children, slow }: { open: boolean; children: ReactNode
   );
 }
 
+/* integer count that ticks to its target (reference: 5 steps over about 0.14 s after a 30 ms delay) */
+function CountTo({ value }: { value: number }) {
+  const [shown, setShown] = useState(value);
+  const from = useRef(value);
+  useEffect(() => {
+    const a = from.current;
+    if (a === value) return;
+    let raf = 0;
+    const t0 = performance.now();
+    const step = () => {
+      const p = Math.min(1, Math.max(0, (performance.now() - t0) / 110));
+      const v = Math.round(a + (value - a) * p);
+      from.current = v;
+      setShown(v);
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <>{shown}</>;
+}
+
+function Seconds({ from }: { from: number }) {
+  const [n, setN] = useState(from);
+  useEffect(() => {
+    const id = window.setInterval(() => setN((x) => Math.max(1, x - 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return <span className="am-secs">{n}s</span>;
+}
+
 function Mark({ text, q }: { text: string; q: string }) {
   const i = q ? text.toLowerCase().indexOf(q.toLowerCase()) : -1;
   if (i < 0) return <>{text}</>;
@@ -69,10 +100,16 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (searchOpen && autoplayEnabled() === false) searchRef.current?.focus({ preventScroll: true });
+  }, [searchOpen]);
   const [editing, setEditing] = useState<string | null>(null);
+  const [closed, setClosed] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const [adding, setAdding] = useState(false);
   const [addText, setAddText] = useState("");
+  const [addNote, setAddNote] = useState<{ kind: "" | "sorting" | "added"; cat: Cat }>({ kind: "", cat: "about" });
   const [pct, setPct] = useState(62);
   const [pill, setPill] = useState<"update" | "added" | "saved">("update");
   const [pillGone, setPillGone] = useState(false);
@@ -115,21 +152,47 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
     /* measured on the reference: the chip leaves at +1.77 s and the list glides up by the chip's height */
     timers.current.gone = window.setTimeout(() => setPillGone(true), 1770);
   }, []);
+  /* reference add flow: "Sorting into a group" for 0.67 s, then the row opens, the field resets and
+     "Added to <group>" shows for 2.3 s */
   const commitAdd = () => {
     const text = addText.trim();
-    setAdding(false);
-    setAddText("");
-    if (!text) return;
-    const id = "n" + Math.random().toString(36).slice(2, 6);
-    const cat: Cat = filter === "all" ? "about" : filter;
-    setMems((m) => [...m, { id, cat, text, date: "Today" }]);
-    setEntered((e) => ({ ...e, [id]: false }));
-    setPct((p) => p + 3);
-    requestAnimationFrame(() => requestAnimationFrame(() => setEntered((e) => ({ ...e, [id]: true }))));
+    if (!text) {
+      setAdding(false);
+      return;
+    }
+    if (addNote.kind === "sorting") return;
+    setAddNote({ kind: "sorting", cat: "about" });
+    timers.current.sort = window.setTimeout(() => {
+      const id = "n" + Math.random().toString(36).slice(2, 6);
+      const cat: Cat = "about";
+      setMems((m) => [{ id, cat, text, date: "Today" }, ...m]);
+      setEntered((e) => ({ ...e, [id]: false }));
+      setPct((p) => p + 3);
+      requestAnimationFrame(() => requestAnimationFrame(() => setEntered((e) => ({ ...e, [id]: true }))));
+      setAdding(false);
+      setAddText("");
+      setAddNote({ kind: "added", cat });
+      timers.current.note = window.setTimeout(() => setAddNote({ kind: "", cat }), 2300);
+    }, 670);
+  };
+  /* reference edit: Esc closes after about 80 ms, Enter commits after about 480 ms; the row height eases 54 <-> 89 px */
+  const finishEdit = (id: string | null) => {
+    setClosed(id);
+    setEditing(null);
   };
   const saveEdit = () => {
-    if (editing && draft.trim()) setMems((m) => m.map((x) => (x.id === editing ? { ...x, text: draft.trim() } : x)));
-    setEditing(null);
+    const id = editing;
+    const text = draft.trim();
+    window.clearTimeout(timers.current.edit);
+    timers.current.edit = window.setTimeout(() => {
+      if (id && text) setMems((m) => m.map((x) => (x.id === id ? { ...x, text } : x)));
+      finishEdit(id);
+    }, 480);
+  };
+  const cancelEdit = () => {
+    const id = editing;
+    window.clearTimeout(timers.current.edit);
+    timers.current.edit = window.setTimeout(() => finishEdit(id), 80);
   };
   const closeSearch = () => {
     setSearchOpen(false);
@@ -189,7 +252,7 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
         </div>
         <div className="am-meter" role="meter" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Memory used">
           <span className="am-meterLabel">
-            <b data-meter-num>{pct}%</b> full
+            <b data-meter-num><CountTo value={pct} />%</b> full
           </span>
           <span className="am-track">
             <span className="am-fill" data-high={pct >= 90} style={{ transform: `scaleX(${pct / 100})` }} />
@@ -229,9 +292,7 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
               placeholder="Search memories"
               aria-label="Search memories"
               tabIndex={searchOpen ? 0 : -1}
-              ref={(el) => {
-                if (el && searchOpen && document.activeElement !== el && autoplayEnabled() === false) el.focus();
-              }}
+              ref={searchRef}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => e.key === "Escape" && closeSearch()}
             />
@@ -285,22 +346,14 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
                                 value={draft}
                                 aria-label="Edit memory"
                                 onChange={(e) => setDraft(e.target.value)}
-                                onKeyDown={(e) => (e.key === "Enter" ? saveEdit() : e.key === "Escape" && setEditing(null))}
+                                onKeyDown={(e) => (e.key === "Enter" ? saveEdit() : e.key === "Escape" && cancelEdit())}
                               />
                               <div className="am-editRow">
                                 <span>Enter to save, Esc to cancel</span>
-                                <span className="am-editBtns">
-                                  <button type="button" className="am-cancel" onClick={() => setEditing(null)}>
-                                    Cancel
-                                  </button>
-                                  <button type="button" className="am-save" onClick={saveEdit}>
-                                    Save
-                                  </button>
-                                </span>
                               </div>
                             </div>
                           ) : (
-                            <div className="am-row" data-fresh={fresh === m.id}>
+                            <div className="am-row" data-fresh={fresh === m.id} data-forgot={st(m.id) === "forgot"} data-shrink={closed === m.id}>
                               {st(m.id) === "forgot" ? (
                                 <div className="am-forgot">
                                   <span>Forgot “{m.text}”</span>
@@ -310,6 +363,7 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
                                       <circle cx="6" cy="6" r="4" stroke="currentColor" transform="rotate(-90 6 6)" />
                                     </svg>
                                     Undo
+                                    <Seconds from={FORGET_MS / 1000} />
                                   </button>
                                 </div>
                               ) : (
@@ -319,7 +373,7 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
                                   </p>
                                   <span className="am-meta">From a chat · {m.date}</span>
                                   <div className="am-acts">
-                                    <button type="button" className="am-ib" data-focus="edit" aria-label={`Edit memory: ${m.text}`} onClick={() => { setEditing(m.id); setDraft(m.text); }}>
+                                    <button type="button" className="am-ib" data-focus="edit" aria-label={`Edit memory: ${m.text}`} onClick={() => { setClosed(null); setEditing(m.id); setDraft(m.text); }}>
                                       <Pencil size={14} />
                                     </button>
                                     <button type="button" className="am-ib" data-focus="forget" aria-label={`Forget memory: ${m.text}`} onClick={() => forget(m.id)}>
@@ -349,11 +403,14 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
               <input
                 autoFocus
                 value={addText}
-                placeholder="What should I remember?"
+                placeholder="Add memory"
                 onChange={(e) => setAddText(e.target.value)}
                 onKeyDown={(e) => (e.key === "Enter" ? commitAdd() : e.key === "Escape" && setAdding(false))}
-                onBlur={() => !addText && setAdding(false)}
+                onBlur={() => !addText && addNote.kind !== "sorting" && setAdding(false)}
               />
+              <button type="button" className="am-addBtn" data-show={!!addText && addNote.kind !== "sorting"} tabIndex={-1} onMouseDown={(e) => e.preventDefault()} onClick={commitAdd}>
+                Add
+              </button>
             </>
           ) : (
             <button type="button" onClick={() => setAdding(true)}>
@@ -361,6 +418,13 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
               Add memory
             </button>
           )}
+          <span className="am-addNote" data-kind={addNote.kind}>
+            <span data-n="sorting">Sorting into a group</span>
+            <span data-n="added">
+              <Check size={14} />
+              Added to {CATS.find((c) => c.id === addNote.cat)?.label}
+            </span>
+          </span>
         </div>
       </section>
     </div>
