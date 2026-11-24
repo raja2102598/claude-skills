@@ -300,8 +300,9 @@ export default function TraceWaterfall() {
     const pb = play.current;
     if (!pb) return;
     if (pb.t0 === null) pb.t0 = ts;
-    const next = Math.min(TOTAL, pb.base + (ts - pb.t0) * pb.rate);
-    if (next >= TOTAL) {
+    const next = Math.min(TOTAL, pb.base + Math.max(0, ts - pb.t0) * pb.rate);
+    if (next >= TOTAL - 0.5) {
+      // done (the half-ms slack absorbs float error so the end lands on the same frame as the reference)
       play.current = null;
       flushSync(() => {
         setP(TOTAL);
@@ -317,7 +318,9 @@ export default function TraceWaterfall() {
   const start = useCallback(
     (sweepMs: number) => {
       cancelAnimationFrame(raf.current);
-      play.current = { rate: TOTAL / sweepMs, t0: null, base: 0 };
+      // Anchored at the press, not at the first frame: the reference's first visible frame already shows one frame of
+      // progress (measured: playhead +1.2 px at 33 ms, hidden again at 6017 ms).
+      play.current = { rate: TOTAL / sweepMs, t0: performance.now(), base: 0 };
       setP(0);
       setPlaying(true);
       setPaused(false);

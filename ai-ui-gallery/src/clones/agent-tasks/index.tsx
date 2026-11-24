@@ -84,14 +84,19 @@ function planFrom(agent: Agent, from: number, at: number): Agent["plan"] {
 }
 
 function start(agent: Agent, at: number): Agent {
-  const total = agent.steps.length * STEP_MS;
+  const s = agent.schedule;
+  const plan: Agent["plan"] = s
+    ? s.map((t, i) => ({ at: t, kind: i === s.length - 1 ? ("done" as const) : ("step" as const) }))
+    : planFrom(agent, 0, at);
+  const total = plan[plan.length - 1].at - at;
   return {
     ...agent,
     status: "running",
     step: 0,
     timerFrom: at,
     ring: { p0: 0, t0: at + RING_LAG_MS, rate: 1 / total },
-    plan: planFrom(agent, 0, at),
+    plan,
+    schedule: undefined,
   };
 }
 
@@ -543,7 +548,8 @@ function AgentTasks({ startedAt }: { startedAt: number }) {
   useEffect(() => {
     let id = 0;
     const loop = () => {
-      const t = performance.now() - startedAt;
+      // +0.5 ms: a frame that lands on a scheduled time (on the capture's virtual clock) can read 999.99 ms.
+      const t = performance.now() - startedAt + 0.5;
       flushSync(() => {
         clock.set(t);
         if (t >= due.current) {

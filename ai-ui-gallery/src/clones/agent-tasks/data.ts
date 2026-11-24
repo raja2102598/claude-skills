@@ -41,6 +41,8 @@ export interface Agent {
   ring: Ring;
   /** Scheduled transitions, in run-clock ms. */
   plan: { at: number; kind: PlanKind }[];
+  /** Scripted demo run: absolute times of the step advances, then of "done" (used when the agent starts). */
+  schedule?: number[];
   question?: { text: string; options: [string, string] };
   error?: string;
   diff: Diff;
@@ -76,11 +78,12 @@ export function initialAgents(): Agent[] {
       step: 0,
       timerFrom: -48_000, // shows 0:48 at mount
       ring: { p0: 0.2377, t0: 0, rate: 0.07691 / 1000 },
+      // Measured on the reference: 2.6 s per step, with one 17 ms slip after the first step.
       plan: [
         { at: 2000, kind: "step" },
-        { at: 2000 + STEP_MS, kind: "step" },
-        { at: 2000 + 2 * STEP_MS, kind: "step" },
-        { at: 2000 + 3 * STEP_MS, kind: "done" },
+        { at: 4617, kind: "step" },
+        { at: 7217, kind: "step" },
+        { at: 9817, kind: "done" },
       ],
       diff: { add: 31, del: 9, files: 4, pr: 218 },
     },
@@ -101,7 +104,7 @@ export function initialAgents(): Agent[] {
       heldSeconds: 71,
       ring: { p0: 0.5, t0: 0, rate: 0 },
       plan: [],
-      question: { text: "Translate the legal pages too, or keep them in English?", options: ["Translate them", "Keep English"] },
+      question: { text: "Translate the legal pages as well?", options: ["Translate them", "Keep English"] },
       diff: { add: 212, del: 40, files: 11, pr: 219 },
     },
     {
@@ -152,6 +155,8 @@ export function initialAgents(): Agent[] {
       timerFrom: 0,
       ring: { p0: 0, t0: 0, rate: 0 },
       plan: [],
+      // Starts at 100 ms (a slot is free); steps measured on the reference.
+      schedule: [2700, 5317, 7917, 10517],
       diff: { add: 64, del: 0, files: 1, pr: 221 },
     },
   ];
