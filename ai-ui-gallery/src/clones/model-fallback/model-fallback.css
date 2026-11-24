@@ -1,0 +1,58 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&display=swap");
+
+.mf-root {
+  --mf-ink: #1c1917;
+  --mf-sub: #78716c;
+  --mf-faint: #a8a29e;
+  --mf-line: #e7e5e4;
+  --mf-blue: #2f5bea;
+  --mf-blue-bg: #e8eefd;
+  --mf-green: #15803d;
+  --mf-green-bg: #dcf5e4;
+  --mf-grey-bg: #ececea;
+  font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  color: var(--mf-ink);
+  width: 442px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 18px 18px 20px;
+  box-shadow: 0 0 0 1px rgb(28 25 23 / 0.05), 0 8px 28px rgb(28 25 23 / 0.07);
+}
+
+/* Incoming text: short rise + de-blur. Plain CSS so it behaves the same on the real and the virtual clock. */
+@keyframes mf-in {
+  from { opacity: 0; transform: translateY(5px); filter: blur(3px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes mf-roll-in {
+  from { opacity: 0; transform: translateY(70%); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes mf-roll-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(-70%); }
+}
+@keyframes mf-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes mf-pulse {
+  50% { opacity: 0.35; }
+}
+@keyframes mf-dots {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+.mf-in { animation: mf-in 280ms cubic-bezier(0.25, 0.1, 0.25, 1) both; }
+.mf-roll-in { animation: mf-roll-in 380ms cubic-bezier(0.25, 0.1, 0.25, 1) both; }
+.mf-roll-out { animation: mf-roll-out 380ms cubic-bezier(0.25, 0.1, 0.25, 1) both; position: absolute; left: 0; top: 0; }
+
+.mf-row { display: grid; grid-template-columns: 34px 1fr auto; column-gap: 12px; align-items: start; padding: 8px; border-radius: 12px; transition: background-color 300ms ease, opacity 300ms ease; }
+.mf-row[data-active="true"] { background: #f5f5f4; }
+.mf-sub { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 320ms cubic-bezier(0.25, 0.1, 0.25, 1); }
+.mf-sub[data-open="true"] { grid-template-rows: 1fr; }
+.mf-sub > div { overflow: hidden; }
+.mf-rail { position: absolute; left: 25px; width: 1px; background: var(--mf-line); transition: background-color 300ms ease; }
+.mf-rail[data-done="true"] { background: #44403c; }
+@media (prefers-reduced-motion: reduce) {
+  .mf-in, .mf-roll-in, .mf-roll-out { animation-duration: 1ms; }
+}
