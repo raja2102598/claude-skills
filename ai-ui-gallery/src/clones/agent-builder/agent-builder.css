@@ -40,7 +40,7 @@
 .ab-card {
   position: relative;
   width: 640px;
-  height: 816px;
+  height: 815px;
   display: flex;
   flex-direction: column;
   background: var(--ab-card);
@@ -141,7 +141,7 @@
 .ab-send[data-busy="true"] { background: #3a3833; color: #fff; }
 
 /* foot */
-.ab-foot { flex: none; height: 61px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-top: 1px solid var(--ab-hair); }
+.ab-foot { flex: none; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-top: 1px solid var(--ab-hair); }
 .ab-status { display: inline-flex; align-items: center; gap: 8px; color: var(--ab-ink-2); animation: ab-fade 220ms var(--ab-quint) both; }
 .ab-status svg { color: var(--ab-ok); }
 .ab-status[data-dirty="true"] svg { color: var(--ab-warn); }

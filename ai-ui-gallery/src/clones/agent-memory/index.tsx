@@ -74,7 +74,7 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
   const [adding, setAdding] = useState(false);
   const [addText, setAddText] = useState("");
   const [pct, setPct] = useState(62);
-  const [pill, setPill] = useState<"update" | "saved">("update");
+  const [pill, setPill] = useState<"update" | "added" | "saved">("update");
   const [saved, setSaved] = useState(true);
   const [history, setHistory] = useState(true);
   const timers = useRef<Record<string, number>>({});
@@ -106,11 +106,16 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
   const addFresh = useCallback(() => {
     setMems((m) => (m.some((x) => x.id === FRESH.id) ? m : [FRESH, ...m]));
     setEntered((e) => ({ ...e, [FRESH.id]: false }));
-    setPill("saved");
+    setPill("added");
     setPct((p) => p + 4);
     setFresh(FRESH.id);
-    requestAnimationFrame(() => requestAnimationFrame(() => setEntered((e) => ({ ...e, [FRESH.id]: true }))));
-    timers.current.fresh = window.setTimeout(() => setFresh(null), 60);
+    timers.current.enter = window.setTimeout(() => setEntered((e) => ({ ...e, [FRESH.id]: true })), 80);
+    timers.current.saved = window.setTimeout(() => setPill("saved"), 450);
+    timers.current.fresh = window.setTimeout(() => setFresh(null), 1500);
+    timers.current.scroll = window.setTimeout(
+      () => document.querySelector('[data-memory-id="fresh"]')?.scrollIntoView({ block: "nearest", behavior: "smooth" }),
+      1000,
+    );
   }, []);
   const commitAdd = () => {
     const text = addText.trim();
@@ -246,6 +251,11 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
                 <i>Noted: you prefer tabs over spaces</i>
                 <ArrowDown size={13} />
               </span>
+              <span data-l="added">
+                <BookmarkCheck size={14} />
+                <b>Added</b>
+                <i>you prefer tabs over spaces</i>
+              </span>
               <span data-l="saved">
                 <Check size={14} />
                 Saved to Preferences
@@ -366,7 +376,6 @@ export default function AgentMemoryClone() {
     window.addEventListener("reanimate:replay", replay);
     return () => window.removeEventListener("reanimate:replay", replay);
   }, []);
-  void BookmarkCheck;
   return (
     <div className="am-stage">
       <AgentMemory key={run} onUser={noop} />
