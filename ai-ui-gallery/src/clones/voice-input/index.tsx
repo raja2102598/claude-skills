@@ -1,4 +1,12 @@
-import { Fragment, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { flushSync } from "react-dom";
 import { ArrowUp, AudioLines, Mic, X } from "lucide-react";
 import {
@@ -43,10 +51,23 @@ import "./voice-input.css";
  * function of time and runs the same on reanimate's virtual clock as on a real one.
  */
 
-const COLORS = { soft: "#ebe8e1", dark: "#2b2823", ink: "#1e1c19", white: "#ffffff" };
+const COLORS = {
+  soft: "#ebe8e1",
+  dark: "#2b2823",
+  ink: "#1e1c19",
+  white: "#ffffff",
+};
 
-const TITLE: Record<Phase, string> = { idle: "Tap to speak", listening: "Listening…", speaking: "Nova is replying…" };
-const MIC_LABEL: Record<Phase, string> = { idle: "Start talking", listening: "Stop and send", speaking: "Interrupt and talk" };
+const TITLE: Record<Phase, string> = {
+  idle: "Tap to speak",
+  listening: "Listening…",
+  speaking: "Nova is replying…",
+};
+const MIC_LABEL: Record<Phase, string> = {
+  idle: "Start talking",
+  listening: "Stop and send",
+  speaking: "Interrupt and talk",
+};
 
 interface Model {
   auto: boolean;
@@ -63,7 +84,11 @@ interface Model {
   resetAt: number | null;
   cancelAt: number | null;
   replyAt: number | null;
-  next: { kind: "listen" | "speak" | "reset"; at: number; reply: boolean } | null;
+  next: {
+    kind: "listen" | "speak" | "reset";
+    at: number;
+    reply: boolean;
+  } | null;
 }
 
 const freshModel = (): Model => ({
@@ -84,7 +109,10 @@ const freshModel = (): Model => ({
 const wordsHeard = (m: Model, t: number) => {
   if (m.phase === "idle" && m.leaveListenAt === null) return 0;
   const until = m.leaveListenAt ?? t;
-  return Math.min(TRANSCRIPT.length, Math.max(0, Math.floor((until - m.listenAt) / WORD_EVERY_MS)));
+  return Math.min(
+    TRANSCRIPT.length,
+    Math.max(0, Math.floor((until - m.listenAt) / WORD_EVERY_MS)),
+  );
 };
 
 function setPhase(m: Model, phase: Phase, at: number) {
@@ -102,14 +130,22 @@ function listen(m: Model, at: number) {
   m.resetAt = null;
   m.replyAt = null;
   if (wasIdle) m.cancelAt = at;
-  m.next = m.auto ? { kind: "speak", at: at + SPEAK_AFTER_MS, reply: true } : null;
+  m.next = m.auto
+    ? { kind: "speak", at: at + SPEAK_AFTER_MS, reply: true }
+    : null;
 }
 
 function speak(m: Model, at: number) {
   m.wordsAtLeave = wordsHeard(m, at);
   m.leaveListenAt = at;
   setPhase(m, "speaking", at);
-  m.next = { kind: "reset", at: m.auto ? m.listenAt + RESET_AFTER_MS : at + (RESET_AFTER_MS - SPEAK_AFTER_MS), reply: true };
+  m.next = {
+    kind: "reset",
+    at: m.auto
+      ? m.listenAt + RESET_AFTER_MS
+      : at + (RESET_AFTER_MS - SPEAK_AFTER_MS),
+    reply: true,
+  };
 }
 
 function reset(m: Model, at: number, reply: boolean) {
@@ -120,7 +156,9 @@ function reset(m: Model, at: number, reply: boolean) {
   setPhase(m, "idle", at);
   m.resetAt = at;
   m.replyAt = reply ? at : null;
-  m.next = m.auto ? { kind: "listen", at: m.listenAt + LOOP_MS, reply: false } : null;
+  m.next = m.auto
+    ? { kind: "listen", at: m.listenAt + LOOP_MS, reply: false }
+    : null;
 }
 
 function advance(m: Model, t: number) {
@@ -137,13 +175,24 @@ function advance(m: Model, t: number) {
 const EXIT_LAG_MS = 1000 / 60;
 
 /** Enter/exit progress of something that appears at `enterAt` and leaves at `exitAt`; null when not mounted. */
-function presence(t: number, enterAt: number | null, exitAt: number | null, reduced: boolean) {
+function presence(
+  t: number,
+  enterAt: number | null,
+  exitAt: number | null,
+  reduced: boolean,
+) {
   if (enterAt === null || t < enterAt) return null;
   if (exitAt !== null && exitAt <= enterAt) return null;
-  const s = (ms: number, end?: number) => (reduced ? (ms > 0 ? 1 : 0) : spring(ms, end));
+  const s = (ms: number, end?: number) =>
+    reduced ? (ms > 0 ? 1 : 0) : spring(ms, end);
   if (exitAt === null || t < exitAt) {
     const dt = t - enterAt;
-    return { size: s(dt), opacity: Math.min(1, s(dt, SWAP_MS)), scale: 0.6 + 0.4 * s(dt, SWAP_MS), settled: dt >= 600 };
+    return {
+      size: s(dt),
+      opacity: Math.min(1, s(dt, SWAP_MS)),
+      scale: 0.6 + 0.4 * s(dt, SWAP_MS),
+      settled: dt >= 600,
+    };
   }
   const dt = t - exitAt - EXIT_LAG_MS;
   if (dt >= SWAP_MS) return null;
@@ -167,13 +216,26 @@ interface Layer<T> {
   out: boolean;
 }
 
-function swapLayers<T>(t: number, at: number, prev: T | null, cur: T, reduced: boolean): Layer<T>[] {
+function swapLayers<T>(
+  t: number,
+  at: number,
+  prev: T | null,
+  cur: T,
+  reduced: boolean,
+): Layer<T>[] {
   const dt = t - at;
-  if (prev === null || prev === cur || reduced || dt >= SWAP_MS) return [{ key: "cur", value: cur, k: 1, out: false }];
+  if (prev === null || prev === cur || reduced || dt >= SWAP_MS)
+    return [{ key: "cur", value: cur, k: 1, out: false }];
   const k = spring(dt, SWAP_MS);
   const ky = spring(dt, SLIDE_MS);
   return [
-    { key: `out-${at}`, value: prev, k: Math.max(0, 1 - k), ky: 1 - ky, out: true },
+    {
+      key: `out-${at}`,
+      value: prev,
+      k: Math.max(0, 1 - k),
+      ky: 1 - ky,
+      out: true,
+    },
     { key: `in-${at}`, value: cur, k, ky, out: false },
   ];
 }
@@ -205,7 +267,8 @@ export default function VoiceInput() {
     const tick = () => {
       const now = performance.now() - origin.current;
       advance(model.current, now);
-      if (bubbleInner.current) bubbleHeight.current = bubbleInner.current.offsetHeight;
+      if (bubbleInner.current)
+        bubbleHeight.current = bubbleInner.current.offsetHeight;
       flushSync(() => setT(now));
       raf = requestAnimationFrame(tick);
     };
@@ -220,7 +283,8 @@ export default function VoiceInput() {
     m.auto = false;
     m.next = m.next?.kind === "reset" && m.phase === "speaking" ? m.next : null;
     if (what === "cancel") return reset(m, now, false);
-    if (what === "send") return m.phase === "listening" ? speak(m, now) : undefined;
+    if (what === "send")
+      return m.phase === "listening" ? speak(m, now) : undefined;
     if (m.phase === "idle") return listen(m, now);
     if (m.phase === "speaking") return listen(m, now);
     return wordsHeard(m, now) > 0 ? speak(m, now) : reset(m, now, false);
@@ -234,22 +298,46 @@ export default function VoiceInput() {
 
   // Mic button: muted ↔ dark in 150 ms.
   const c = reduced ? 1 : easeColor(progress(t - m.activeAt, COLOR_MS));
-  const micBg = active ? mixHex(COLORS.soft, COLORS.dark, c) : mixHex(COLORS.dark, COLORS.soft, c);
-  const micFg = active ? mixHex(COLORS.ink, COLORS.white, c) : mixHex(COLORS.white, COLORS.ink, c);
+  const micBg = active
+    ? mixHex(COLORS.soft, COLORS.dark, c)
+    : mixHex(COLORS.dark, COLORS.soft, c);
+  const micFg = active
+    ? mixHex(COLORS.ink, COLORS.white, c)
+    : mixHex(COLORS.white, COLORS.ink, c);
 
   // Beam around the bar while listening.
   const fadeIn = easeBeam(progress(t - m.listenAt, BEAM_FADE_MS));
   const beamOpacity =
-    leftAt === null ? (active ? fadeIn : 0) : easeBeam(progress(leftAt - m.listenAt, BEAM_FADE_MS)) * (1 - easeBeam(progress(t - leftAt, BEAM_FADE_MS)));
-  const beamTurn = reduced ? 0.12 : (t - m.listenAt - BEAM_DELAY_MS) / BEAM_TURN_MS;
+    leftAt === null
+      ? active
+        ? fadeIn
+        : 0
+      : easeBeam(progress(leftAt - m.listenAt, BEAM_FADE_MS)) *
+        (1 - easeBeam(progress(t - leftAt, BEAM_FADE_MS)));
+  const beamTurn = reduced
+    ? 0.12
+    : (t - m.listenAt - BEAM_DELAY_MS) / BEAM_TURN_MS;
 
   // Bubble, Cancel and Send come and go with the measured spring.
-  const bubble = presence(t, words > 0 || (leftAt !== null && m.wordsAtLeave > 0) ? firstWordAt : null, m.resetAt, reduced);
+  const bubble = presence(
+    t,
+    words > 0 || (leftAt !== null && m.wordsAtLeave > 0) ? firstWordAt : null,
+    m.resetAt,
+    reduced,
+  );
   const cancel = presence(t, m.cancelAt, m.resetAt, reduced);
-  const send = presence(t, words > 0 || (leftAt !== null && m.wordsAtLeave > 0) ? firstWordAt : null, leftAt, reduced);
+  const send = presence(
+    t,
+    words > 0 || (leftAt !== null && m.wordsAtLeave > 0) ? firstWordAt : null,
+    leftAt,
+    reduced,
+  );
 
   const barsOn = active || (m.resetAt !== null && t < m.resetAt);
-  const hint = m.phase === "idle" && m.replyAt !== null && t - m.replyAt < REPLY_HOLD_MS ? REPLY : HINT;
+  const hint =
+    m.phase === "idle" && m.replyAt !== null && t - m.replyAt < REPLY_HOLD_MS
+      ? REPLY
+      : HINT;
   const shownWords = bubble ? (leftAt === null ? words : m.wordsAtLeave) : 0;
 
   const icons = swapLayers(t, m.phaseAt, m.prevPhase, m.phase, reduced);
@@ -264,22 +352,27 @@ export default function VoiceInput() {
               className="vi-bubble-wrap -mx-4"
               style={{
                 opacity: bubble.opacity,
-                height: bubble.settled ? "auto" : bubble.size * (bubbleHeight.current || 80),
+                height: bubble.settled
+                  ? "auto"
+                  : bubble.size * (bubbleHeight.current || 80),
                 transform: `translateY(${reduced ? 0 : 6 * (1 - spring(t - firstWordAt, SLIDE_MS))}px)`,
               }}
             >
               <div className="vi-bubble-pad" ref={bubbleInner}>
                 <div className="vi-bubble">
-                <p>
-                  {TRANSCRIPT.slice(0, shownWords).map((w, i) => (
-                    <Fragment key={i}>
-                      {i > 0 && " "}
-                      <Word ms={t - (m.listenAt + WORD_EVERY_MS * (i + 1))} reduced={reduced}>
-                        {w}
-                      </Word>
-                    </Fragment>
-                  ))}
-                </p>
+                  <p>
+                    {TRANSCRIPT.slice(0, shownWords).map((w, i) => (
+                      <Fragment key={i}>
+                        {i > 0 && " "}
+                        <Word
+                          ms={t - (m.listenAt + WORD_EVERY_MS * (i + 1))}
+                          reduced={reduced}
+                        >
+                          {w}
+                        </Word>
+                      </Fragment>
+                    ))}
+                  </p>
                 </div>
               </div>
             </div>
@@ -290,7 +383,9 @@ export default function VoiceInput() {
               <span className="vi-ring-fade" style={{ opacity: beamOpacity }}>
                 <span
                   className="vi-ring-cone"
-                  style={{ transform: `translate(-50%, -50%) rotate(${(beamTurn * 360).toFixed(2)}deg)` }}
+                  style={{
+                    transform: `translate(-50%, -50%) rotate(${(beamTurn * 360).toFixed(2)}deg)`,
+                  }}
                 />
               </span>
             </span>
@@ -312,9 +407,16 @@ export default function VoiceInput() {
                 <span
                   key={l.key}
                   className="vi-icon"
-                  style={{ opacity: Math.min(1, l.k), transform: `scale(${(0.5 + 0.5 * l.k).toFixed(4)})` }}
+                  style={{
+                    opacity: Math.min(1, l.k),
+                    transform: `scale(${(0.5 + 0.5 * l.k).toFixed(4)})`,
+                  }}
                 >
-                  {l.value === "speaking" ? <AudioLines size={20} strokeWidth={1.5} /> : <Mic size={20} strokeWidth={1.5} />}
+                  {l.value === "speaking" ? (
+                    <AudioLines size={20} strokeWidth={1.5} />
+                  ) : (
+                    <Mic size={20} strokeWidth={1.5} />
+                  )}
                 </span>
               ))}
             </button>
@@ -326,7 +428,10 @@ export default function VoiceInput() {
                     key={l.key}
                     style={{
                       opacity: Math.min(1, l.k),
-                      transform: l.ky === undefined ? undefined : `translateY(${(l.out ? -10 * (1 - l.ky) : 10 * (1 - l.ky)).toFixed(3)}px)`,
+                      transform:
+                        l.ky === undefined
+                          ? undefined
+                          : `translateY(${(l.out ? -10 * (1 - l.ky) : 10 * (1 - l.ky)).toFixed(3)}px)`,
                     }}
                   >
                     {TITLE[l.value]}
@@ -351,7 +456,9 @@ export default function VoiceInput() {
                   <span
                     key={i}
                     className="vi-bar"
-                    style={{ transform: `scaleY(${(reduced ? 0.55 * BAR_PEAKS[i] + 0.1 : barScale(i, t - m.listenAt)).toFixed(4)})` }}
+                    style={{
+                      transform: `scaleY(${(reduced ? 0.55 * BAR_PEAKS[i] + 0.1 : barScale(i, t - m.listenAt)).toFixed(4)})`,
+                    }}
                   />
                 ) : (
                   <span key={i} className="vi-dot" />
@@ -361,12 +468,22 @@ export default function VoiceInput() {
 
             <div className="vi-actions">
               {cancel && (
-                <PresenceButton label="Cancel" className="vi-btn-cancel" p={cancel} onClick={() => act("cancel")}>
+                <PresenceButton
+                  label="Cancel"
+                  className="vi-btn-cancel"
+                  p={cancel}
+                  onClick={() => act("cancel")}
+                >
                   <X size={16} strokeWidth={1.75} />
                 </PresenceButton>
               )}
               {send && (
-                <PresenceButton label="Send" className="vi-btn-send" p={send} onClick={() => act("send")}>
+                <PresenceButton
+                  label="Send"
+                  className="vi-btn-send"
+                  p={send}
+                  onClick={() => act("send")}
+                >
                   <ArrowUp size={16} strokeWidth={1.75} />
                 </PresenceButton>
               )}
@@ -384,12 +501,24 @@ export default function VoiceInput() {
   );
 }
 
-function Word({ ms, reduced, children }: { ms: number; reduced: boolean; children: ReactNode }) {
+function Word({
+  ms,
+  reduced,
+  children,
+}: {
+  ms: number;
+  reduced: boolean;
+  children: ReactNode;
+}) {
   const e = reduced ? 1 : easeOut(progress(ms, WORD_MS));
   const style: CSSProperties =
     e >= 1
       ? {}
-      : { opacity: e, filter: `blur(${(3 * (1 - e)).toFixed(3)}px)`, transform: `translateY(${(3 * (1 - e)).toFixed(3)}px)` };
+      : {
+          opacity: e,
+          filter: `blur(${(3 * (1 - e)).toFixed(3)}px)`,
+          transform: `translateY(${(3 * (1 - e)).toFixed(3)}px)`,
+        };
   return (
     <span className="inline-block" style={style}>
       {children}
@@ -416,7 +545,11 @@ function PresenceButton({
       aria-label={label}
       className={`vi-btn ${className}`}
       onClick={onClick}
-      style={{ width: 32 * p.size, opacity: p.opacity, transform: `scale(${p.scale.toFixed(4)})` }}
+      style={{
+        width: 32 * p.size,
+        opacity: p.opacity,
+        transform: `scale(${p.scale.toFixed(4)})`,
+      }}
     >
       {children}
     </button>
