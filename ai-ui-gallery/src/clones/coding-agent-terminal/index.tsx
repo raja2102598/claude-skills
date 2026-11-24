@@ -45,7 +45,7 @@ const COMMANDS = [
 const QUESTION = "Run the checks, then build the app.";
 const ANSWER = "Lint and tests pass, and the build compiled both routes.".split(" ");
 
-// ms after the click (measured on the reference): first output line at 33, then one line per 200 ms
+// ms after the click (measured on the reference): one output line per 200 ms from the click, each command ends 33 ms after its last line's slot
 const T = { first: 33, line: 200, word: 20 };
 
 interface RunState {
@@ -221,9 +221,9 @@ function Demo({ autoplay }: { autoplay: boolean }) {
     let before = 0;
     COMMANDS.forEach((c, ci) => {
       const start = ci === 0 ? 0 : T.first + T.line * before;
-      if (ci > 0) at(start, (s) => ({ ...s, lines: s.lines.map((n, i) => (i === ci ? 0 : n)) }));
+      if (ci > 0) at(start, (s) => ({ ...s, lines: s.lines.map((n, i) => (i === ci && n < 0 ? 0 : n)) }));
       c.output.forEach((_, k) => {
-        at(T.first + T.line * (before + k), (s) => ({ ...s, lines: s.lines.map((n, i) => (i === ci ? k + 1 : n)) }));
+        at(T.line * (before + k), (s) => ({ ...s, lines: s.lines.map((n, i) => (i === ci ? k + 1 : n)) }));
       });
       before += c.output.length;
       at(T.first + T.line * before, (s) => ({ ...s, done: s.done.map((d, i) => d || i === ci) }));
