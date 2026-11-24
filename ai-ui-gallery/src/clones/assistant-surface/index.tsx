@@ -103,7 +103,7 @@ export default function AssistantSurface() {
         <Bot className="as-ico-bot" />
         <ChevronDown className="as-ico-chev" />
       </button>
-      <span className="as-tip" aria-hidden="true">
+      <span className="as-tip" key={open ? "o" : "c"} data-flash={!open ? "" : undefined} aria-hidden="true">
         {open ? "Close Assistant" : "Open Assistant"}
       </span>
     </div>

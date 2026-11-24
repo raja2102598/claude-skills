@@ -71,7 +71,7 @@ export default function ThreadList() {
         return cs.filter((c) => c.id !== id);
       });
       setRemoving(null);
-    }, 350);
+    }, 390);
   }, [dismissToast]);
 
   const undo = useCallback(() => {

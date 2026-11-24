@@ -38,7 +38,7 @@
   padding: 0;
   transition: transform 120ms ease, background-color 150ms;
 }
-.as-launcher:hover { background: oklch(0.94 0.004 106); }
+.as-launcher:hover { background: var(--as-bg); }
 .as-launcher:active { transform: scale(0.94); }
 .as-launcher:focus-visible { outline: 2px solid oklch(0.145 0.004 106 / 0.4); outline-offset: 2px; }
 .as-launcher svg { grid-area: 1 / 1; width: 20px; height: 20px; transition: transform 200ms var(--as-ease), opacity 200ms var(--as-ease); }
@@ -160,4 +160,7 @@
   border-radius: 2px;
   z-index: -1;
 }
-.as-launcher:hover ~ .as-tip, .as-launcher:focus-visible ~ .as-tip { opacity: 1; transform: none; }
+.as-launcher:hover ~ .as-tip, .as-launcher:focus-visible ~ .as-tip { opacity: 1; transform: none; transition-delay: 350ms; }
+/* the label shows briefly as the panel closes (pointer is on the launcher), then fades while the icon swaps */
+.as-tip[data-flash] { animation: as-tip-flash 200ms ease-out both; }
+@keyframes as-tip-flash { 0% { opacity: 1; transform: none; } 25% { opacity: 1; } 100% { opacity: 0; transform: none; } }

@@ -23,8 +23,8 @@
 .tl-group h4 { margin: 0; padding: 12px 10px 4px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tl-fg2); }
 .tl-group ul { list-style: none; margin: 0; padding: 0; }
 .tl-item { height: 36px; margin-bottom: 2px; overflow: hidden; }
-.tl-item.tl-in { animation: tl-grow 230ms cubic-bezier(.22,1,.36,1) both; }
-.tl-item.tl-out { animation: tl-fade 170ms ease-out forwards, tl-collapse 200ms cubic-bezier(.22,1,.36,1) 150ms forwards; }
+.tl-item.tl-in { animation: tl-grow 230ms ease-out both; }
+.tl-item.tl-out { animation: tl-fade 190ms ease-out forwards, tl-collapse 230ms ease-out 160ms forwards; }
 @keyframes tl-grow { from { height: 0; opacity: 0; margin-bottom: 0; } to { height: 36px; opacity: 1; margin-bottom: 2px; } }
 @keyframes tl-fade { to { opacity: 0; } }
 @keyframes tl-collapse { to { height: 0; margin-bottom: 0; } }
