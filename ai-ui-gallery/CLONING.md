@@ -18,9 +18,9 @@ several catalogs. For each concept:
    - motion quality
    - how cleanly it reads as an AI/agent pattern
 
-   When two candidates are close, prefer the one with a verified open-source license, because only
-   that one can be cloned pixel for pixel. Pick **one** winner. Pick a second only when the concept
-   holds two genuinely different components rather than variants of one, and say why.
+   License plays no part in the choice: the best candidate wins, whichever catalog it comes from.
+   Pick **one** winner. Pick a second only when the concept holds two genuinely different
+   components rather than variants of one, and say why.
 3. **Clone the winner with the `reanimate` skill.** Invoke the skill and follow its workflow: scope,
    capture, spec, build, verify, and repeat for up to 5 rounds.
 4. **Record the selection** (see Output).
