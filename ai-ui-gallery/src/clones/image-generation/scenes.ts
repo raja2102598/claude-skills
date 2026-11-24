@@ -63,15 +63,15 @@ function skyline(ctx: CanvasRenderingContext2D, S: number, base: number, amp: nu
 function lake(ctx: CanvasRenderingContext2D, S: number, seed: number) {
   const horizon = 0.6;
   ctx.fillStyle = linear(ctx, 0, horizon * S, [
-    [0, "#26315f"],
-    [0.42, "#5f5a92"],
-    [0.78, "#d99a86"],
-    [1, "#f4cfa4"],
+    [0, "#6f8fc4"],
+    [0.45, "#a9bedc"],
+    [0.8, "#ead7c6"],
+    [1, "#f6dcb8"],
   ]);
   ctx.fillRect(0, 0, S, horizon * S);
   const glow = ctx.createRadialGradient(0.66 * S, 0.5 * S, 0, 0.66 * S, 0.5 * S, 0.42 * S);
-  glow.addColorStop(0, "rgba(255, 222, 180, 0.65)");
-  glow.addColorStop(1, "rgba(255, 222, 180, 0)");
+  glow.addColorStop(0, "rgba(255, 232, 196, 0.6)");
+  glow.addColorStop(1, "rgba(255, 232, 196, 0)");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, S, horizon * S);
   // thin clouds
@@ -79,26 +79,26 @@ function lake(ctx: CanvasRenderingContext2D, S: number, seed: number) {
   for (let i = 0; i < 7; i++) {
     const y = (0.08 + r() * 0.3) * S;
     const x = r() * S;
-    ctx.fillStyle = `rgba(255, 214, 200, ${0.08 + r() * 0.1})`;
+    ctx.fillStyle = `rgba(255, 250, 244, ${0.18 + r() * 0.2})`;
     ctx.beginPath();
     ctx.ellipse(x, y, (0.15 + r() * 0.2) * S, 0.012 * S, -0.05, 0, Math.PI * 2);
     ctx.fill();
   }
   const far = ridge(seed + 1);
-  skyline(ctx, S, 0.52, 0.06, (x) => far(x) + 0.4, "rgba(132, 124, 172, 0.85)");
+  skyline(ctx, S, 0.52, 0.06, (x) => far(x) + 0.4, "rgba(146, 158, 196, 0.85)");
   // the lit summit
   const peak = ridge(seed + 2, 3);
   const summit = (x: number) => Math.max(0, 1 - Math.abs(x - 0.56) / 0.2) ** 1.6 * 2.2 + peak(x) * 0.35 + 0.35;
   const rock = ctx.createLinearGradient(0.36 * S, 0, 0.76 * S, 0);
-  rock.addColorStop(0, "#4a3d58");
-  rock.addColorStop(0.5, "#7d4c4a");
-  rock.addColorStop(0.62, "#e08257");
-  rock.addColorStop(1, "#b76a4e");
+  rock.addColorStop(0, "#6d6077");
+  rock.addColorStop(0.5, "#9c6152");
+  rock.addColorStop(0.62, "#ef9a62");
+  rock.addColorStop(1, "#c97d57");
   skyline(ctx, S, 0.56, 0.11, summit, rock);
   const mid = ridge(seed + 3);
-  skyline(ctx, S, 0.585, 0.035, (x) => mid(x) + 0.3, "#3d3a55");
+  skyline(ctx, S, 0.585, 0.035, (x) => mid(x) + 0.3, "#5b6378");
   // treeline
-  ctx.fillStyle = "#1c2724";
+  ctx.fillStyle = "#22362d";
   ctx.beginPath();
   ctx.moveTo(0, S);
   const tr = rng(seed + 4);
@@ -112,8 +112,8 @@ function lake(ctx: CanvasRenderingContext2D, S: number, seed: number) {
   ctx.fill();
   // water with a soft mirror of the sky and summit
   ctx.fillStyle = linear(ctx, horizon * S, S, [
-    [0, "#5a6f97"],
-    [1, "#1b2740"],
+    [0, "#8fb9bd"],
+    [1, "#2f5d66"],
   ]);
   ctx.fillRect(0, horizon * S + 0.012 * S, S, S);
   ctx.save();
@@ -129,7 +129,7 @@ function lake(ctx: CanvasRenderingContext2D, S: number, seed: number) {
   }
   // foreground shore
   const shore = ridge(seed + 5);
-  skyline(ctx, S, 0.97, 0.06, (x) => shore(x) + (1 - x) * 1.6, "#2a2a26");
+  skyline(ctx, S, 0.97, 0.06, (x) => shore(x) + (1 - x) * 1.6, "#3b3a30");
 }
 
 function dunes(ctx: CanvasRenderingContext2D, S: number, seed: number) {
