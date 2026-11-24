@@ -76,6 +76,9 @@ src/clones/<slug>/*              any other files the clone needs (clone-local CS
   commands. From `ai-ui-gallery/`, start `npx vite --port <5200 + a random number> --strictPort` in the
   background, render your clone at `http://127.0.0.1:<port>/c/<slug>`, and stop the server when you finish.
   Use your port wherever this brief says 5173.
+- **Shared scratchpad:** every agent sees the same scratchpad directory, so prefix any scratch file
+  with your slug (`<slug>-port`, `<slug>-vite.pid`) or keep it in `.reanimate/<slug>/`. Stop only a
+  process you started, by the PID you recorded yourself; never by a PID read from a generic file name.
 - **Warm the page before every clone capture.** The dev server's Tailwind only learns a file's classes
   once Vite has transformed that file, so the first load of a new or edited clone renders unstyled and
   the CSS arrives mid-capture. Run
