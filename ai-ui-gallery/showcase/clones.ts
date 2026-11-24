@@ -319,7 +319,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "ai-avatar",
     load: () => import("../src/clones/ai-avatar/index.tsx"),
     meta: () => import("../src/clones/ai-avatar/meta.ts"),
-    reference: "Arc UI · AI mascot", candidates: 2, rounds: 3, timing: "6 state changes within 50 ms", runnerUp: "Libraries.dev Bot avatars",
+    reference: "Arc UI · AI mascot", candidates: 2, rounds: 5, timing: "state changes on the same frame", runnerUp: "Libraries.dev Bot avatars",
   },
   {
     slug: "ai-hero",
