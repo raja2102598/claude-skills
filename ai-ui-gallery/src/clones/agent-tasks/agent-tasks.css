@@ -1,0 +1,142 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+/* Own palette: warm graphite with a violet running ring. Motion-faithful clone, so nothing here is copied. */
+.at-root {
+  --at-bg: #131211;
+  --at-card: #1b1a18;
+  --at-card-border: #2a2825;
+  --at-list: #131211;
+  --at-line: #252320;
+  --at-chip: #262421;
+  --at-fg: #eeeae3;
+  --at-muted: #8e897f;
+  --at-faint: #5d5952;
+  --at-run: #a18cff;
+  --at-track: #2c2a26;
+  --at-needs: #f3b23c;
+  --at-needs-fg: #f6c766;
+  --at-fail: #ff6a5f;
+  --at-fail-fg: #ff8c83;
+  --at-done: #46cf9b;
+  --at-add: #5fe0ad;
+  --at-del: #ff8077;
+  --at-primary: #7a68f2;
+  --at-primary-hover: #8a7af5;
+  /* easeOutExpo: the subtitle roll, panel height, chevron */
+  --at-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  /* spring (omega 28.9/s, damping ratio 0.94) sampled over 300 ms: the marker pop. Fitted to the reference's
+     measured curve, max error 0.0012. */
+  --at-spring: linear(
+    0, 0.0349 3.33%, 0.1169 6.67%, 0.2211 10%, 0.3314 13.33%, 0.4383 16.67%, 0.5363 20%, 0.6229 23.33%,
+    0.6973 26.67%, 0.7599 30%, 0.8117 33.33%, 0.8538 36.67%, 0.8876 40%, 0.9144 43.33%, 0.9355 46.67%,
+    0.9518 50%, 0.9644 53.33%, 0.974 56.67%, 0.9812 60%, 0.9866 63.33%, 0.9906 66.67%, 0.9935 70%,
+    0.9957 73.33%, 0.9972 76.67%, 0.9982 80%, 0.9989 83.33%, 0.9994 86.67%, 0.9997 90%, 1 93.33%, 1
+  );
+  font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  color: var(--at-fg);
+  -webkit-font-smoothing: antialiased;
+}
+
+.at-mono {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Short opacity / blur / transform swaps run as CSS keyframes, so they behave the same on the real clock and on
+ * reanimate's virtual clock. Timings are the reference's (spec rows 6-8); the 16 ms delay matches its one-frame
+ * lag between the state change and the first animated frame.
+ */
+.at-sub-in {
+  animation: at-sub-in 300ms var(--at-expo) 16ms both;
+}
+.at-sub-out {
+  animation: at-sub-out 300ms var(--at-expo) 16ms both;
+}
+@keyframes at-sub-in {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+@keyframes at-sub-out {
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    filter: blur(2px);
+    transform: translateY(-16px);
+  }
+}
+
+.at-mk-in {
+  animation: at-mk-in 300ms var(--at-spring) 16ms both;
+}
+.at-mk-out {
+  animation: at-mk-out 120ms cubic-bezier(0.4, 0, 1, 1) 16ms both;
+}
+@keyframes at-mk-in {
+  from {
+    opacity: 0;
+    filter: blur(3px);
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+@keyframes at-mk-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+/* The needs-you dot: a ring that grows and fades once a second. */
+@keyframes at-ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+.at-ping {
+  animation: at-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.at-chevron {
+  transition: transform 300ms var(--at-expo);
+}
+
+.at-tone {
+  transition-property: color, background-color, border-color;
+  transition-duration: 200ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .at-sub-in,
+  .at-sub-out,
+  .at-mk-in,
+  .at-mk-out {
+    animation-duration: 1ms;
+  }
+  .at-ping {
+    animation: none;
+  }
+}

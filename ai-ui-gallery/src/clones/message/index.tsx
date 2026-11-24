@@ -8,7 +8,7 @@ import {
   type RefObject,
 } from "react";
 import { flushSync } from "react-dom";
-import { Check, CircleAlert, CircleCheck, Copy, LoaderCircle, Sparkle, ThumbsDown, ThumbsUp, X } from "lucide-react";
+import { Check, CircleAlert, Copy, LoaderCircle, Sparkle, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import "./message.css";
 
 /*
@@ -427,7 +427,10 @@ function FeedbackForm({
 function Thanks() {
   return (
     <div className="mf-thanks" data-mf="thanks">
-      <CircleCheck size={16} strokeWidth={2} className="mf-thanks-icon" />
+      {/* the check draws itself from the short arm, 100ms after the view swaps in (250ms, quint-out) */}
+      <svg className="mf-thanks-icon" width={16} height={16} viewBox="0 0 24 24" fill="none" aria-hidden>
+        <path d="M5 12.5l4.5 4.5L19 7.5" pathLength={1} stroke="currentColor" strokeWidth={2.25} strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
       <span className="mf-thanks-title">Feedback received</span>
       <span className="mf-thanks-muted">Demo only, nothing left this page.</span>
     </div>

@@ -232,8 +232,12 @@
 
 /* Copy → check: the leaving glyph fades out and shrinks to 0.7 over 100ms (quint-out), the entering one fades in over
    100ms and springs from 0.7 to 1 (critically damped, ω = 26 rad/s, sampled into --mf-spring). */
+/* The reference flips to "copied" one frame after the click, so its colour change starts 16ms late. */
 .mf-copy {
-  transition: color 150ms var(--mf-quint);
+  transition:
+    background-color 150ms var(--mf-quint),
+    color 150ms var(--mf-quint) 16ms,
+    transform 100ms var(--mf-quint);
 }
 
 .mf-copy[data-copied="true"] {
@@ -612,6 +616,18 @@
   left: 0;
   top: 8px;
   color: var(--mf-ok);
+}
+
+.mf-thanks-icon path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: mf-draw 250ms var(--mf-quint) 100ms both;
+}
+
+@keyframes mf-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 .mf-thanks-title {

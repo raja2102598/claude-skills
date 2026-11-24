@@ -1,0 +1,675 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap");
+
+.at-card {
+  --at-ink: #141823;
+  --at-secondary: #535a6b;
+  --at-muted: #8b90a0;
+  --at-faint: #a9adba;
+  --at-border: #e5e7ed;
+  --at-grid: #f3f4f7;
+  --at-surface: #ffffff;
+  --at-surface-muted: #f5f6f9;
+  --at-success: #16916a;
+  --at-danger: #d23f5c;
+  --at-lead: #5d6474;
+  --at-s1: #1488c9;
+  --at-s2: #7a4fd6;
+  --at-s3: #e08a1e;
+  --at-s4: #16a39a;
+  --at-tint: 26%;
+  --at-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --at-ease-in: cubic-bezier(0.16, 1, 0.3, 1);
+  --at-ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --at-row: 44px;
+  --at-bar: 16px;
+  --at-rows-h: 226px;
+
+  box-sizing: border-box;
+  width: 669px;
+  border: 1px solid var(--at-border);
+  border-radius: 24px;
+  background: var(--at-surface);
+  color: var(--at-ink);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+.at-card *,
+.at-card *::before,
+.at-card *::after {
+  box-sizing: border-box;
+}
+.at-inner {
+  padding: 18px 0;
+  display: grid;
+  gap: 16px;
+}
+
+/* Header ---------------------------------------------------------------------------------------------------- */
+.at-header {
+  padding: 0 20px;
+  display: grid;
+  gap: 2px;
+}
+.at-title {
+  margin: 0;
+  font-size: 15px;
+  line-height: 17px;
+  font-weight: 500;
+}
+.at-status {
+  display: grid;
+  color: var(--at-secondary);
+}
+.at-layer {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 100ms var(--at-ease),
+    visibility 0s linear 100ms;
+}
+.at-layer[data-on] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 150ms var(--at-ease-in),
+    visibility 0s;
+}
+.at-word {
+  display: inline-grid;
+  color: var(--at-ink);
+}
+.at-word > span {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity 100ms var(--at-ease);
+}
+.at-word > span[data-on] {
+  opacity: 1;
+  transition: opacity 150ms var(--at-ease-in);
+}
+.at-sep {
+  margin: 0 4px;
+  color: var(--at-faint);
+}
+.at-val {
+  color: var(--at-ink);
+}
+.at-count {
+  display: inline-grid;
+  justify-items: end;
+  font-variant-numeric: tabular-nums;
+}
+.at-count > * {
+  grid-area: 1 / 1;
+}
+.at-count > [aria-hidden] {
+  visibility: hidden;
+}
+.at-unit {
+  margin-left: 4px;
+}
+.at-done-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  color: var(--at-success);
+}
+.at-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Shimmering "Running": a lighter band sweeps across ink text every 2 s. */
+.at-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    var(--at-ink) 0%,
+    var(--at-ink) 38%,
+    color-mix(in oklab, var(--at-ink) 35%, white) 50%,
+    var(--at-ink) 62%,
+    var(--at-ink) 100%
+  );
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: at-shimmer 2s linear infinite;
+}
+@keyframes at-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0% 0;
+  }
+}
+
+/* Body: labels column + plot ----------------------------------------------------------------------------------- */
+.at-body {
+  position: relative;
+  display: grid;
+  grid-template-columns: 176px 1fr;
+  height: 256px;
+}
+.at-labels {
+  padding: 6px 12px 30px 20px;
+}
+.at-label {
+  position: relative;
+  height: var(--at-row);
+  padding: 4px 0 0 18px;
+}
+.at-dot {
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--c);
+}
+.at-name {
+  display: block;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+}
+.at-model {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--at-muted);
+  white-space: nowrap;
+}
+.at-model svg {
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+
+.at-track {
+  position: relative;
+  padding: 0 20px 0 12px;
+}
+.at-plot {
+  position: relative;
+  height: 100%;
+}
+.at-grid {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--at-rows-h);
+  pointer-events: none;
+}
+.at-gridline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  margin-left: -0.5px;
+  background: var(--at-grid);
+}
+.at-links,
+.at-ports {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.at-links {
+  z-index: 1;
+}
+.at-ports {
+  z-index: 3;
+}
+.at-row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--at-row);
+  z-index: 2;
+}
+
+/* Spans ---------------------------------------------------------------------------------------------------------- */
+.at-span {
+  --fill: color-mix(in oklab, var(--c) var(--at-tint), var(--at-surface));
+  position: absolute;
+  top: calc((var(--at-row) - var(--at-bar)) / 2);
+  height: var(--at-bar);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: var(--fill);
+  color: var(--at-surface);
+  cursor: pointer;
+  transition: opacity 150ms var(--at-ease);
+}
+.at-span[data-kind="tool"] {
+  --fill: var(--c);
+}
+.at-span[data-kind="waiting"] {
+  background:
+    repeating-linear-gradient(-45deg, color-mix(in oklab, var(--c) 32%, transparent) 0 1px, transparent 1px 5px),
+    color-mix(in oklab, var(--c) 5%, var(--at-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--c) 22%, transparent);
+}
+.at-span:hover {
+  --fill: color-mix(in oklab, var(--c) calc(var(--at-tint) + 12%), var(--at-surface));
+}
+.at-span[data-kind="tool"]:hover {
+  --fill: color-mix(in oklab, var(--c) 85%, var(--at-ink));
+}
+.at-span[data-active] {
+  border-top-right-radius: 1.5px;
+  border-bottom-right-radius: 1.5px;
+  box-shadow: inset -2px 0 0 var(--c);
+}
+.at-span[data-kind="tool"][data-active] {
+  box-shadow: inset -2px 0 0 color-mix(in oklab, var(--c) 68%, var(--at-ink));
+}
+.at-span[data-kind="waiting"][data-active] {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--c) 22%, transparent),
+    inset -2px 0 0 var(--c);
+}
+/* While a thinking or tool span runs, a 28 px highlight sweeps through it: 70 % of a 1.5 s cycle, then rests. */
+.at-span[data-active][data-playing]:not([data-kind="waiting"])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5), transparent) no-repeat;
+  background-size: 28px 100%;
+  animation: at-sweep 1.5s var(--at-ease-io) infinite;
+}
+@keyframes at-sweep {
+  0% {
+    background-position: -28px 0;
+  }
+  70%,
+  100% {
+    background-position: calc(100% + 28px) 0;
+  }
+}
+.at-span[data-failed] {
+  background: color-mix(in oklab, var(--at-danger) 13%, var(--at-surface));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--at-danger) 52%, transparent);
+  color: var(--at-danger);
+}
+.at-span[data-dim] {
+  opacity: 0.28;
+}
+.at-span-icon {
+  width: 11px;
+  height: 11px;
+  animation: at-fade-in 150ms var(--at-ease-in);
+}
+.at-span:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--c) 60%, var(--at-ink));
+  outline-offset: 1px;
+}
+
+/* Handoff links: an L from the planner's bar to an agent's row, drawn with a clip-path reveal. */
+.at-link {
+  position: absolute;
+  top: 36px;
+  border: 0 solid var(--c);
+  transition: opacity 150ms var(--at-ease);
+}
+.at-link[data-dir="out"] {
+  border-left-width: 1.5px;
+  border-bottom-width: 1.5px;
+  border-bottom-left-radius: 7px;
+  animation: at-draw-down 360ms var(--at-ease) backwards;
+}
+.at-link[data-dir="in"] {
+  border-right-width: 1.5px;
+  border-bottom-width: 1.5px;
+  border-bottom-right-radius: 7px;
+  animation: at-draw-up 360ms var(--at-ease) backwards;
+}
+@keyframes at-draw-down {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes at-draw-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+.at-port {
+  position: absolute;
+  top: 36px;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 0 1.5px var(--at-surface);
+  transition: opacity 150ms var(--at-ease);
+  animation: at-pop 150ms var(--at-ease-in) var(--delay, 0ms) backwards;
+}
+@keyframes at-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.at-plot[data-trace] .at-link:not([data-hot]),
+.at-plot[data-trace] .at-port:not([data-hot]) {
+  opacity: 0.16;
+}
+
+.at-playhead {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  width: 1px;
+  height: var(--at-rows-h);
+  margin-left: -0.5px;
+  background: var(--at-ink);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 200ms var(--at-ease);
+}
+.at-playhead[data-settled] {
+  opacity: 0;
+}
+
+/* Axis + scrub knob */
+.at-axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--at-rows-h);
+  height: 30px;
+  border-top: 1px solid var(--at-border);
+  cursor: pointer;
+  touch-action: none;
+}
+.at-tick {
+  position: absolute;
+  top: 9px;
+  transform: translateX(-50%);
+  color: var(--at-muted);
+  font-size: 12px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.at-knob {
+  position: absolute;
+  top: -1px;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%;
+  background: var(--at-ink);
+  box-shadow: 0 0 0 2px var(--at-surface);
+  outline: none;
+  transition: transform 150ms var(--at-ease);
+}
+.at-knob:focus-visible,
+.at-knob[data-active],
+.at-axis:not([data-live]):hover .at-knob {
+  transform: scale(1.3);
+}
+
+/* Hover card */
+.at-card-layer {
+  position: absolute;
+  z-index: 20;
+  width: min(280px, 100% - 16px);
+  pointer-events: none;
+  animation: at-card-in 150ms var(--at-ease-in);
+}
+@keyframes at-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.at-tip {
+  display: grid;
+  gap: 3px;
+  padding: 11px 13px;
+  border: 1px solid var(--at-border);
+  border-radius: 14px;
+  background: var(--at-surface);
+  box-shadow:
+    0 18px 44px rgb(16 20 34 / 0.11),
+    0 3px 10px rgb(16 20 34 / 0.05);
+}
+.at-tip-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.at-tip-head b {
+  font-weight: 500;
+}
+.at-tip-head span {
+  color: var(--at-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.at-tip-label {
+  margin: 0;
+}
+.at-tip-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  color: var(--at-secondary);
+  font-size: 12px;
+}
+.at-tip-meta svg {
+  width: 12px;
+  height: 12px;
+}
+.at-tip-note {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--at-danger);
+  font-size: 12px;
+}
+
+/* Footer: transport + legend ---------------------------------------------------------------------------------- */
+.at-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 40px;
+  padding: 0 20px;
+}
+.at-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.at-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--at-secondary);
+  cursor: pointer;
+  transition:
+    background-color 150ms var(--at-ease),
+    color 150ms var(--at-ease);
+}
+.at-btn:hover {
+  background: var(--at-surface-muted);
+  color: var(--at-ink);
+}
+.at-btn[data-variant="secondary"] {
+  border-color: var(--at-border);
+  background: var(--at-surface);
+  color: var(--at-ink);
+}
+.at-btn[data-variant="secondary"]:hover {
+  background: var(--at-surface-muted);
+}
+.at-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.at-glyph {
+  display: grid;
+}
+.at-glyph > svg {
+  grid-area: 1 / 1;
+  transition: opacity 100ms var(--at-ease);
+}
+.at-glyph .at-play {
+  translate: 0.5px;
+}
+.at-glyph .at-pause {
+  opacity: 0;
+}
+.at-glyph[data-playing] .at-play {
+  opacity: 0;
+}
+.at-glyph[data-playing] .at-pause,
+.at-glyph:not([data-playing]) .at-play {
+  opacity: 1;
+  transition-duration: 150ms;
+}
+.at-seg {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--at-border);
+  border-radius: 14px;
+  background: var(--at-surface-muted);
+}
+.at-seg-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  height: 32px;
+  border: 1px solid var(--at-border);
+  border-radius: 10px;
+  background: var(--at-surface);
+  transition:
+    transform 200ms var(--at-ease),
+    width 200ms var(--at-ease);
+}
+.at-seg button {
+  position: relative;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--at-muted);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 150ms var(--at-ease);
+}
+.at-seg button[aria-pressed="true"] {
+  color: var(--at-ink);
+}
+.at-legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--at-secondary);
+  font-size: 12px;
+  line-height: 17px;
+  white-space: nowrap;
+}
+.at-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.at-swatch {
+  width: 14px;
+  height: 8px;
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--at-lead) var(--at-tint), var(--at-surface));
+}
+.at-swatch[data-kind="tool"] {
+  background: var(--at-lead);
+}
+.at-swatch[data-kind="waiting"] {
+  background:
+    repeating-linear-gradient(-45deg, color-mix(in oklab, var(--at-lead) 40%, transparent) 0 1px, transparent 1px 4px),
+    var(--at-surface);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--at-lead) 30%, transparent);
+}
+.at-legend svg {
+  width: 13px;
+  height: 13px;
+}
+.at-legend .at-failed-icon {
+  color: var(--at-danger);
+}
+
+@keyframes at-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .at-card *,
+  .at-card *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .at-shimmer {
+    color: var(--at-ink);
+    background: none;
+  }
+}
