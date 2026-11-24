@@ -26,24 +26,25 @@
   animation: tc-fade-in 150ms var(--tc-ease-standard) both;
 }
 
-/* ---------- shimmer: a 4.4em ink band sweeps left → right across the label cell ----------
-   The image is twice the cell wide with the band ending at its middle, so background-position 100% → 0% moves the
-   band from just left of the cell to its right edge: one pass is 1800 ms, then it rests 600 ms (2400 ms cycle). */
+/* ---------- shimmer: a 4.4em band of the label's own colour sweeps left → right across the label cell ----------
+   The label is drawn in a dim base colour. The gradient image is (2 × cell + 4.4em) wide with the band centred in it,
+   so background-position 100% → 0% carries the band from just left of the cell (-4.4em) to just past its right edge:
+   one pass is 1800 ms (cell + band), then it rests 600 ms (2400 ms cycle). */
 .tc-shimmer {
-  --tc-sh-base: color-mix(in oklab, var(--tc-ink) 12%, var(--tc-muted));
+  --tc-sh-base: color-mix(in oklab, currentColor 12%, var(--tc-muted));
   background-image: linear-gradient(
     90deg,
     var(--tc-sh-base) 0,
-    var(--tc-sh-base) calc(50% - 4.4em),
-    color-mix(in oklab, var(--tc-ink) 50%, var(--tc-sh-base)) calc(50% - 3.3em),
-    color-mix(in oklab, var(--tc-ink) 90%, var(--tc-sh-base)) calc(50% - 2.64em),
-    var(--tc-ink) calc(50% - 2.2em),
-    color-mix(in oklab, var(--tc-ink) 90%, var(--tc-sh-base)) calc(50% - 1.76em),
-    color-mix(in oklab, var(--tc-ink) 50%, var(--tc-sh-base)) calc(50% - 1.1em),
-    var(--tc-sh-base) 50%,
+    var(--tc-sh-base) calc(50% - 2.2em),
+    color-mix(in oklab, currentColor 50%, var(--tc-sh-base)) calc(50% - 1.1em),
+    color-mix(in oklab, currentColor 90%, var(--tc-sh-base)) calc(50% - 0.44em),
+    currentColor 50%,
+    color-mix(in oklab, currentColor 90%, var(--tc-sh-base)) calc(50% + 0.44em),
+    color-mix(in oklab, currentColor 50%, var(--tc-sh-base)) calc(50% + 1.1em),
+    var(--tc-sh-base) calc(50% + 2.2em),
     var(--tc-sh-base) 100%
   );
-  background-size: 200% 100%;
+  background-size: calc(200% + 4.4em) 100%;
   background-repeat: no-repeat;
   background-position: 100% 0;
   -webkit-background-clip: text;

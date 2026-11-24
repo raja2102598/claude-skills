@@ -40,9 +40,10 @@ function criticalSpring(omega: number, ms?: number, samples = 40) {
 const ICON_SPRING = criticalSpring(25); // status icon scale .6 ↔ 1
 const STACK_SPRING = criticalSpring(17); // header mark scale .6 → 1
 const CHEVRON_SPRING = criticalSpring(18.3, 440); // chevron rotation, 440 ms
-const HEIGHT_SPRING = { type: "spring", stiffness: 300, damping: 35, mass: 1 } as const; // ω ≈ 17.3, no overshoot
+const HEIGHT_SPRING = { type: "spring", stiffness: 300, damping: 35, mass: 1, restDelta: 0.02, restSpeed: 0.2 } as const; // ω ≈ 17.3, no overshoot
 
-const SHIMMER_LEAD = 200; // ms from a label's mount to the start of its first sweep
+// ms from a call's / the card's mount to the start of its label's first sweep
+const SHIMMER_LEAD = { row: 280, header: 200 };
 
 // Main run, ms from mount.
 const T = { chunk1: 180, chunk2: 230, group: 600, done1: 1800, row2: 2017, done2: 2777, row3: 3000, fail3: 4385 };
@@ -367,7 +368,7 @@ function AutoHeight({
 
 /** A label that shimmers while `shimmerFrom` is set; it keeps its phase from that origin across re-renders. */
 function ShimmerLabel({ text, shimmerFrom, className }: { text: string; shimmerFrom: number | null; className?: string }) {
-  const [delay] = useState(() => (shimmerFrom === null ? 0 : shimmerFrom + SHIMMER_LEAD - performance.now()));
+  const [delay] = useState(() => (shimmerFrom === null ? 0 : shimmerFrom - performance.now()));
   const on = shimmerFrom !== null;
   return (
     <span className={[className, on ? "tc-shimmer" : ""].join(" ")} style={on ? { animationDelay: `${Math.round(delay)}ms` } : undefined}>
@@ -557,7 +558,7 @@ function CallRow({
           <SwapText
             className="tc-title"
             text={call.title}
-            shimmerFrom={call.status === "running" ? call.at : null}
+            shimmerFrom={call.status === "running" ? call.at + SHIMMER_LEAD.row : null}
           />
           <span className="tc-aside" style={{ position: "relative" }}>
             <Presence
@@ -680,7 +681,7 @@ function Turn({ onRunAgain }: { onRunAgain: () => void }) {
                       );
                     })}
                   </span>
-                  <SwapText className="min-w-0 flex-1" text={s.header} shimmerFrom={running ? s.groupAt : null} />
+                  <SwapText className="min-w-0 flex-1" text={s.header} shimmerFrom={running ? s.headerAt! + SHIMMER_LEAD.header : null} />
                   <span style={{ position: "relative", display: "flex", flex: "none" }}>
                     <Presence
                       show={s.flag !== null}
