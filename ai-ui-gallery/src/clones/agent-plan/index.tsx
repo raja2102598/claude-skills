@@ -11,6 +11,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "motion/react";
 import { Check, CornerDownLeft, MessageSquareText, Orbit, Pencil, Play, Plus, RotateCcw, Square, X } from "lucide-react";
 import clsx from "clsx";
@@ -21,12 +22,12 @@ import "./agent-plan.css";
 const EXPO = [0.16, 1, 0.3, 1] as const;
 const T = { duration: 0.3, ease: EXPO };
 const AUTO_RUN_MS = 700; // the draft holds this long, then the plan starts by itself
-const HANDOFF_MS = 8; // a finished step hands over to the next one just after its last tick
+const HANDOFF_MS = 10; // a finished step hands over to the next one just after its last tick
 
 /**
- * Motion hands opacity to WAAPI, which runs on the browser's own animation clock. An `onUpdate` listener keeps
- * it on Motion's JS frameloop instead, so opacity stays in step with the x / scale / height tweens it pairs with
- * (and with a virtual capture clock).
+ * Motion hands opacity and transforms to WAAPI, which runs on the browser's own animation clock. An `onUpdate`
+ * listener keeps them on Motion's JS frameloop instead, in step with the height and layout tweens they pair with
+ * (and with reanimate's virtual capture clock, which does not drive WAAPI).
  */
 const onFrameloop = { onUpdate: () => {} };
 
@@ -141,7 +142,7 @@ function reducer(s: PlanState, a: Action): PlanState {
     case "resume":
       return s.phase === "paused" ? { ...s, phase: "running" } : s;
     case "retry":
-      return { ...s, phase: "running", shown: 1, retried: [...s.retried, step.id] };
+      return { ...s, phase: "running", shown: 1, calls: s.calls + s.shown, retried: [...s.retried, step.id] };
     case "edit":
       return { ...initialState, steps: s.steps.filter((x) => !s.added.includes(x.id)).concat(s.steps.filter((x) => s.added.includes(x.id))) };
     case "add":
@@ -157,7 +158,7 @@ function reducer(s: PlanState, a: Action): PlanState {
   }
 }
 
-function usePlanRun() {
+function usePlanRun(startedAt: number) {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [clock] = useState(createClock);
   const stateRef = useRef(state);
@@ -165,50 +166,63 @@ function usePlanRun() {
 
   // Auto-run after the draft has been on screen for AUTO_RUN_MS, unless the person starts editing.
   const autoRun = useRef<number | null>(null);
+  const tickBase = useRef(0); // performance.now() when the run last (re)started
   useLayoutEffect(() => {
+    // Count from when the plan was asked to (re)start, not from when React got round to mounting it.
+    const wait = Math.max(0, AUTO_RUN_MS - (performance.now() - startedAt));
     autoRun.current = window.setTimeout(() => {
       autoRun.current = null;
       clock.set({ total: 0, step: 0 });
+      tickBase.current = performance.now();
       dispatch({ type: "run" });
-    }, AUTO_RUN_MS);
+    }, wait);
     return () => {
       if (autoRun.current) window.clearTimeout(autoRun.current);
     };
-  }, [clock]);
+  }, [clock, startedAt]);
   const cancelAutoRun = useCallback(() => {
     if (autoRun.current) window.clearTimeout(autoRun.current);
     autoRun.current = null;
   }, []);
 
-  // The run clock: one tick every 100 ms while running.
+  // The run clock: one tick every 100 ms while running, on a grid anchored at the moment the run (re)started,
+  // so the effect mounting a frame later does not shift every tick.
   useEffect(() => {
     if (state.phase !== "running") return;
-    let handoff: number | null = null;
-    const id = window.setInterval(() => {
+    let k = 0;
+    let timer = 0;
+    let settle: number | null = null;
+    const next = () => {
+      k += 1;
+      timer = window.setTimeout(tick, Math.max(0, tickBase.current + k * TICK - performance.now()));
+    };
+    const tick = () => {
       const s = stateRef.current;
-      if (handoff !== null || s.phase !== "running") return;
+      if (s.phase !== "running") return;
+      if (settle !== null) return next();
       const step = s.steps[s.current];
       const c = clock.get();
-      const next = { total: c.total + TICK, step: Math.min(c.step + TICK, step.ms) };
-      clock.set(next);
-      if (next.step >= step.ms) {
-        if (step.failure && !s.retried.includes(step.id)) {
-          dispatch({ type: "fail" });
-          return;
-        }
-        handoff = window.setTimeout(() => {
-          handoff = null;
+      const now = { total: c.total + TICK, step: Math.min(c.step + TICK, step.ms) };
+      clock.set(now);
+      if (now.step >= step.ms) {
+        // A failing step stops the run on its last tick; a passing one hands over just after it.
+        if (step.failure && !s.retried.includes(step.id)) return dispatch({ type: "fail" });
+        settle = window.setTimeout(() => {
+          settle = null;
           clock.set({ total: clock.get().total, step: 0 });
           dispatch({ type: "complete" });
         }, HANDOFF_MS);
-        return;
+      } else {
+        // Streamed lines land on the tick: flushed at once so the row and its layout animation start together.
+        const shown = linesAt(step, now.step);
+        if (shown !== s.shown) flushSync(() => dispatch({ type: "lines", shown }));
       }
-      const shown = linesAt(step, next.step);
-      if (shown !== s.shown) dispatch({ type: "lines", shown });
-    }, TICK);
+      next();
+    };
+    next();
     return () => {
-      window.clearInterval(id);
-      if (handoff !== null) window.clearTimeout(handoff);
+      window.clearTimeout(timer);
+      if (settle !== null) window.clearTimeout(settle);
     };
   }, [state.phase, clock]);
 
@@ -216,6 +230,7 @@ function usePlanRun() {
     (a: Action) => {
       if (a.type === "run" || a.type === "edit") clock.set({ total: 0, step: 0 });
       if (a.type === "retry") clock.set({ total: clock.get().total, step: 0 });
+      if (a.type === "run" || a.type === "resume" || a.type === "retry") tickBase.current = performance.now();
       cancelAutoRun();
       dispatch(a);
     },
@@ -314,7 +329,21 @@ function Spinner({ spinning }: { spinning: boolean }) {
   );
 }
 
-const pop = { initial: { scale: 0.4, opacity: 0 }, animate: { scale: 1, opacity: 1 }, transition: T, ...onFrameloop };
+/**
+ * Icon and button swaps cross-fade, as measured on the reference with a real-clock probe: the new one pops in
+ * (scale .5 → 1, opacity, expo-out 300 ms) while the old one fades out (opacity ~110 ms linear, scale → .5).
+ */
+const pop = {
+  initial: { scale: 0.5, opacity: 0 },
+  animate: { scale: 1, opacity: 1 },
+  exit: {
+    scale: 0.5,
+    opacity: 0,
+    transition: { opacity: { duration: 0.11, ease: "linear" }, scale: { duration: 0.13, ease: [0.45, 0, 0.55, 1] } },
+  },
+  transition: T,
+  ...onFrameloop,
+} as const;
 
 function Marker({ status, index }: { status: StepStatus; index: number }) {
   if (status === "draft")
@@ -323,27 +352,36 @@ function Marker({ status, index }: { status: StepStatus; index: number }) {
         {index + 1}
       </span>
     );
+  const kind = status === "paused" ? "running" : status;
   return (
     <span className="relative grid size-5 shrink-0 place-items-center">
-      {status === "pending" && (
-        <span
-          className="ap-mono absolute inset-0 grid place-items-center rounded-full border text-xs"
-          style={{ borderColor: C.border, color: C.muted }}
-        >
-          {index + 1}
-        </span>
-      )}
-      {(status === "running" || status === "paused") && <Spinner spinning={status === "running"} />}
-      {status === "done" && (
-        <motion.span key="done" {...pop} className="absolute inset-0 grid place-items-center rounded-full" style={{ background: C.fg }}>
-          <Check size={12} strokeWidth={3.25} color="var(--ap-card)" />
-        </motion.span>
-      )}
-      {status === "failed" && (
-        <motion.span key="failed" {...pop} className="absolute inset-0 grid place-items-center rounded-full" style={{ background: C.danger }}>
-          <X size={12} strokeWidth={3.25} color="#fff" />
-        </motion.span>
-      )}
+      <AnimatePresence initial={false}>
+        {kind === "pending" && (
+          <motion.span
+            key="pending"
+            {...pop}
+            className="ap-mono absolute inset-0 grid place-items-center rounded-full border text-xs"
+            style={{ borderColor: C.border, color: C.muted }}
+          >
+            {index + 1}
+          </motion.span>
+        )}
+        {kind === "running" && (
+          <motion.span key="running" {...pop} className="absolute inset-0">
+            <Spinner spinning={status === "running"} />
+          </motion.span>
+        )}
+        {kind === "done" && (
+          <motion.span key="done" {...pop} className="absolute inset-0 grid place-items-center rounded-full" style={{ background: C.fg }}>
+            <Check size={12} strokeWidth={3.25} color="var(--ap-card)" />
+          </motion.span>
+        )}
+        {kind === "failed" && (
+          <motion.span key="failed" {...pop} className="absolute inset-0 grid place-items-center rounded-full" style={{ background: C.danger }}>
+            <X size={12} strokeWidth={3.25} color="#fff" />
+          </motion.span>
+        )}
+      </AnimatePresence>
     </span>
   );
 }
@@ -387,9 +425,9 @@ function Output({ step, shown, status, onRetry }: { step: StepDef; shown: number
       data-part="output"
       {...onFrameloop}
       className="overflow-hidden"
-      initial={{ height: 0 }}
-      animate={{ height: "auto" }}
-      exit={{ height: 0, opacity: 0, transition: { height: T, opacity: { duration: 0 } } }}
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: "auto", opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
       transition={T}
     >
       <ol className="ap-mono mt-1.5 space-y-0.5 text-xs" style={{ color: C.muted }}>
@@ -427,7 +465,7 @@ function Output({ step, shown, status, onRetry }: { step: StepDef; shown: number
         )}
       </ol>
       {failed && (
-        <div className="mt-2">
+        <motion.div className="mt-2" {...onFrameloop} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} transition={T}>
           <button
             type="button"
             onClick={onRetry}
@@ -437,7 +475,7 @@ function Output({ step, shown, status, onRetry }: { step: StepDef; shown: number
             <RotateCcw size={12} strokeWidth={2.25} />
             Retry
           </button>
-        </div>
+        </motion.div>
       )}
     </motion.div>
   );
@@ -461,7 +499,7 @@ const StepRow = memo(function StepRow({ step, index, status, shown, last, clock,
   return (
     <motion.li
       layout
-      transition={T}
+      transition={{ layout: { duration: 0.22, ease: EXPO } }}
       data-part="step"
       data-status={status}
       className="group/step relative flex list-none gap-3"
@@ -472,6 +510,7 @@ const StepRow = memo(function StepRow({ step, index, status, shown, last, clock,
         {!last && (
           <span className="relative my-1 w-px flex-1 overflow-hidden rounded-full" style={{ background: C.border }}>
             <motion.span
+              {...onFrameloop}
               className="absolute inset-0 origin-top"
               style={{ background: C.fg }}
               initial={false}
@@ -554,7 +593,6 @@ function FooterAction({ phase, act }: { phase: Phase; act: (a: Action) => void }
         key={phase}
         type="button"
         {...pop}
-        initial={{ scale: 0.5, opacity: 0 }}
         onClick={() => act({ type: phase === "draft" ? "run" : "resume" })}
         className="inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-xs font-medium text-white"
         style={{ background: "var(--ap-primary)" }}
@@ -569,7 +607,6 @@ function FooterAction({ phase, act }: { phase: Phase; act: (a: Action) => void }
         key="stop"
         type="button"
         {...pop}
-        initial={{ scale: 0.5, opacity: 0 }}
         onClick={() => act({ type: "pause" })}
         className="inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs font-medium"
         style={{ borderColor: C.border, background: C.surface, color: C.fg }}
@@ -584,7 +621,6 @@ function FooterAction({ phase, act }: { phase: Phase; act: (a: Action) => void }
         key="edit"
         type="button"
         {...pop}
-        initial={{ scale: 0.5, opacity: 0 }}
         aria-label="Edit the plan"
         onClick={() => act({ type: "edit" })}
         className="grid size-8 place-items-center rounded-full transition-colors hover:bg-white/5"
@@ -594,7 +630,7 @@ function FooterAction({ phase, act }: { phase: Phase; act: (a: Action) => void }
       </motion.button>
     );
   return (
-    <div className="flex shrink-0 items-center gap-1">
+    <div className="relative flex shrink-0 items-center gap-1">
       <AnimatePresence initial={false} mode="popLayout">
         {node}
       </AnimatePresence>
@@ -646,8 +682,8 @@ function Composer({ phase, act }: { phase: Phase; act: (a: Action) => void }) {
 
 /* ------------------------------------------------------------------ the card */
 
-function AgentPlan() {
-  const { state, clock, act, cancelAutoRun } = usePlanRun();
+function AgentPlan({ startedAt }: { startedAt: number }) {
+  const { state, clock, act, cancelAutoRun } = usePlanRun(startedAt);
   const onRemove = useCallback((id: string) => act({ type: "remove", id }), [act]);
   const onRetry = useCallback(() => act({ type: "retry" }), [act]);
 
@@ -726,16 +762,16 @@ function AgentPlan() {
  * `window.dispatchEvent(new Event("reanimate:replay"))` remounts it (used by the capture).
  */
 export default function AgentPlanClone() {
-  const [run, setRun] = useState(0);
+  const [run, setRun] = useState(() => ({ n: 0, at: performance.now() }));
   useEffect(() => {
-    const replay = () => setRun((n) => n + 1);
+    const replay = () => setRun((r) => ({ n: r.n + 1, at: performance.now() }));
     window.addEventListener("reanimate:replay", replay);
     return () => window.removeEventListener("reanimate:replay", replay);
   }, []);
   return (
     <MotionConfig reducedMotion="user">
       <div className="ap-root h-full w-full p-6" style={{ background: "var(--ap-bg)" }}>
-        <AgentPlan key={run} />
+        <AgentPlan key={run.n} startedAt={run.at} />
       </div>
     </MotionConfig>
   );
