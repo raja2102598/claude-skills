@@ -14,12 +14,13 @@ import "./reasoning-tree.css";
  * be paused and stepped; every visual change is a CSS transition keyed off the step number.
  */
 
-// step: 0 ready (play icon, card taller), 1 collapse (the stage shrinks, controls slide in), 2 reading, then per
-// depth k: propose, score, keep (depth 3: answer, whose path highlight keeps moving for 1.26 s)
-const T = [0, 1400, 1570, 2170, 2840, 3730, 4520, 5170, 6050, 6810, 7430];
-const P = (k: number) => 3 + 3 * (k - 1);
+// step: 0 ready (play icon, card taller than the stage), 1 reading (the stage shrinks and the controls slide in at the
+// same moment, in the reference too), then per depth k: propose, score, keep (depth 3: answer, whose path highlight
+// keeps moving for 1.26 s after the step). Times are ms from mount, read off the reference on the virtual clock.
+const S = 34;
+const T = [0, S, S + 550, S + 1184, S + 2084, S + 2867, S + 3484, S + 4384, S + 5150, S + 5784, S + 6684];
+const P = (k: number) => 2 + 3 * (k - 1);
 const END = 10;
-const TAIL = 1260;
 
 const COL_X = [20, 167, 337, 506];
 const COL_W = [119, 140, 140, 140];
@@ -78,6 +79,8 @@ export default function ReasoningTree() {
   const [running, setRunning] = useState(false);
   const [prev, setPrev] = useState<string | null>(null);
   const clock = useRef({ t: 0, step: 0, running: false });
+  const started = useRef(false);
+  if (step >= 1) started.current = true;
 
   const { levels, all } = useMemo(() => layout(beam), [beam]);
 
@@ -101,7 +104,7 @@ export default function ReasoningTree() {
     setRunning(true);
   }, []);
 
-  // autoplay shortly after mount (the Ready state lasts T[1]), and again after a reset or beam change
+  // autoplay shortly after mount (Ready lasts two frames, long enough to paint the tall card, like the reference's pre-hydration state), and again after a reset or beam change
   useEffect(() => {
     if (step === 0 && !running && !clock.current.running) {
       clock.current.running = true;
@@ -148,14 +151,14 @@ export default function ReasoningTree() {
   const count = (d: number) => levels[d - 1].length;
   let status = "Ready";
   if (answer) status = "Answer found";
-  else if (step >= 2) {
-    const d = Math.min(3, Math.floor((step - 3) / 3) + 1);
-    const ph = step < 3 ? -1 : (step - 3) % 3;
+  else if (step >= 1) {
+    const d = Math.min(3, Math.floor((step - 2) / 3) + 1);
+    const ph = step < 2 ? -1 : (step - 2) % 3;
     status = ph < 0 ? "Reading the question" : ph === 0 ? `Proposing ${count(d)} thoughts` : ph === 1 ? `Scoring ${count(d)} thoughts` : `Keeping the best ${beam}`;
   }
-  const live = step >= 2 && !answer;
-  const activeDepth = step < 3 || answer ? 0 : Math.min(3, Math.floor((step - 3) / 3) + 1);
-  const paused = !running && step > 1 && !answer;
+  const live = step >= 1 && !answer;
+  const activeDepth = step < 2 || answer ? 0 : Math.min(3, Math.floor((step - 2) / 3) + 1);
+  const paused = !running && step > 0 && !answer;
 
   // the status crossfades: the old line fades out in 100 ms, the new one fades in over 150 ms after it
   const lastStatus = useRef(status);
@@ -196,7 +199,7 @@ export default function ReasoningTree() {
   const dim = (n: N) => (decided(n) && !n.kept) || (answer && n.depth === 3 && !n.best);
 
   return (
-    <div className="rt" data-rt data-start={step >= 1 ? "1" : "0"}>
+    <div className="rt" data-rt data-start={started.current ? "1" : "0"}>
       <div className="rt-card">
         <div className="rt-head">
           <Sparkle size={16} fill="currentColor" style={{ color: "var(--mark)" }} />
@@ -211,7 +214,7 @@ export default function ReasoningTree() {
         </div>
 
         <div className="rt-cols">
-          <span className={clsx("rt-col", step < 3 && "on")} style={{ left: COL_X[0] }}>Question</span>
+          <span className={clsx("rt-col", step < 2 && "on")} style={{ left: COL_X[0] }}>Question</span>
           {[1, 2, 3].map((d) => (
             <span key={d} className={clsx("rt-col", activeDepth === d && "on")} style={{ left: COL_X[d] }}>
               Depth {d}
@@ -302,7 +305,7 @@ export default function ReasoningTree() {
           </button>
           <button
             className={clsx("rt-btn", answer && "off")} aria-label="Step" disabled={step >= END}
-            onClick={() => apply(Math.min(END, Math.max(2, step + 1)), false)}
+            onClick={() => apply(Math.min(END, step + 1), false)}
           >
             <SkipForward size={16} />
           </button>
