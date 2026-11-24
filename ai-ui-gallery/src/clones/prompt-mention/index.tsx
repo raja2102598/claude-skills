@@ -130,6 +130,7 @@ export default function PromptMention() {
   const [phase, setPhase] = useState<Phase>("closed");
   const [openKey, setOpenKey] = useState(0);
   const [anchor, setAnchor] = useState<{ x: number; y: number } | null>(null);
+  const anchorRef = useRef<{ x: number; y: number } | null>(null);
   const [from, setFrom] = useState<CSSProperties | undefined>(undefined);
   const [outFrom, setOutFrom] = useState<CSSProperties | undefined>(undefined);
 
@@ -137,7 +138,7 @@ export default function PromptMention() {
   const measureRef = useRef<HTMLDivElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
-  const hlRef = useRef<HTMLDivElement>(null);
+  const hlRef = useRef<HTMLLIElement>(null);
   const snapshot = useRef<Snapshot | null>(null);
   const glideNext = useRef(false);
   const pendingCaret = useRef<number | null>(null);
@@ -204,19 +205,19 @@ export default function PromptMention() {
     const line = Math.max(0, Math.floor(((r.top + r.bottom) / 2 - b.top) / k / LINE));
     const scroll = inputRef.current?.scrollTop ?? 0;
     const next = { x: Math.min(Math.max(0, Math.round(x * 10) / 10), POP_MAX_LEFT), y: line * LINE + POP_GAP - scroll };
-    setAnchor((prev) => {
-      if (prev && prev.x === next.x && prev.y === next.y) return prev;
-      // The list jumped while open: the highlight glides in from where it was on screen.
-      const hl = hlRef.current;
-      if (prev && hl && phase === "open") {
-        hl.style.setProperty("--pm-fx", `${prev.x - next.x}px`);
-        hl.style.setProperty("--pm-fy", `${prev.y - next.y}px`);
-        hl.classList.remove("pm-hl-flip");
-        void hl.offsetWidth;
-        hl.classList.add("pm-hl-flip");
-      }
-      return next;
-    });
+    const prev = anchorRef.current;
+    if (prev && prev.x === next.x && prev.y === next.y) return;
+    anchorRef.current = next;
+    // The list jumped while open: the highlight glides in from where it was on screen.
+    const hl = hlRef.current;
+    if (prev && hl && phase === "open") {
+      hl.style.setProperty("--pm-fx", `${prev.x - next.x}px`);
+      hl.style.setProperty("--pm-fy", `${prev.y - next.y}px`);
+      hl.classList.remove("pm-hl-flip");
+      void hl.offsetWidth;
+      hl.classList.add("pm-hl-flip");
+    }
+    setAnchor(next);
   });
 
   /* ---------- highlight row ---------- */
@@ -429,7 +430,7 @@ export default function PromptMention() {
                     aria-label={GROUP_LABEL[shown.trigger]}
                     className="pm-list"
                   >
-                    <div ref={hlRef} className="pm-hl" aria-hidden="true" />
+                    <li ref={hlRef} role="presentation" className="pm-hl" aria-hidden="true" />
                     {shown.matches.map((item, i) => {
                       const head = i === 0 || shown.matches[i - 1].group !== item.group;
                       const on = i === activeIdx;
