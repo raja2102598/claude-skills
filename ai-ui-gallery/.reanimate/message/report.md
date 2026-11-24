@@ -12,7 +12,7 @@
 **Fidelity:** motion-faithful. The component is Arc Pro (paid) and states no license. The clone uses:
 - its own palette and Geist / Geist Mono;
 - its own copy, model name ("Nova 2") and reason labels;
-- a lucide sparkle mark and lucide icons, plus a hand-drawn check.
+- a lucide sparkle mark and lucide icons, plus hand-drawn checks (the copy check and the thanks check).
 
 No Arc CSS, JS, copy or assets were used.
 
@@ -23,6 +23,7 @@ No Arc CSS, JS, copy or assets were used.
 **How the motion was built:**
 - Panel height uses `SpringPanel`: a critically damped spring (ω = 26 rad/s) stepped on rAF, whose first frame only anchors the clock, as in the reference.
 - Fades, pops and draws are CSS keyframes and transitions. The springs are sampled into `linear()`.
+- The copy check is an inline svg path with `pathLength="1"`. A CSS keyframe on `stroke-dashoffset` (220 ms quint-out, 66 ms delay) draws it on while the scale spring pops it in.
 - Timers commit through `flushSync`, so each state lands in the frame its timer fires in.
 
 **Captures:** reference and clone use the same commands: viewport 1440x1200, crop 632×690, virtual clock, 200 ms pre-roll.
@@ -33,7 +34,7 @@ No Arc CSS, JS, copy or assets were used.
 
 WAAPI rows were taken from a real-clock `getAnimations()` probe of the reference. The clone's own animation durations, delays and easing curves were checked against it. Probes and capture scripts stay out of git.
 
-## Verification (round 3 of 3)
+## Verification (round 4: copy re-captured after the row 9 fix; hover, down and submit are from round 3 of 3)
 
 compare.ts was run with `--offset 0`; the triggers are deterministic on the virtual clock.
 
@@ -41,10 +42,10 @@ compare.ts was run with `--offset 0`; the triggers are deterministic on the virt
 |---|---|---|---|
 | hover | 3.34 % | 0 / 0 / 0 s, pass | 8–9, 15–19 / 8–9, 15–18 |
 | down | 3.72 % | end +0.183 s (artifact, see residual 3) | 14–31, 34 / 14–31, 34 (identical) |
-| copy | 3.25 % | 0 s, pass | 8–14, 62–68 / 8–15, 18, 62–69, 72 |
+| copy (round 4) | 3.25 % | 0 s, pass | 8–14, 62–68 / 8–14, 62–69 (the check now settles by frame 14) |
 | submit | 3.83 % | end +0.233 s (artifact plus one frame) | 7–36, 76–84 / 7–36, 77–85 |
 
-Sheets: `compare-3-{hover,down,copy,submit}/sheets/compare-01.webp`.
+Sheets: `compare-3-{hover,down,submit}/sheets/compare-01.webp` and `compare-4-copy/sheets/compare-01.webp`.
 
 Per row, from easing.ts with the clone track mapped onto the reference selectors:
 
@@ -58,7 +59,7 @@ Per row, from easing.ts with the clone track mapped onto the reference selectors
 | 6 | panel opacity 150 ms quint-out | real probe → CSS (WAAPI snaps under the virtual clock) | ≤ 1 frame | pass |
 | 7 | focus moves to the first reason | same (focus ring in submit frame 0 on both) | n/a | pass |
 | 8 | copy glyph out: opacity and scale 1 → 0.7, 100 ms quint-out, one frame late | same | scale max 0.01 | pass |
-| 9 | check in: scale spring 0.7 → 1 (ω = 26), plus a stroke draw-on | scale matches; draw-on missing | scale max 0.0008 (133–420 ms) | partial fail, residual 1 |
+| 9 | check in: scale spring 0.7 → 1 (ω = 26), plus a stroke draw-on | scale matches. Draw-on: ref about 0.05 → 0.27 s after the click, clone 0.066 → 0.286 s (220 ms quint-out). Visible stroke as a fraction of final at frames 9 / 10 / 11 / 12 / 13: ref 0.38 / 0.73 / 0.88 / 0.98 / 1.0, clone 0.41 / 0.66 / 0.89 / 0.88 / 0.98 | scale max 0.0008 (133–420 ms); draw start and end within 17 ms | pass (fixed in round 4) |
 | 10 | copy colour → green, 150 ms, one frame late | same | first change frame 8 → 8 | pass |
 | 11 | revert at +1800 ms | 1817 → 1817 | first change frame 62 → 62 | pass |
 | 12 | Submit label → spinner, 700 ms | same | frames 7–26 → 7–26 | pass |
@@ -70,11 +71,10 @@ Per row, from easing.ts with the clone track mapped onto the reference selectors
 
 ## Residual deviations
 
-1. **Copy check draw-on is missing (row 9).**
-   - The reference draws its check stroke from about 0.05 s to 0.27 s; visible change ends at frame 14.
-   - The clone fades and pops the whole check in. It is fully visible by 0.13 s, and its spring tail keeps changing below a pixel until frame 18 (0.40 s).
-   - Frames 8–12 of the copy capture therefore show a partly drawn check in the reference and a whole one in the clone.
-   - It was found after round 3 and left unfixed because of the 3-round cap. The fix is to reuse the thanks-check path-draw on the copy check.
+1. **Copy glyph and check styling in frames 7–8 of the copy capture.**
+   - Frame 7 is 33 ms after the click. The reference's copy glyph is already gone and only a dot of the check's round cap is visible. The clone still shows the copy glyph, tinted green, at about 0.19 of the final green. It is gone at frame 8. This is the one-frame lag noted in row 8, and it is within ±80 ms.
+   - The reference check is slightly bolder and a darker green. That is palette and stroke weight, which motion-faithful work allows.
+   - The draw-on itself (formerly residual 1) is fixed in round 4. The zoomed check crop for frames 7–14 shows the same short-arm-first draw on both sides.
 2. **The fold shows one 30-fps frame later in the pixels.**
    - First change is at frame 76 in the reference and 77 in the clone (+33 ms); the end is 84 vs 85.
    - The tracks agree (tooltip at 2300 ms on both, height within 0.43 px), so this is ordering inside the virtual-clock frame, and it is within ±80 ms.
@@ -82,5 +82,10 @@ Per row, from easing.ts with the clone track mapped onto the reference selectors
    - The reference's panel and content fades are WAAPI, and they snap under the virtual clock.
    - The clone fades for the measured 150 ms (real-clock probe). That shifts the activity threshold, which is relative to the reference's peak.
    - The lists of frames with visible change match frame for frame (down) or within one frame (submit).
-4. **Mean mismatch of 3.3–3.8 % is palette, font and copy.** It is present at rest too, which is expected for motion-faithful work.
+4. **Mean mismatch of 3.3–3.8 % is palette, font and copy.** It is present at rest too, which is expected for motion-faithful work. It is why the round 4 copy mean (3.25 %) is unchanged from round 3.
 5. **Round 2 was captured twice.** The first attempt ran against a stale dev server (the file-watcher limit had been hit). It was discarded and captured again on a fresh server.
+
+## Rounds
+
+- Rounds 1–3: the original build and verification. Round 3 left row 9 as a partial fail.
+- Round 4: a single fix round (of two allowed) for row 9. Only the copy capture was re-taken (`clone-4-copy`, `compare-4-copy`). Row 9 now passes and no other copy row changed.

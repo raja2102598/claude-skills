@@ -31,7 +31,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "message",
     load: () => import("../src/clones/message/index.tsx"),
     meta: () => import("../src/clones/message/meta.ts"),
-    reference: "Arc UI · Response feedback", candidates: 9, rounds: 3, timing: "16 of 17 rows pass", runnerUp: "UIStacks Message",
+    reference: "Arc UI · Response feedback", candidates: 9, rounds: 4, timing: "all 17 rows pass", runnerUp: "UIStacks Message",
   },
   {
     slug: "streaming-text",
