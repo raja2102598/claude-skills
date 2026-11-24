@@ -77,7 +77,8 @@
   border-color: var(--ms-line-strong);
   background: var(--ms-fill);
 }
-.ms-trigger:focus-visible {
+/* Focus ring only after keyboard use (focus also returns here after a pointer pick, like the reference). */
+.ms-root[data-kbd] .ms-trigger:focus-visible {
   box-shadow: 0 0 0 3px rgb(224 104 63 / 0.25);
 }
 
@@ -410,18 +411,25 @@
 .ms-trigger-text > .ms-inner {
   grid-area: 1 / 1;
 }
+.ms-mark-layer {
+  display: grid;
+}
+.ms-swap > span {
+  display: inline-block;
+}
 .ms-out {
   animation: ms-out 100ms var(--ms-ease) both;
 }
+/* The fade starts on the pick; the lift and pop start one frame later (the reference runs them on its JS frame loop). */
 .ms-in {
   animation:
     ms-fade-in 150ms var(--ms-ease) both,
-    ms-lift 150ms var(--ms-ease) both;
+    ms-lift 150ms var(--ms-ease) 16.7ms both;
 }
 .ms-in-pop {
   animation:
     ms-fade-in 150ms var(--ms-ease) both,
-    ms-pop 150ms var(--ms-ease) both;
+    ms-pop 150ms var(--ms-ease) 16.7ms both;
 }
 @keyframes ms-out {
   to {
