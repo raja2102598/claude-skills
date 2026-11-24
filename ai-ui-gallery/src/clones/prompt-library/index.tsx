@@ -166,9 +166,9 @@ export default function PromptStudio() {
     clear(); setShown(0); setPhase("thinking");
     const total = words.length;
     later(() => setPhase("writing"), 800);
-    const stepMs = 750 / total;
+    const stepMs = 900 / total;
     for (let i = 1; i <= total; i++) later(() => setShown(i), Math.round(800 + i * stepMs));
-    const end = 1700;
+    const end = 1780;
     later(() => { setPhase("done"); setElapsed((end / 1000 - 0.25).toFixed(2)); }, end);
   }, [words.length]);
 
@@ -269,7 +269,7 @@ export default function PromptStudio() {
           </div>
         </div>
 
-        <div className="ps-outframe" style={{ height: outH, transitionDuration: phase === "writing" ? "140ms" : phase === "done" ? "200ms" : "380ms", transitionTimingFunction: "ease-out" }}>
+        <div className="ps-outframe" style={{ height: outH, transitionDuration: phase === "writing" ? "140ms" : phase === "done" ? "200ms" : "340ms", transitionTimingFunction: "ease-out" }}>
           <div ref={innerRef}>
             <div className="ps-out">
               {phase === "idle" ? (
