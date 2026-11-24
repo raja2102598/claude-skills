@@ -166,9 +166,9 @@ export default function PromptStudio() {
     clear(); setShown(0); setPhase("thinking");
     const total = words.length;
     later(() => setPhase("writing"), 800);
-    const stepMs = 24;
-    for (let i = 1; i <= total; i++) later(() => setShown(i), 800 + i * stepMs);
-    const end = 800 + total * stepMs + 150;
+    const stepMs = 750 / total;
+    for (let i = 1; i <= total; i++) later(() => setShown(i), Math.round(800 + i * stepMs));
+    const end = 1700;
     later(() => { setPhase("done"); setElapsed((end / 1000 - 0.25).toFixed(2)); }, end);
   }, [words.length]);
 
