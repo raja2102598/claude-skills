@@ -37,16 +37,17 @@ Reference captures:
 ## Timeline (t = 0 is the click on Live; a live run loops every 10.867 s)
 | # | element | property | from → to | start ms | duration ms | easing | notes / source |
 |---|---|---|---|---|---|---|---|
+| 0 | state switch pill | x, width | Finished → Live | 0 (next frame) | ~320 (96 % at +280) | spring, critically damped, ω ≈ 17.5 (visualDuration 0.3, bounce 0) | ref frames: left edge 22 / 40 / 66 / 78 / 86 / 92 / 96 % at +40…+280 ms |
 | 1 | card | state | Finished (open) → Thinking 0s, Stop, no chevron, h 46 | 0 | instant | – | virtual track: h 483.2 → 46 between −83 and 0 |
 | 2 | label "Thinking" | shimmer band | dark band sweeps left → right over muted text | 200 after mount, every 2400 | 1750 sweep | linear | virtual frames: darkening from 0.24 s, centroid x 68 → 116 by 1.92 s; next band 2.64–2.68 s. Probe: sweep 1.8 s, rest 0.55 s |
-| 3 | counter | text | 0s → 1s → 2s → 3s | 1040 / 2120 / 3200 | – | – | virtual track (y starts moving at ~1040, 2125, 3205) |
+| 3 | counter | text | 0s → 1s → 2s → 3s | ≈1037 / 2118 / 3197 | – | – | first 25 fps frame showing it (1040 / 2120 / 3200) ∩ rAF window from the track |
 | 3b | counter | old: opacity 1→0, y 0→−4; new: opacity 0→1, y 4→0 | per tick | 100 out / 150 in | (.22,1,.36,1) out / (.16,1,.3,1) in | animate() hook (opacity); virtual track (y: 63 % at +22 ms, 96 % at +60 ms) |
 | 4 | chevron | presence | hidden → shown | 900 | instant | – | virtual track |
 | 5 | live window | height 0 → 44, opacity 0 → 1 | 900 (mount), spring from 917 | ~330 (1 % at +267) | spring k 685 c 52.4 (visualDuration 0.2, bounce 0); opacity 150 ms (.22,1,.36,1) | fit rmse 0.0019 (`easing.ts`: "material emphasized ~293 ms" family) |
 | 6 | stream chunks | append + opacity 0→1 | P1 900/950/1000/1033/1067/1100/1150; P2 1967/1983/2033/2083/2117/2167/2200/2250; P3 3050/3067/3100/3150/3200/3233; P4 4050/4083/4117/4167/4200 | 150 each | (.22,1,.36,1) | first chunk of each step arrives with its layer (no own fade); virtual track: 0 / .44 / .72 / .87 at 17 ms steps |
 | 7 | stream tail | translateY on wrap to line 3 | +20 → 0 | 1083 / 2217 / 3217 / 4217 (wrap +17) | ~300 | same spring as #5 | virtual track; ref shows the jumped text for one frame before the offset applies (1067, 2200, 3200, 4200) |
 | 7b | live slot | mask | none → 16 px top fade | with #7 | instant | – | `[data-overflow]` once the tail is taller than 40 px |
-| 8 | stream layer | step swap: old opacity 1→0, new 0→1 | 1967 / 3050 / 4050 | 100 out / 150 in | (.22,1,.36,1) / (.16,1,.3,1) | animate() hook |
+| 8 | stream layer | step swap: old opacity 1→0, new 0→1 | ≈1955 / 3037 / 4037 (rAF ticks 1967 / 3050 / 4050) | 100 out / 150 in | (.22,1,.36,1) / (.16,1,.3,1) | animate() hook; first frame showing it 1960 / 3040 / 4040 |
 | 9 | Stop | presence | shown → removed | 4233 | instant | – | virtual track |
 | 10 | label | "Thinking Ns" → "Thought for 4s": old opacity 1→0; new opacity 0→1, y 2→0 | 4233 (first frame 4250) | 100 out / 150 in | (.22,1,.36,1) / (.16,1,.3,1) | animate() hook; virtual y 2 → 0.92 → 0.43 → 0.19 at 17 ms steps; colour secondary |
 | 11 | live window | height 44 → 0 | 4250 | ~330 | spring #5 | virtual track |
@@ -80,5 +81,10 @@ Panel content (all four steps and the foot) arrives with the panel; there is no 
 - Header hover: surface tint; clicking the header toggles the panel (or the live window while thinking).
 
 ## Additions
-- None to the motion. The clone drops the reference's Live/Finished/Interrupted thumb animation (the reference has
-  none either: the pill jumps). Reduced motion: no shimmer, no fades, springs jump to their end values.
+- None. Reduced motion: no shimmer, no fades, springs jump to their end values (the timeline still runs).
+
+## Capture notes
+- Frame i of a capture is the page state at i/25 s − 0.2 s; rAF (track) samples are at 60 Hz. A timer change shows
+  on a frame when it fires at or before that frame's time, so event times were placed inside the intersection of the
+  reference's rAF window and its first visible frame. The clone commits each timeline step with `flushSync` inside its
+  timer; with React's normal batching the commit raced the frame and landed one frame late (rounds 2–3).
