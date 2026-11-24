@@ -48,7 +48,7 @@
 .am-c > .am-ci { min-height: 0; overflow: hidden; }
 .am-pillRow { padding: 10px 16px 0; height: 44px; box-sizing: border-box; }
 .am-pill { display: grid; height: 34px; border: 1px solid var(--line); border-radius: 17px; padding: 0 12px; align-items: center; font-size: 13px; transition: background-color 160ms var(--q); width: max-content; }
-.am-pill:hover { background: var(--wash); }
+.am-pill[data-state="update"]:hover { background: var(--wash); }
 .am-pill > span { grid-area: 1 / 1; display: flex; align-items: center; gap: 8px; transition: opacity 100ms var(--q); white-space: nowrap; }
 .am-pill b { font-weight: 600; } .am-pill i { font-style: normal; color: var(--muted); }
 .am-pill [data-l="saved"], .am-pill [data-l="added"] { opacity: 0; }
