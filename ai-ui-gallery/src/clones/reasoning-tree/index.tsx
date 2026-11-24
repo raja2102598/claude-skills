@@ -212,7 +212,7 @@ export default function ReasoningTree() {
               d={edge(n)}
               pathLength={1}
               className={clsx("rt-edge", proposed(n) && "in", pruned && "out", answer && n.onPath && "win")}
-              style={{ transitionDelay: proposed(n) ? `${(n.idx % 6) * 60}ms` : "0ms" }}
+              style={{ transitionDelay: answer && n.onPath ? `${(n.depth - 1) * 220}ms` : proposed(n) ? `${(n.idx % 6) * 60}ms` : "0ms", transitionDuration: answer && n.onPath ? "420ms, 700ms, 400ms" : undefined }}
             />
           );
         })}
