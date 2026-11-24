@@ -6,11 +6,12 @@
 
 Viewport 1440x900 · fps 25 (main) and 50 (probe) · `--clock virtual` · crop 745x679
 Reference captures:
+- `ref-real/`, `ref-real2/` — real clock, `--no-video`, rAF `--track` probes (pre-js `prejs-ref-probe.js` / `prejs-ref-probe2.js`, the second also mirrors the arc's opacity); the source for the opacity/transform rows marked **real** below.
 - `ref/` — `capture.ts --url <arc> --selector 'section[class*="ai-composer_root"]' --trigger click --target 'button[class*="ai-composer_send"]' --pre-js prejs-ref.js --wait-before 1500 --duration 4000 --fps 25 --clock virtual --network-wait 300 --track …`
 - `ref-probe/` — same, `--duration 1600 --fps 50`, pre-js `prejs-ref-probe.js` also mirrors the send arc's `stroke-dashoffset`, the ring-track opacity and the live chunk count into hidden fixed divs so `track.json` records them (analysis only).
 
 Trigger: click on Send with the textarea pre-filled by pre-js (`execCommand('insertText')`). t = 0 is the click. In the gallery the clone autoplays the same sequence (types the prompt, then sends); `?autoplay=0` turns autoplay off so the capture uses the same click trigger as the reference.
-Total length: 1.30 s of motion (last change: arrow settle at ~1.30 s). Captures run 4.0 s.
+Captures run 4.0 s (main) and 1.6–1.7 s (probes).
 
 ## Structure (static, crop coordinates)
 
@@ -33,31 +34,37 @@ Total length: 1.30 s of motion (last change: arrow settle at ~1.30 s). Captures 
 
 ## Timeline (t = 0 is the click)
 
+Rows marked **real** were re-measured on the real clock (`ref-real/`, `ref-real2/`: `--track` rAF probes without `--clock virtual`,
+aligned on the switch frame). The reference runs those opacity/transform tweens through WAAPI, which the virtual clock does not
+advance, so in `ref/` and `ref-probe/` they collapse into one frame. Layout, stream and arc timing agree on both clocks.
+
 | # | element | property | from → to | start ms | duration ms | easing | source |
 |---|---|---|---|---|---|---|---|
-| 1 | greeting, suggestions | presence | shown → removed | 17 | 0 (instant) | – | track (intro/sugg gone at t=0 sample), frames |
-| 2 | bubble, reply head, "Thinking" | presence | none → shown at rest position | 17 | 0 (instant, no lift visible) | – | probe track bubble y=278 constant from 16.7 |
+| 1 | greeting, suggestions | presence | shown → removed | 17 | 0 (instant) | – | track, frames |
+| 2 | bubble, reply head, "Thinking" | presence | none → shown at rest position | 17 | 0 (no lift, no fade, both clocks) | – | probe tracks: bubble y and opacity constant |
 | 3 | textarea | value | prompt → empty (placeholder) | 17 | 0 | – | frames |
-| 4 | dock | translateY (FLIP) | −263.6 px → 0 | 17 (moves from 33) | ~650 (within 1 % at 383) | critically damped spring ω≈17.5 rad/s (stiffness 300, damping 35, mass 1); easing.ts: material-emphasized 441 ms fit, no overshoot | ref/track.json + easing.ts |
-| 5 | send ring arc | visible fraction (1 − dashoffset) | 0.02 → 0.10 | 17 | 17 | step | probe |
-| 6 | send ring track | opacity | 0 → 1 | 33 | ~20 | fast fade | probe |
-| 7 | send arrow | opacity / translateY | 1 → 0 / 0 → −8 px | 17 | opacity ≤ 20, y 160 | y ease-in (invisible after opacity) | probe track |
-| 8 | stop square | scale, opacity | 0.7 → 1, 0 → 1 | 17 | scale ~330, opacity ~70 | critically damped spring ω≈23.5 rad/s (stiffness 550, damping 47) | probe track (s .73@17, .82@66, .97@166, .995@250) |
-| 9 | send button | background, colour | ink → subtle fill, light → ink | 17 | 150 | cubic-bezier(0.22,1,0.36,1) | inspect.json transition |
-| 10 | mic | colour | normal → dim (disabled while streaming) | 17 | 150 | same | frames |
-| 11 | top-bar button | opacity | 0 → 1 | 33 | ≤ 17 (instant) | – | probe track |
-| 12 | "Thinking" | shimmer (dark band sweeps left → right) | label grey → darker leading edge | 250 | continuous until removal at 680 | linear | pixel darkness of label: band 0 121 → 95 from 280 to 640 ms |
-| 13 | "Thinking" | presence | shown → removed | 680 | 0 | – | frames (blank at 680) |
-| 14 | reply chunks | opacity per chunk | 0 → 1 | 700, 750, 800, 850, 900, 950, 1000, 1033 | 150 each | cubic-bezier(0.16,1,0.3,1) | inspect.json CSSAnimation + probe chunk count |
-| 15 | reply body | height | 26 → 48 (2nd line) | 850 | 158 | ease-out | probe track + easing.ts |
-| 16 | reply body | height | 48 → 72 (3rd line) | 1040 | 150 | ease-out | probe track |
-| 17 | send ring arc | visible fraction | 0.10 → 1.0 | 700 | 483 (hidden from 1050) | accelerates over ~180 ms then linear ~2.2 /s (capped-speed follower of reply progress) | probe arc channel |
-| 18 | reply foot | presence | none → shown, then rides the body height | 1033 | instant | – | probe track foot o 0→1 at 1033–1050 |
-| 19 | send ring (track + arc) | opacity | 1 → 0 | 1050 | ≤ 17 | – | probe |
-| 20 | stop square | opacity / scale | 1 → 0 / 1 → 0.7 | 1050 | ≤ 17 (invisible after) | – | probe |
-| 21 | send arrow | translateY, opacity | +2.5 px → 0, 0 → 1 | 1050 | ~250 | spring stiffness 550 damping 47 | probe (ty .41@1183, .10@1250, .03@1300) |
-| 22 | send button, mic | colour | ink stop → muted arrow (empty), mic dim → normal | 1050 | 150 | cubic-bezier(0.22,1,0.36,1) | frames |
+| 4 | dock | translateY (FLIP) | −263.6 px → 0 | 17 (moves from 33) | ~650 (within 1 % at 383) | critically damped spring ω≈17.5 rad/s (stiffness 300, damping 35); easing.ts: material-emphasized 441 ms fit, no overshoot; same curve on the real clock | ref/track.json, ref-real |
+| 5 | ring arc | opacity, visible fraction | 0 → 1 at once; 0.02 → 0.10 | 17 | 0 / 17 | – | probes |
+| 6 | ring track | opacity | 0 → 1 | 17 | 230 (t½ 85) | easeOutQuad | **real** |
+| 7 | send arrow | opacity / translateY | 1 → 0 / 0 → −4 px | 17 | 130 / 150 (t½ 118) | easeInQuint (lifts and fades late) | **real** |
+| 8 | stop square | scale, opacity | 0.7 → 1, 0 → 1 | 17 | scale spring ω≈24 (stiffness 600, damping 49); opacity 260 (t½ 65) | spring / easeOutCubic | **real** (scale also in probe) |
+| 9 | send button | background, colour | ink → soft fill | 17 | 150 | cubic-bezier(0.22,1,0.36,1) | inspect.json transition |
+| 10 | mic | colour | normal → dim while streaming | 17 | 150 | same | frames |
+| 11 | top-bar button | opacity | 0 → 1 | 17 + 183 delay | 220 (t½ 265) | easeOutQuad | **real** |
+| 12 | "Thinking" | shimmer | dark edge enters from the left, ~100 px/s, ~110–125 px soft ramp | ~250 | until removal | linear | label pixel darkness, band 0: 121 → 95 from 280 to 640 ms |
+| 13 | "Thinking" | presence | shown → removed | 667 | 0 | – | probes (both clocks) |
+| 14 | reply chunks (8) | opacity per chunk | 0 → 1 | 700, 750, 800, 850, 900, 950, 1000, ~1033 | 150 each | cubic-bezier(0.16,1,0.3,1) | inspect.json CSSAnimation + probe chunk count |
+| 15 | reply body | height | 26 → 48 (2nd line) | 850 | 158 | ease-out | probe + easing.ts |
+| 16 | reply body | height | 48 → 72 (3rd line) | ~1035 | 150 | ease-out | probe |
+| 17 | ring arc | visible fraction | 0.10 → 1.0 | 700 | ~480 (to ~1180) | starts at ~0.8 /s, ramps to ~2.2 /s in ~170 ms, keeps filling after the reply ends | probe arc channel (both clocks) |
+| 18 | reply foot | opacity | 0 → 1, then rides the body height | 1050 | 160 (t½ 1082 from switch) | easeOutQuad | **real** |
+| 19 | ring track | opacity | 1 → 0 | 1050 | 210 (t½ 1115 from switch) | easeOutQuad | **real** |
+| 20 | stop square | opacity / scale | 1 → 0 / 1 → 0.7 | 1050 | 100 / 110 | easeOutQuart / easeOutCubic | **real** |
+| 21 | send arrow | translateY, opacity | +4 px → 0, 0 → 1 | 1050 | spring ω≈24 (stiffness 600, damping 49); opacity 280 | spring / easeOutCubic | **real** |
+| 22 | send button, mic | colour | stop on soft fill → muted arrow (empty); mic back | 1050 | 150 | cubic-bezier(0.22,1,0.36,1) | frames |
+| 23 | ring arc | opacity | 1 → 0 once it has closed | ~1185 | 200 (t½ 1249 from switch) | easeOutQuad | **real** |
 
+Trigger: click on Send (or Enter). Total length: ~1.45 s from the click (last change: arc fade and arrow settle).
 Nothing else moves: bubble, reply head, toolbar chips and model chip are still throughout.
 
 ## Style facts the motion depends on

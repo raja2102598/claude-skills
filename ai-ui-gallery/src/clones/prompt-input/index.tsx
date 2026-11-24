@@ -19,18 +19,24 @@ import {
 import "./prompt-input.css";
 
 /*
- * Motion constants, all measured from the reference trace (.reanimate/prompt-input/spec.md).
- * t = 0 is the click on Send.
+ * Motion constants, all measured from the reference traces (.reanimate/prompt-input/spec.md): layout and stream timing
+ * from the virtual-clock captures, the opacity/transform fades from the real-clock rAF probes. t = 0 is the click on Send.
+ * Everything runs on motion values (JS frame loop) or CSS keyframes, never motion element tweens (those go to WAAPI).
  */
 const DOCK_TOP_NEW = 294.4; // centred group: greeting 239.6, dock 294.4, suggestions 406.4 (card padding box)
 const DOCK_TOP_THREAD = 558; // foot of the thread, 24px above the card's bottom edge
 const GLIDE = { type: "spring", stiffness: 300, damping: 35, mass: 1 } as const; // critically damped, ω ≈ 17.5/s
-const MORPH = { type: "spring", stiffness: 600, damping: 49, mass: 1 } as const; // critically damped, ω ≈ 24.5/s
+const MORPH = { type: "spring", stiffness: 600, damping: 49, mass: 1 } as const; // stop scale-in and arrow return, ω ≈ 24.5/s
+const EASE_IN_QUINT = [0.64, 0, 0.78, 0] as const;
+const EASE_OUT_CUBIC = [0.33, 1, 0.68, 1] as const;
+const EASE_OUT_QUART = [0.25, 1, 0.5, 1] as const;
+const EASE_OUT_QUAD = [0.5, 1, 0.89, 1] as const;
 // Schedule relative to the click. The reference shows each change on the first frame at or after these times.
 const THINK_END_MS = 640;
 const CHUNK_AT_MS = [668, 718, 768, 818, 868, 918, 968, 1001];
 const DONE_MS = 1018;
 const ARC_START = 0.1; // the ring shows a 10% stub while thinking
+const ARC_FROM_MS = 700; // and starts to fill when the reply starts
 const ARC_V0 = 0.75; // per second when the first words land
 const ARC_VMAX = 2.3; // per second, reached after ARC_RAMP_S
 const ARC_RAMP_S = 0.17;
@@ -82,6 +88,8 @@ export default function PromptComposer() {
   const arrowY = useMotionValue(0);
   const stopO = useMotionValue(0);
   const stopS = useMotionValue(0.7);
+  const trackO = useMotionValue(0);
+  const arcO = useMotionValue(0);
   const wasBusy = useRef(false);
   const flipFrom = useRef<number | null>(null);
   const run = useRef<{ raf: number; stop: boolean } | null>(null);
@@ -99,6 +107,7 @@ export default function PromptComposer() {
     let v = 0;
     let shownChunks = 0;
     let pending = true;
+    let finished = false;
     setArc(ARC_START);
     const tick = (now: number) => {
       const t = now - t0;
@@ -108,9 +117,10 @@ export default function PromptComposer() {
       const chunks = stopped ? shownChunks : CHUNK_AT_MS.filter((at) => t >= at).length;
       const nextPending = !stopped && t < THINK_END_MS;
       const done = stopped || t >= DONE_MS;
-      if (chunks !== shownChunks || nextPending !== pending || done) {
+      if (chunks !== shownChunks || nextPending !== pending || (done && !finished)) {
         shownChunks = chunks;
         pending = nextPending;
+        finished = done;
         // Commit inside this frame: a scheduled render would land a frame or more later.
         flushSync(() => {
           setTurn((cur) => (cur ? { ...cur, chunks, pending, done } : cur));
@@ -120,19 +130,21 @@ export default function PromptComposer() {
       // Arc: chases the reply's progress at a capped speed (it accelerates for ~180 ms, then runs at ~2.2/s).
       const revealed = REPLY.slice(0, chunks).join("").length;
       const target = done ? 1 : ARC_START + (1 - ARC_START) * (revealed / REPLY_CHARS);
-      if (arc < target) {
+      if (arc < target && t >= ARC_FROM_MS) {
         v = Math.min(ARC_VMAX, Math.max(v, ARC_V0) + ((ARC_VMAX - ARC_V0) / ARC_RAMP_S) * dt);
         arc = Math.min(target, arc + v * dt);
       } else v = 0;
       setArc(arc);
-      if (done) {
-        run.current = null;
+      // After the reply ends the arc keeps filling at its own speed, then fades once it closes.
+      if (done && arc >= 1) {
+        animate(arcO, 0, { duration: reduce ? 0 : 0.2, ease: EASE_OUT_QUAD });
+        if (run.current === state) run.current = null;
         return;
       }
       state.raf = requestAnimationFrame(tick);
     };
     state.raf = requestAnimationFrame(tick);
-  }, []);
+  }, [arcO, reduce]);
 
   const send = useCallback(
     (value?: string) => {
@@ -158,10 +170,11 @@ export default function PromptComposer() {
     if (run.current) cancelAnimationFrame(run.current.raf);
     run.current = null;
     dockY.jump(0);
+    arcO.jump(0);
     setBusy(false);
     setTurn(null);
     setMode("new");
-  }, [dockY]);
+  }, [dockY, arcO]);
 
   // FLIP: the dock is laid out at its new top in the same commit; play the move back from the old top.
   useLayoutEffect(() => {
@@ -175,27 +188,33 @@ export default function PromptComposer() {
     return () => controls.stop();
   }, [mode, dockY, reduce]);
 
-  // Send ↔ stop morph: the arrow lifts out as the stop square springs in; on finish the stop drops and the arrow settles back.
+  // Send ↔ stop morph. Out: the arrow lifts and fades (ease-in) while the stop square springs and fades in and the
+  // ring's track fades up. Back: the stop drops out fast, the arrow settles in from below, the track fades away.
   useLayoutEffect(() => {
     if (busy === wasBusy.current) return;
     wasBusy.current = busy;
-    const fast = (ms: number) => ({ duration: reduce ? 0 : ms / 1000, ease: "linear" as const });
-    const spring = reduce ? { duration: 0 } : MORPH;
+    const tw = (ms: number, ease: readonly number[], delayMs = 0) => ({
+      duration: reduce ? 0 : ms / 1000,
+      delay: reduce ? 0 : delayMs / 1000,
+      ease: ease as [number, number, number, number],
+    });
     const runs = busy
       ? [
-          animate(arrowO, 0, fast(20)),
-          animate(arrowY, -8, { duration: reduce ? 0 : 0.16, ease: [0.7, 0, 0.84, 0] }),
-          (stopS.jump(0.7), stopO.jump(0), animate(stopS, 1, spring)),
-          animate(stopO, 1, fast(70)),
+          animate(arrowO, 0, tw(130, EASE_IN_QUINT)),
+          animate(arrowY, -4, tw(140, EASE_IN_QUINT)),
+          (stopS.jump(0.7), stopO.jump(0), animate(stopS, 1, reduce ? { duration: 0 } : MORPH)),
+          animate(stopO, 1, tw(260, EASE_OUT_CUBIC)),
+          (trackO.jump(0), arcO.jump(1), animate(trackO, 1, tw(210, EASE_OUT_QUAD))),
         ]
       : [
-          animate(stopO, 0, fast(16)),
-          animate(stopS, 0.7, fast(16)),
-          (arrowY.jump(2.5), arrowO.jump(0), animate(arrowY, 0, spring)),
-          animate(arrowO, 1, fast(30)),
+          animate(stopO, 0, tw(100, EASE_OUT_QUART)),
+          animate(stopS, 0.7, tw(110, EASE_OUT_CUBIC)),
+          (arrowY.jump(4), arrowO.jump(0), animate(arrowY, 0, reduce ? { duration: 0 } : MORPH)),
+          animate(arrowO, 1, tw(280, EASE_OUT_CUBIC)),
+          animate(trackO, 0, tw(210, EASE_OUT_QUAD)),
         ];
     return () => runs.forEach((r) => r.stop());
-  }, [busy, reduce, arrowO, arrowY, stopO, stopS]);
+  }, [busy, reduce, arrowO, arrowY, stopO, stopS, trackO, arcO]);
 
   // The reply body animates its height to the content (one line at a time), so a new line stays clipped until it opens.
   useEffect(() => {
@@ -395,9 +414,10 @@ export default function PromptComposer() {
                   onClick={() => (busy ? stop() : send())}
                 >
                   <svg className="pi-ring" viewBox="0 0 40 40" aria-hidden>
-                    <circle className="pi-track" cx="20" cy="20" r="18.5" />
-                    <circle
+                    <motion.circle className="pi-track" cx="20" cy="20" r="18.5" style={{ opacity: trackO }} />
+                    <motion.circle
                       ref={arcRef}
+                      style={{ opacity: arcO }}
                       className="pi-arc"
                       cx="20"
                       cy="20"
