@@ -92,7 +92,8 @@ const IDLE: FieldFrame = { mode: "idle", bx: 0, by: 0, sigma: 1, fade: 0, c: 0 }
 
 const clockOf = (job: Job, now: number) => job.frozen ?? now - job.start + RUN_AT;
 
-function makeJob(id: SceneId, seed: number, aspect: Aspect, start: number, slot: number): Job {
+/** Paint one image and its two dot grids. The clock fields are set when the run starts. */
+function makeJob(id: SceneId, seed: number, aspect: Aspect): Job {
   const label = SCENES.find((s) => s.id === id)!.label;
   const scene = paintScene(id, label, seed);
   return {
@@ -101,8 +102,8 @@ function makeJob(id: SceneId, seed: number, aspect: Aspect, start: number, slot:
     aspect,
     stageField: toFieldImage(sampleGrid(scene.canvas, STAGE_DOTS), STAGE_DOTS),
     thumbField: toFieldImage(sampleGrid(scene.canvas, THUMB_DOTS), THUMB_DOTS),
-    start,
-    slot,
+    start: 0,
+    slot: 0,
     frozen: null,
     status: "running",
     elapsed: 0,
@@ -160,6 +161,8 @@ export default function ImageGeneration() {
     reduce: false,
     upscale: null as null | { idx: number; start: number },
     runs: 0,
+    /** the first run's images, painted at mount so the auto-submit does not stall a frame */
+    prepared: null as Job[] | null,
     key: "",
   });
 
@@ -175,14 +178,21 @@ export default function ImageGeneration() {
     flushSync(() => setView(next));
   }, []);
 
+  /** Start a run. `at` pins its clock (the auto-submit); otherwise the clock starts once the images are painted. */
   const startRun = useCallback(
-    (ids: SceneId[], at: number, aspectId: Aspect) => {
+    (ids: SceneId[], aspectId: Aspect, at?: number) => {
       const e = eng.current;
       const run = e.runs++;
-      e.jobs = ids.map((id, i) => {
-        const seed = run === 0 ? FIRST_SEEDS[i % FIRST_SEEDS.length] : 10000 + ((run * 7919 + i * 104729) % 89999);
-        return makeJob(id, seed, aspectId, at, i);
+      const jobs =
+        e.prepared ??
+        ids.map((id, i) => makeJob(id, 10000 + ((run * 7919 + i * 104729) % 89999), aspectId));
+      e.prepared = null;
+      const start = at ?? performance.now();
+      jobs.forEach((job, i) => {
+        job.start = start;
+        job.slot = i;
       });
+      e.jobs = jobs;
       e.active = 0;
       e.upscale = null;
       e.dirty = true;
@@ -202,7 +212,8 @@ export default function ImageGeneration() {
     };
     reduceQuery.addEventListener("change", onReduce);
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    if (!capture) e.t0 = performance.now();
+    if (e.runs === 0 && !e.prepared) e.prepared = SCENES.map((sc, i) => makeJob(sc.id, FIRST_SEEDS[i], "1:1"));
+    if (!capture && e.t0 === null) e.t0 = performance.now();
     let raf = 0;
 
     const frame = () => {
@@ -210,9 +221,9 @@ export default function ImageGeneration() {
       // the auto-submit: the first run begins RUN_AT after mount (or after the capture's start click)
       if (e.t0 !== null && e.jobs.length === 0 && now - e.t0 >= RUN_AT) {
         startRun(
-          SCENES.map((s) => s.id),
-          e.t0 + RUN_AT,
+          SCENES.map((sc) => sc.id),
           "1:1",
+          e.t0 + RUN_AT,
         );
       }
 
@@ -308,7 +319,9 @@ export default function ImageGeneration() {
   const generate = (ids?: SceneId[]) => {
     if (!canGenerate && !ids) return;
     if (e.t0 === null) e.t0 = performance.now() - RUN_AT;
-    startRun(ids ?? SCENES.map((s) => s.id), performance.now(), aspect);
+    // a prompt other than the sample (or a Vary) paints fresh images
+    if (ids || prompt !== PROMPT || aspect !== "1:1") e.prepared = null;
+    startRun(ids ?? SCENES.map((sc) => sc.id), aspect);
   };
 
   const stop = () => {
@@ -338,6 +351,11 @@ export default function ImageGeneration() {
 
   const select = (i: number) => {
     if (!e.jobs[i]) return;
+    if (e.upscale && e.upscale.idx !== i) {
+      e.upscale = null;
+      const band = bandRef.current;
+      band?.getContext("2d")?.clearRect(0, 0, band.width, band.height);
+    }
     e.active = i;
     e.dirty = true;
     commit();

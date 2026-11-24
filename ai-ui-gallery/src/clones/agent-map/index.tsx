@@ -420,7 +420,7 @@ function MapCard({ onLoop }: { onLoop: () => void }) {
 
       if (touring.current) {
         if (T >= TOUR.loop) {
-          onLoopRef.current();
+          flushSync(() => onLoopRef.current());
           return;
         }
         if (step.current === 0 && T >= TOUR.scout) {
@@ -452,11 +452,13 @@ function MapCard({ onLoop }: { onLoop: () => void }) {
           const n = Number(c.dataset.n);
           const dur = Number(c.dataset.dur);
           const begin = (Number(c.dataset.k) * dur) / n;
-          if (!track || reduce || T < begin) {
+          // The dots' clock starts a frame after the graph mounts, like an SVG timeline that begins on insertion.
+          const Td = T - DRAW_LAG;
+          if (!track || reduce || Td < begin) {
             c.setAttribute("opacity", "0");
             return;
           }
-          const ph = ((T - begin) % dur) / dur;
+          const ph = ((Td - begin) % dur) / dur;
           const pt = track.getPointAtLength(track.getTotalLength() * easeInOut(ph));
           c.setAttribute("cx", pt.x.toFixed(2));
           c.setAttribute("cy", pt.y.toFixed(2));

@@ -80,7 +80,7 @@ function Panel({ open, keepMounted, children }: { open: boolean; keepMounted?: b
 
   if (!present) return null;
   return (
-    <div ref={ref} data-slot="trace-collapsible-content" className="ca-panel" style={open && initiallyOpen.current && first.current ? undefined : { height: 0 }} inert={!open}>
+    <div ref={ref} data-slot="trace-collapsible-content" className="ca-panel" style={initiallyOpen.current ? undefined : { height: 0 }} inert={!open}>
       <div data-slot="trace-collapsible-content-inner" className="ca-panel-inner">
         {children}
       </div>
