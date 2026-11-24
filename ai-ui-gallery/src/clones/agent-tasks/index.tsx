@@ -161,6 +161,14 @@ function nextDue(agents: Agent[]) {
   return min;
 }
 
+/** Next second boundary of any running agent's timer. */
+function nextTick(agents: Agent[], t: number) {
+  let min = Infinity;
+  for (const a of agents)
+    if (a.status === "running") min = Math.min(min, a.timerFrom + (Math.floor((t - a.timerFrom) / 1000) + 1) * 1000);
+  return min;
+}
+
 function advance(agents: Agent[], t: number): Agent[] {
   let list = agents;
   // Apply due events in time order, so queue decisions see the right number of busy agents.
@@ -539,29 +547,47 @@ function AgentTasks({ startedAt }: { startedAt: number }) {
   const [clock] = useState(createClock);
   const [draft, setDraft] = useState("");
   const titleId = useId();
-  const due = useRef(nextDue(state.agents));
-  useLayoutEffect(() => {
-    due.current = nextDue(state.agents);
-  }, [state.agents]);
+  const agentsRef = useRef(state.agents);
+  const wakeRef = useRef<() => void>(() => {});
 
-  // One frame loop drives the clock (rings, timers) and fires scheduled transitions on the frame they fall due.
+  // Scheduled transitions and timer ticks fire from timeouts set for their exact time (as in the reference), so
+  // they land on time on the capture's virtual clock too; a frame loop only advances the clock for the rings.
   useEffect(() => {
-    let id = 0;
-    const loop = () => {
-      // +0.5 ms: a frame that lands on a scheduled time (on the capture's virtual clock) can read 999.99 ms.
-      const t = performance.now() - startedAt + 0.5;
+    let timeout = 0;
+    let frame = 0;
+    // +0.5 ms: a callback that lands on a scheduled time can read 999.99 ms on the virtual clock.
+    const time = () => performance.now() - startedAt + 0.5;
+    const arm = () => {
+      window.clearTimeout(timeout);
+      const t = time();
+      const next = Math.min(nextDue(agentsRef.current), nextTick(agentsRef.current, t));
+      if (next < Infinity) timeout = window.setTimeout(wake, Math.max(0, next - t));
+    };
+    const wake = () => {
+      const t = time();
       flushSync(() => {
         clock.set(t);
-        if (t >= due.current) {
-          due.current = Infinity;
-          dispatch({ type: "advance", t });
-        }
+        if (t >= nextDue(agentsRef.current)) dispatch({ type: "advance", t });
       });
-      id = requestAnimationFrame(loop);
+      arm();
     };
-    id = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(id);
+    wakeRef.current = arm;
+    const loop = () => {
+      clock.set(time());
+      frame = requestAnimationFrame(loop);
+    };
+    frame = requestAnimationFrame(loop);
+    arm();
+    return () => {
+      window.clearTimeout(timeout);
+      cancelAnimationFrame(frame);
+    };
   }, [clock, startedAt]);
+
+  useLayoutEffect(() => {
+    agentsRef.current = state.agents;
+    wakeRef.current();
+  }, [state.agents]);
 
   const now = useCallback(() => performance.now() - startedAt, [startedAt]);
   const actionsRef = useRef<Actions>(null as unknown as Actions);

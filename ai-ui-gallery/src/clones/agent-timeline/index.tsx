@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import { flushSync } from "react-dom";
 import { CircleCheck, CircleX, CornerDownRight, Pause, Play, RotateCcw, RotateCw, Wrench } from "lucide-react";
-import { AGENTS, AXIS, LINKS, SPEEDUP, TICKS, TITLE, TOTAL_TOKENS, type RunSpan } from "./data";
+import { AGENTS, AXIS, HOP, LINKS, SPEEDUP, TICKS, TITLE, TOTAL_TOKENS, type RunSpan } from "./data";
 import "./agent-timeline.css";
 
 /*
@@ -254,7 +254,7 @@ export default function AgentTimeline() {
                           "--c": AGENTS[l.row].color,
                           height: ROW_TOP(l.row) + 22 - 36 + 0.75,
                           left: l.dir === "out" ? `calc(${pct(l.from)}% - 0.75px)` : `${pct(l.from)}%`,
-                          width: `calc(${pct(l.at - l.from)}% + 0.75px)`,
+                          width: `calc(${pct(HOP)}% + 0.75px)`,
                         } as CSSProperties
                       }
                     />

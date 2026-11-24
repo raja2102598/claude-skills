@@ -35,6 +35,9 @@ import "./chat-thread.css";
 const WIDTH_SPRING = { type: "spring", stiffness: 663, damping: 51.5, mass: 1, restDelta: 0.3, restSpeed: 2 } as const; // ω ≈ 25.75, critically damped
 const FOLLOW_K = 0.22; // share of the remaining distance per 16.7 ms frame
 const LOOP_REST = 5000; // gallery autoplay: rest after the demo before it plays again
+// The reference fires its steps on timers and shows them on the next frame; a frame that starts up to 12 ms before a
+// step's time shows it already, so each step lands on the same frame as in the reference.
+const EARLY = 12;
 
 interface TurnRec {
   id: number;
@@ -56,7 +59,7 @@ function liveAt(rec: TurnRec, now: number): TurnLive {
   const T = rec.script.timing;
   const n = tokenCount(rec.script);
   const at = rec.stoppedAt ?? now;
-  const t = at - rec.start;
+  const t = at - rec.start + EARLY;
   const ticks = t < T.stream ? 0 : Math.min(n, Math.floor((t - T.stream) / T.tick) + 1);
   const done = rec.stoppedAt != null || t >= T.stream + n * T.tick; // 50 ms after the last tick
   return {
@@ -144,7 +147,7 @@ export default function ChatThread() {
       }
       let list = turnsRef.current;
       let changed = false;
-      while (d.queue.length && now >= d.queue[0].at) {
+      while (d.queue.length && now + EARLY >= d.queue[0].at) {
         const q = d.queue.shift()!;
         list = [...list, makeTurn(q.script, q.at)];
         follow.current.stick = true;
