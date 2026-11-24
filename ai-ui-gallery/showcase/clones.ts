@@ -235,7 +235,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "model-stats",
     load: () => import("../src/clones/model-stats/index.tsx"),
     meta: () => import("../src/clones/model-stats/meta.ts"),
-    reference: "Arc UI · Model card", candidates: 6, rounds: 2, timing: "re-check pending, frame compare failed", runnerUp: "Arc UI LLM cost calculator",
+    reference: "Arc UI · Model card", candidates: 6, rounds: 5, timing: "timing passes, cost rolls on time", runnerUp: "Arc UI LLM cost calculator",
   },
   {
     slug: "prompt-enhancer",
