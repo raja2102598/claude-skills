@@ -1,18 +1,18 @@
 # sources: motion spec
 
-- **Target**: AI Elements "Sources" demo preview, https://ui.shadcn.com/docs/ai-elements/base/sources (`[data-slot=preview]`, 638×397 at 1440×900, crop `--clip 401,267,638,397`, the code panel under it hidden by `hide-code.js`). Two interactions: one replay of the demo (its Replay button) and folding the "Used 3 sources" list (its trigger).
+- **Target**: AI Elements "Sources" demo preview, https://ui.shadcn.com/docs/ai-elements/base/sources (`[data-slot=preview]`, 638×397 at 1440×901, crop `--clip 401,267,638,397`, the code panel under it hidden by `hide-code.js`). Two interactions: one replay of the demo (its Replay button) and folding the "Used 3 sources" list (its trigger).
 - **Destination**: `ai-ui-gallery/src/clones/sources/` (React 19 + TS, clone-local CSS, lucide-react; no motion library: every change is a state swap, a CSS height transition and CSS transitions for colour and rotation, which keep time on the virtual clock too).
-- **Fidelity**: pixel-faithful. shadcn/ui is MIT (LICENSE.md in shadcn-ui/ui, "Copyright (c) 2023 shadcn"); the demo is `apps/v4/examples/base/sources-demo.tsx` (copy in `src-ref/`), built on the AI Elements `Trace` (`src-ref/trace.tsx`), `Message`, `Bubble` and `Button`. Same font (Geist 400/500 from Google Fonts), colours, spacing, radii and layout, with attribution in `meta`. Copy text: fictional question, answer and source sites (placeholder titles and domains, no real publications).
+- **Fidelity**: pixel-faithful. shadcn/ui is MIT (LICENSE.md in shadcn-ui/ui, "Copyright (c) 2023 shadcn"); the demo is `apps/v4/examples/base/sources-demo.tsx` (copy in `src-ref/`), built on the AI Elements `Trace` (`src-ref/trace.tsx`), `Message`, `Bubble` and `Button`. Same font (Geist 400/500 from Google Fonts), colours, spacing, radii and layout, with attribution in `meta`. Copy: the demo's own question and answer (MIT sample copy); the cited sites are placeholders on the reserved `.example` domain (page titles kept, domains swapped), so no real publication is named or linked.
 
 ## Capture
 
-`capture.sh` / `capclone.sh`: `--viewport 1440x900 --wait-before 5000 --pre-roll 200 --clock virtual --network-wait 300 --fps 60`
+`capref.sh` / `capclone.sh`: `--viewport 1440x901 --wait-before 5000 --pre-roll 200 --clock virtual --network-wait 300 --fps 60`
 
 - reference: `--url https://ui.shadcn.com/docs/ai-elements/base/sources --pre-js hide-code.js --clip 401,267,638,397`
 - clone: `--url http://127.0.0.1:<port>/c/sources?autoplay=0 --selector "[data-stage]"`
 - replay: `--trigger click --target 'button:has-text("Replay")' --duration 1800`
 - close: `--trigger click --target '[data-slot=trace-collapsible-trigger]' --duration 600`
-- t = ms after the click; frame = 12 + t / 16.67.
+- t = ms after the click; frame = 12 + t / 16.67. The viewport is 901 tall so the centred 397 px clone stage lands on a whole pixel (at 900 it sat at y 251.5, a 0.5 px shift in round 1).
 
 ## Rows
 
@@ -45,4 +45,4 @@ Hover a source row: colour #737373 → #000 over 150 ms.
 ## Additions
 
 - `?autoplay=0` starts on the finished transcript for captures; without it the demo plays once on mount. `window.dispatchEvent(new Event("reanimate:replay"))` replays.
-- Placeholder copy: a fictional "Fernkit" CLI and three fictional doc sites (same character counts as close as practical so the layout and line breaks hold).
+- Placeholder sources: `Install Astro | guides.example`, `create-astro | packages.example`, `pnpm create | cli-notes.example` (the stream still cites four, with one repeat that is dropped). Only these three rows differ from the reference in pixels.

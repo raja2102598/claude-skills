@@ -94,18 +94,27 @@ function Panel({ open, children }: { open: boolean; children: ReactNode }) {
       return;
     }
     let timer = 0;
+    // Like Base UI, settle once the height transition has finished (the fallback covers a skipped transition).
+    const settle = () => {
+      el.removeEventListener("transitionend", onEnd);
+      window.clearTimeout(timer);
+      if (open) el.style.height = "auto";
+      else el.hidden = true;
+    };
+    const onEnd = (e: TransitionEvent) => {
+      if (e.target === el && e.propertyName === "height") settle();
+    };
     el.hidden = false;
     el.style.height = open ? "0px" : `${el.getBoundingClientRect().height}px`;
     const raf = requestAnimationFrame(() => {
       el.style.height = open ? `${el.scrollHeight}px` : "0px";
-      timer = window.setTimeout(() => {
-        if (open) el.style.height = "auto";
-        else el.hidden = true;
-      }, T.panel);
+      el.addEventListener("transitionend", onEnd);
+      timer = window.setTimeout(settle, T.panel + 100);
     });
     return () => {
       cancelAnimationFrame(raf);
       window.clearTimeout(timer);
+      el.removeEventListener("transitionend", onEnd);
     };
   }, [open]);
 
