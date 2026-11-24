@@ -1,0 +1,7 @@
+node_modules
+dist
+# reanimate working files: commit only the notes and the compare sheets, never raw captures
+.reanimate/**
+!.reanimate/**/
+!.reanimate/**/*.md
+!.reanimate/**/compare-*/sheets/**
