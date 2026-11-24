@@ -167,4 +167,6 @@
 .gu-composer { transition: opacity 200ms; }
 .gu-root[data-card] .gu-composer { opacity: 0; }
 .gu-collapse.snap { animation: gu-fade 200ms ease both; }
-.gu-foot { animation: gu-fade 250ms ease both; }
+.gu-foot span { opacity: 0; transition: opacity 250ms; }
+.gu-foot span.show { opacity: 1; }
+.gu-done { margin-top: 16px; height: 52px; font-size: 15px; line-height: 22.5px; animation: gu-fade 300ms ease both; }

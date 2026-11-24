@@ -151,6 +151,7 @@ export default function PromptStudio() {
   const [effort, setEffort] = useState("High");
   const timers = useRef<number[]>([]);
   const innerRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
   const [outH, setOutH] = useState(52);
 
   const reply = CASES.find((c) => c.id === caseId)!.reply;
@@ -164,10 +165,22 @@ export default function PromptStudio() {
   const stop = useCallback(() => { clear(); setPhase("idle"); setShown(0); }, []);
   const run = useCallback(() => {
     clear(); setShown(0); setPhase("thinking");
-    const total = words.length;
     later(() => setPhase("writing"), 800);
-    const stepMs = 900 / total;
-    for (let i = 1; i <= total; i++) later(() => setShown(i), Math.round(800 + i * stepMs));
+    // line-by-line chunks: count words per rendered line from the hidden measuring copy
+    const lines: number[] = [];
+    const spans = measureRef.current?.querySelectorAll<HTMLElement>("[data-w]") ?? [];
+    let lastTop = -1, count = 0;
+    spans.forEach((sp) => { if (sp.offsetTop !== lastTop && count) { lines.push(count); count = 0; } lastTop = sp.offsetTop; count++; });
+    if (count) lines.push(count);
+    const n = Math.max(lines.length, 1);
+    const T = [800, 917, 1000, 1167, 1200, 1350, 1500]; // reference chunk times
+    let acc = 0;
+    lines.forEach((c, k) => {
+      acc += c;
+      const f = n > 1 ? (k * (T.length - 1)) / (n - 1) : 0, lo = Math.floor(f), hi = Math.min(lo + 1, T.length - 1);
+      const at = Math.round(T[lo] + (T[hi] - T[lo]) * (f - lo)), cum = acc;
+      later(() => setShown(cum), at);
+    });
     const end = 1780;
     later(() => { setPhase("done"); setElapsed((end / 1000 - 0.25).toFixed(2)); }, end);
   }, [words.length]);
@@ -201,6 +214,9 @@ export default function PromptStudio() {
   return (
     <div className="ps-root" data-stage>
       <section className="ps-card">
+        <div ref={measureRef} className="ps-out ps-measure" aria-hidden="true"><div className="ps-body">
+          {reply.map((p, pi) => <p key={pi}>{p.split(" ").map((w, wi) => <span key={wi} data-w="">{w}{" "}</span>)}</p>)}
+        </div></div>
         <header className="ps-head">
           <h2 className="ps-title">Order reply</h2>
           <div className="ps-chips">
@@ -269,7 +285,7 @@ export default function PromptStudio() {
           </div>
         </div>
 
-        <div className="ps-outframe" style={{ height: outH, transitionDuration: phase === "writing" ? "140ms" : phase === "done" ? "200ms" : "340ms", transitionTimingFunction: "ease-out" }}>
+        <div className="ps-outframe" style={{ height: outH, transitionDuration: phase === "done" ? "200ms" : "340ms", transitionTimingFunction: "ease-out" }}>
           <div ref={innerRef}>
             <div className="ps-out">
               {phase === "idle" ? (
@@ -287,7 +303,7 @@ export default function PromptStudio() {
                   {(phase === "writing" || phase === "done") && (
                     <div className="ps-body">
                       {reply.map((p, pi) => {
-                        const ws = p.split(" ").map((w, wi) => { const idx = visible++; return idx < shown || phase === "done" ? <span key={wi} className="ps-w" style={phase === "done" ? { animation: "none", opacity: 1 } : undefined}>{w}{" "}</span> : null; });
+                        const ws = p.split(" ").map((w, wi) => { const idx = visible++; return idx < shown || phase === "done" ? <span key={wi} className={clsx("ps-w",)} style={phase === "done" ? { animation: "none", opacity: 1 } : undefined}>{w}{" "}</span> : null; });
                         const any = ws.some(Boolean);
                         return any ? <p key={pi}>{ws}</p> : null;
                       })}

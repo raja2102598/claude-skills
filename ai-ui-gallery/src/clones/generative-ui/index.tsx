@@ -360,14 +360,12 @@ export default function GenerativeUI() {
                                     );
                                   })}
                                 </div>
-                                {stage === "confirmed" && (
-                                  <div className="gu-foot">
-                                    <code>0x821b…c253</code>
-                                    <span>
-                                      View on explorer <ExternalLink size={12} />
-                                    </span>
-                                  </div>
-                                )}
+                                <div className="gu-foot">
+                                  <code>0x821b…c253</code>
+                                  <span className={stage === "confirmed" ? "show" : ""}>
+                                    View on explorer <ExternalLink size={12} />
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -382,6 +380,7 @@ export default function GenerativeUI() {
                       </div>
                     </div>
                   )}
+                  {stage === "confirmed" && <div className="gu-done">Done. You swapped 0.5 LMN for {receive} USDX.</div>}
                 </div>
               </div>
             )}

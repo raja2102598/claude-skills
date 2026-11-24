@@ -79,8 +79,9 @@
 @keyframes ps-fade { from { opacity:0; } to { opacity:1; } }
 .ps-body { padding:4px 12px 0; font-size:14px; line-height:23px; }
 .ps-body p { margin:0 0 7px; } .ps-body p:last-child { margin:0; }
-.ps-w { display:inline; opacity:0; animation:ps-word 220ms ease-out forwards; }
-@keyframes ps-word { from { opacity:0; filter:blur(3px); } to { opacity:1; filter:none; } }
+.ps-w { display:inline; opacity:0; animation:ps-word 260ms ease-out forwards; }
+@keyframes ps-word { from { opacity:0; } to { opacity:1; } }
+.ps-measure { position:absolute; left:0; right:0; top:0; visibility:hidden; pointer-events:none; border:0; }
 .ps-foot { padding:0 12px; font-size:12px; line-height:29px; color:var(--fg3); animation:ps-fade 240ms ease-out both; }
 .ps-empty { padding:0 12px; font-size:13px; color:var(--fg2); line-height:29px; }
 
