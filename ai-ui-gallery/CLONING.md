@@ -84,7 +84,11 @@ src/clones/<slug>/*              any other files the clone needs (clone-local CS
   motion animations can stay frozen at their start value. Measure such rows on the reference with
   real-clock rAF probes (`--track` without `--clock virtual`). In the clone, use CSS keyframes for
   short opacity/transform transitions (sample a spring into a `linear()` easing). Those behave the same
-  on both clocks. Keep `motion` for JS-driven values such as height and layout.
+  on both clocks. Keep `motion` for JS-driven values such as height and layout. Alternatives that also
+  worked: animate motion values with `animate(value, …)`, or give a motion element an `onUpdate`
+  handler. Either keeps the tween on motion's JS frameloop instead of WAAPI.
+- Measure WAAPI rows on the real clock in your first or second round, not your last. Two clones needed
+  a 6th or 7th round because their real-clock probes came late.
 - The machine has 4 CPUs shared with other agents. Keep captures short (the motion plus about 1 s),
   use `--fps 25` or lower unless the motion needs more, and do not run captures in parallel yourself.
 - Keep raw captures under `.reanimate/`. The `.gitignore` keeps `spec.md`, `report.md`,

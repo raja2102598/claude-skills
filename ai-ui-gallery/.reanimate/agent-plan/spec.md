@@ -15,7 +15,8 @@
 Both sides: `--viewport 1440x1200 --trigger none --wait-before 3000 --pre-roll 0 --duration 12000 --fps 20 --clock virtual`,
 crop 496x549 (card 448 wide + 24 px pad). Reference: `--clip 592,481,496,549`, `--pre-js` clicks
 `#runner button[aria-label="Refresh preview"]` (remounts the demo, t=0 = remount). Clone: `--clip` of the stage
-(same size), `--pre-js "dispatchEvent(new Event('reanimate:replay'))"` (remounts the clone).
+(same size, = the `[data-stage]` rect at 472,325 in a 1440x1199 viewport), `--pre-js "dispatchEvent(new Event('reanimate:replay'))"`
+(remounts the clone).
 No `--selector`, so frames start right at the pre-js (no 300 ms scroll settle).
 
 ## Static facts the motion depends on (reference, CSS px)
@@ -43,15 +44,28 @@ No `--selector`, so frames start right at the pre-js (no 300 ms scroll settle).
 | 5 | markers | draft numbers → bordered circles; running = spinner | 700 | 0 | | instant | spinner 1 turn / 1 s linear, arc ~90° + centre dot |
 | 6 | titles | pending muted, running/done foreground | 700, each handoff | 300 | | css ease | |
 | 7 | input / footer | "Add a step" → "Steer the next step"; footer text → "Step 1 of 6 · 0.0s · 1 call" | 700 | 0 | | instant | |
-| 8 | footer button | Run plan → Stop: old gone at once, new pops | 700 | 300 | scale .5 → 1, opacity 0 → 1 | easeOutExpo (0.16,1,0.3,1) | frame 15 Stop at ~0.8 scale |
+| 8 | footer button | Run plan → Stop cross-fade (popLayout): old fades out, new pops in at the same time | 700 | old ~110, new 300 | old: opacity 1 → 0 linear ~110 ms, scale 1 → .5 ~130 ms; new: scale .5 → 1, opacity 0 → 1 | old: linear / ease-in-out; new: easeOutExpo | virtual frame 15: Stop at ~0.8 scale; opacity part measured with the real-clock probe (WAAPI) |
 | 9 | output block | height 0 → auto on step start (card h +22) | 700, 2533, 4033, 6633, 8333 | 300 | | easeOutExpo (0.16,1,0.3,1), fitted 284-300 ms, rmse .003 | from easing.ts on card h |
 | 10 | output line | x -4 → 0, opacity 0 → 1 | each line | 300 | | easeOutExpo, fitted 300 ms rmse .002 | |
 | 11 | line schedule | lines appear on a 100 ms tick grid at ceil100(k·dur/n) into the step | s1 0/600/1200, s2 0/800, s3 0/900/1800, s4 0/900, s5 0/1200 | | | | step durations 1800/1500/2600/1700/2300 ms |
 | 12 | line insert | step row layout animation (translate + scaleY from old box), rows below slide +18 | each line ≥ 2 | ~300 | | easeOutExpo | card/footer jump +18 at once; 1-2 frames of vertical squish |
-| 13 | step handoff | done marker pops (scale .4 → 1, opacity), old output hidden at once and height → 0, next output enters | 2533, 4033, 6633, 8333 (tick + ~33) | 300 | | easeOutExpo | card h 465 → 429 etc. animated |
+| 13 | step handoff | marker cross-fade (old: opacity → 0 ~100-110 ms, scale → .5; new check: scale .5 → 1 + opacity, 300 ms); old output opacity → 0 and height → 0; next output enters | 2533, 4033, 6633, 8333 (tick + ~33) | 300 | | easeOutExpo; exit opacity ~linear | card h 465 → 429 etc. animated; opacity rows from the real-clock probe |
 | 14 | connector | fill scaleY 0 → 1 (origin top) on done | each handoff | 300 | | easeOutExpo | 34 % after 17 ms |
 | 15 | segment fill | scaleX = step elapsed / duration, follows the 100 ms tick (lag ~100 ms) | step start | step duration | 0 → 1 | linear | colour accent while running |
 | 16 | segment colour | accent → foreground on done, → red on fail | handoff / fail | 300 | | css ease | |
 | 17 | timers | step time and footer total count in 0.1 s per tick | 700 | per 100 ms | | step | done rows freeze at 1.8/1.5/2.6/1.7 s, total 9.9 s |
 | 18 | failure | at 10600: pill → "Needs attention" red, marker → red X (pop), title red (300), error line enters, Retry button, footer "Step 5 failed · 9.9s · 12 calls", Stop → edit icon (pop), segment → red | 10600 | 300 | | easeOutExpo / css ease | card +54 instant, row 6 slides (layout) |
 | 19 | rest | static from ~11.1 s | | | | | |
+
+## Real-clock probe (WAAPI rows)
+
+`motion` runs opacity (and some transforms) through WAAPI, which reanimate's virtual clock does not drive, so in
+`ref/` those fades collapse to one frame. Measured instead with real-clock rAF tracks (`ref-realclock/`,
+`ref-realclock-2/`, no `--clock virtual`):
+
+- output line enter: opacity 0 → 1 with x -4 → 0, easeOutExpo ~300 ms (0.38 / 0.58 / 0.72 / 0.81 / 0.87 per frame)
+- output block: opacity 0 → 1 on enter and 1 → 0 on exit, alongside height, easeOutExpo ~300 ms
+- marker swap (pending → spinner → check): old fades out (opacity linear ~103-113 ms, scale 1 → .5 ~120-140 ms)
+  while the new one pops in (scale .5 → 1, opacity 0 → 1)
+- footer button swap: same cross-fade; the Stop button is at 0.93-0.95 scale when the old one is removed
+- layout slide after a streamed line: easeOutExpo ~218 ms (virtual clock, JS-driven, so `ref/` is exact)
