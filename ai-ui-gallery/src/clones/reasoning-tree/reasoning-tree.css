@@ -31,6 +31,7 @@
 }
 @keyframes rt-shimmer { to { background-position-x: 0; } }
 .rt-status.done { color: var(--ink); }
+.rt-status.done svg { color: var(--best); }
 
 .rt-cols { position: absolute; left: 0; right: 0; top: 60px; height: 20px; }
 .rt-col { position: absolute; top: 0; color: var(--muted); white-space: nowrap; transition: color 200ms cubic-bezier(0.22, 1, 0.36, 1); }
@@ -81,7 +82,7 @@
 .rt-ic { position: absolute; opacity: 0; transition: opacity 100ms cubic-bezier(0.22, 1, 0.36, 1); }
 .rt-ic.on { opacity: 1; transition-duration: 150ms; }
 .rt-btn:hover { background: var(--faint); }
-.rt-btn:disabled { opacity: 0.4; cursor: default; }
+.rt-btn:disabled { cursor: default; }
 .rt-beam { margin-left: auto; color: var(--muted); display: flex; align-items: center; gap: 12px; }
 .rt-seg { position: relative; display: flex; padding: 3px; border-radius: 12px; background: var(--faint); border: 1px solid #eceef3; }
 .rt-seg button { position: relative; z-index: 1; width: 34px; height: 30px; border: 0; background: none; color: var(--muted); border-radius: 9px; font: inherit; cursor: pointer; }

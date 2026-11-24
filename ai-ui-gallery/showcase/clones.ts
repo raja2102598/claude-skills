@@ -271,7 +271,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "reasoning-tree",
     load: () => import("../src/clones/reasoning-tree/index.tsx"),
     meta: () => import("../src/clones/reasoning-tree/meta.ts"),
-    reference: "Arc UI · Reasoning tree", candidates: 1, rounds: 4, timing: "partial, run end 0.5 s early", runnerUp: "none (only candidate)",
+    reference: "Arc UI · Reasoning tree", candidates: 1, rounds: 7, timing: "every event within 51 ms, tail included", runnerUp: "none (only candidate)",
   },
   {
     slug: "share-chat",

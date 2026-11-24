@@ -17,8 +17,10 @@ import "./reasoning-tree.css";
 // step: 0 ready (play icon, card taller than the stage), 1 reading (the stage shrinks and the controls slide in at the
 // same moment, in the reference too), then per depth k: propose, score, keep (depth 3: answer, whose path highlight
 // keeps moving for 1.26 s after the step). Times are ms from mount, read off the reference on the virtual clock.
-const S = 34;
-const T = [0, S, S + 550, S + 1184, S + 2084, S + 2867, S + 3484, S + 4384, S + 5150, S + 5784, S + 6684];
+const S = 0;
+// 40 ms is taken off every step after Reading: the clone's rAF clock lags the reference's timers by about one frame
+const L = 40;
+const T = [0, S, S + 550 - L, S + 1184 - L, S + 2084 - L, S + 2867 - L, S + 3484 - L, S + 4384 - L, S + 5150 - L, S + 5784 - L, S + 6684 - L];
 const P = (k: number) => 2 + 3 * (k - 1);
 const END = 10;
 
@@ -104,7 +106,7 @@ export default function ReasoningTree() {
     setRunning(true);
   }, []);
 
-  // autoplay shortly after mount (Ready lasts two frames, long enough to paint the tall card, like the reference's pre-hydration state), and again after a reset or beam change
+  // autoplay shortly after mount (Ready lasts one frame: the reference's Ready is its pre-hydration state and autoplay starts at hydration), and again after a reset or beam change
   useEffect(() => {
     if (step === 0 && !running && !clock.current.running) {
       clock.current.running = true;
@@ -208,6 +210,7 @@ export default function ReasoningTree() {
           <span className="rt-statuswrap" data-rt-status>
             {prev !== null && <span key={"o" + prev} className="rt-status rt-out">{prev}</span>}
             <span key={status} className={clsx("rt-status", prev !== null && "rt-in", live && !paused && "live", answer && "done")}>
+              {answer && <Check size={14} />}
               {status}
             </span>
           </span>
@@ -257,7 +260,7 @@ export default function ReasoningTree() {
 
         {all.map((n) => {
           const kept = decided(n) && n.kept;
-          const pathDelay = answer && n.onPath ? 160 + (n.depth - 1) * (760 / 3) : 0;
+          const pathDelay = answer && n.onPath ? 160 + n.depth * (760 / 3) : 0;
           return (
             <div
               key={n.t.id}
