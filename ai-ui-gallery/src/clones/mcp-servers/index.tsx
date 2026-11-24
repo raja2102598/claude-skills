@@ -36,9 +36,9 @@ function Card() {
   const authorize = () => {
     setSheet((s) => s && { ...s, busy: true });
     later(650, () => setSheet((s) => s && { ...s, kind: "discover", busy: false, shown: 0 }));
-    for (let i = 1; i <= 4; i++) later(650 + 800 + (i - 1) * 100, () => setSheet((s) => s && { ...s, shown: i }));
-    later(650 + 800 + 300 + 100, () => setSheet((s) => s && { ...s, found: true }));
-    later(650 + 800 + 300 + 150, () => setSheet((s) => s && { ...s, ready: true }));
+    for (let i = 1; i <= 4; i++) later(650 + 750 + (i - 1) * 100, () => setSheet((s) => s && { ...s, shown: i }));
+    later(650 + 750 + 300 + 150, () => setSheet((s) => s && { ...s, found: true }));
+    later(650 + 750 + 300 + 200, () => setSheet((s) => s && { ...s, ready: true }));
   };
   const closeSheet = (apply: boolean) => {
     setSheet((s) => s && { ...s, out: true });
@@ -171,7 +171,7 @@ function Card() {
                 {sheet.kind === "signin" ? (
                   <>
                     <button type="button" className="ms-ghost" onClick={() => closeSheet(false)}>Cancel</button>
-                    <button type="button" className="ms-primary" data-ms="authorize" onClick={authorize} disabled={sheet.busy}>{sheet.busy ? <span className="ms-spin" /> : "Authorize"}</button>
+                    <button type="button" className={`ms-primary${sheet.busy ? " busy" : ""}`} data-ms="authorize" onClick={authorize} aria-busy={sheet.busy}>{sheet.busy ? <span className="ms-spin" /> : "Authorize"}</button>
                   </>
                 ) : (
                   <button type="button" className="ms-primary" data-ms="done" disabled={!sheet.ready} onClick={() => closeSheet(true)}>Done</button>

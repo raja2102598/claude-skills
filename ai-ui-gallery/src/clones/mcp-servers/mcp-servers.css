@@ -102,3 +102,5 @@
 .ms-skel u { display: block; height: 24px; width: 42px; border-radius: 9999px; background: var(--track); }
 @keyframes ms-tool-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 .ms-found { animation: ms-fade 180ms ease-out both; }
+
+.ms-primary.busy { background: #45423b !important; cursor: default; pointer-events: none; }

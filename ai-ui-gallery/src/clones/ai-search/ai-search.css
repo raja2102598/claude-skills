@@ -19,6 +19,7 @@
 .as-head:first-child { margin-top: 0; }
 .as-row { height: 40px; display: flex; align-items: center; gap: 12px; padding: 0 12px; border-radius: 10px; white-space: nowrap; }
 .as-row > svg, .as-row > .as-ico { flex: none; width: 17px; height: 17px; color: #5d574e; }
+.as-row { transition: background-color 180ms ease-out; }
 .as-row.on { background: var(--hover); }
 .as-row.faint { background: #faf7f1; }
 .as-title { font-weight: 450; }

@@ -20,9 +20,9 @@ import "./ai-search.css";
 const PERIOD = 18000;
 const TYPE_START = 1070;
 const TYPE_MS = 25;
-const TOKEN_MS = 14.5;
+const TOKEN_MS = 13.5;
 const DONE_LAG = 100;
-const START_OFFSET = 500;
+const START_OFFSET = 0;
 
 interface Run { script: Script; ask: number; thinkEnd: number; reset: number; typed: boolean }
 const RUNS: Run[] = [
@@ -46,7 +46,7 @@ function Hl({ text, query }: { text: string; query: string }) {
 
 function useClock() {
   const [t, setT] = useState(0);
-  // the capture starts the loop clock at navigation; mounting takes ~0.5 s there, so start 0.5 s in
+  // the capture starts the loop clock at navigation; mounting at about 0.4 s there is already counted in the script times
   const t0 = useRef(performance.now() - START_OFFSET);
   useEffect(() => {
     let raf = 0;
@@ -117,7 +117,7 @@ function citeRevealed(script: Script, n: Cite, now: number, thinkEnd: number) {
 export default function AiSearch() {
   const t = useClock();
   const tt = t % PERIOD;
-  const hidden = t < 250;
+  const fade = Math.max(0, Math.min(1, (t - 100) / 380)); // the card fades in over ~0.4 s
 
   const run = tt < RUNS[0].reset ? RUNS[0] : RUNS[1];
   const base = run === RUNS[0] ? 0 : RUNS[0].reset;
@@ -150,7 +150,7 @@ export default function AiSearch() {
   };
 
   return (
-    <div className="as-root" style={{ visibility: hidden ? "hidden" : "visible" }}>
+    <div className="as-root" style={{ opacity: fade }}>
       <div className="as-field">
         <Search size={17} strokeWidth={1.6} />
         <div className={"as-input" + (query ? "" : " ph")}>{query || "Search docs, customers and issues"}</div>

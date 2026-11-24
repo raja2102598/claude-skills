@@ -20,7 +20,8 @@ const NEXT: Partial<Record<Phase, [Phase, number]>> = {
   writing: ["done", 1988],
   done: ["idle", 1844],
 };
-const WIDTH_DELAY = 300;
+// delay from the swap to the width change: 335 / 313 / 408 / 471 ms measured on the reference
+const WIDTH_DELAY: Record<Phase, number> = { reading: 335, writing: 313, done: 408, idle: 471 };
 
 function Icon({ phase }: { phase: Phase }) {
   if (phase === "idle") return <Sparkles className="aib-spark" strokeWidth={2.2} fill="currentColor" />;
