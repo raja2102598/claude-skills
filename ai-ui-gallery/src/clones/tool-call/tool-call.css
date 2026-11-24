@@ -148,7 +148,7 @@
 .tc-btn-outline:hover { background: var(--tc-hover); }
 .tc-btn-solid { border: 1px solid var(--tc-ink); background: var(--tc-ink); color: #fff; }
 .tc-btn-solid:hover { background: color-mix(in oklab, var(--tc-ink) 88%, white); }
-.tc-btn-ghost { margin: 4px 0 0 -6px; border: 0; background: transparent; color: var(--tc-secondary); padding: 0 8px 0 6px; }
+.tc-btn-ghost { margin: 4px 0 0 -6px; border: 0; background: transparent; color: var(--tc-secondary); padding: 0 8px 0 6px; font-size: 13px; font-weight: 400; }
 .tc-btn-ghost:hover { background: var(--tc-fill); color: var(--tc-ink); }
 
 /* ---------- row details ---------- */

@@ -48,7 +48,7 @@ const SHIMMER_LEAD = { row: 280, header: 200 };
 // Main run, ms from mount.
 const T = { chunk1: 180, chunk2: 230, group: 600, done1: 1800, row2: 2017, done2: 2777, row3: 3000, fail3: 4385 };
 // Follow-ups, ms from the click.
-const RETRY = { done: 700, approval: 975 };
+const RETRY = { done: 700, approval: 960 };
 const ALLOW = { done: 620, collapse: 1100, answer: 1580, chunkGap: 45, runAgain: 2280 };
 const DENY = { answer: 480, runAgain: 1180 };
 
