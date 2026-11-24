@@ -9,22 +9,47 @@ const ICONS = { Minimize2, WandSparkles, Smile, Briefcase, SpellCheck } as const
 
 // Timeline, ms. menuAt = menu starts to appear; the command is picked CLICK_AFTER later.
 const CLICK_AFTER = 870;
-const THINK = 2400; // click -> first token
-const STREAM = 3750; // first token -> last token
+const THINK = 980; // click -> first token
+const STREAM = 1840; // first token -> review bar morph (2820 after the click, as measured on the reference)
 const AUTO_ACCEPT = 4000; // review -> auto accept (autoplay only)
 const RESET = 2800; // resolved -> restart
 const LEAD = 700; // mount -> menu open
 
-// Reveal progress (fraction of tokens) vs ms after the click; the reference streams in uneven bursts.
-const ANCHORS: [number, number][] = [[THINK, 0], [3750, 0.3], [5400, 0.75], [THINK + STREAM, 1]];
-function frac(ms: number) {
-  for (let i = 1; i < ANCHORS.length; i++) {
-    const [t1, f1] = ANCHORS[i];
-    const [t0, f0] = ANCHORS[i - 1];
-    if (ms <= t1) return f0 + ((f1 - f0) * Math.max(0, ms - t0)) / (t1 - t0);
-  }
-  return 1;
-}
+// Reveal time (ms after the click) of every token, per op of the diff. Measured on the reference
+// on the virtual clock: one word per ~150 ms at first, then uneven bursts, deletions struck at the end.
+const OP_TIMES: number[][] = [
+  [983, 1117, 1200, 1283, 1450], // keep: Volunteers in the east ward
+  [1729], // del has
+  [1550], // ins have
+  [1617, 1767, 1800, 1820, 1850], // keep: been asking for lanterns for
+  [1883], // del over
+  [1933, 1960], // keep: a year.
+  [2133], // del Right now, if
+  [2000], // ins Today,
+  [2017], // keep a
+  [2250], // keep family
+  [2183], // ins who
+  [2333, 2450, 2500], // keep loses the trail
+  [2783], // del in the dusk parade,
+  [2367, 2533, 2583], // ins mid parade loses
+  [2633], // keep the
+  [2683], // keep route
+  [2783], // del just goes dark
+  [2733], // keep and
+  [2783], // del they have
+  [2750], // ins has
+  [2783, 2850], // keep to start
+  [2800], // del over when ...
+  [2800], // ins over.
+];
+const TOK_AT: number[] = (() => {
+  const seen: Record<number, number> = {};
+  return TOKS.map((t) => {
+    const n = (seen[t.op] = (seen[t.op] ?? -1) + 1);
+    const list = OP_TIMES[t.op];
+    return list[Math.min(n, list.length - 1)];
+  });
+})();
 
 type Status = "pending" | "accepted" | "rejected";
 
@@ -81,7 +106,7 @@ export default function AiInlineEdit() {
   else if (c.clickAt !== null) phase = "think";
   else if (sinceMenu >= 0) phase = "menu";
 
-  const cursor = phase === "stream" ? Math.min(TOKS.length, Math.ceil(frac(sinceClick) * TOKS.length)) : phase === "review" || phase === "done" ? TOKS.length : 0;
+  const isShown = (i: number) => phase === "review" || phase === "done" || ((phase === "think" || phase === "stream") && sinceClick >= TOK_AT[i]);
   const dimming = phase === "think" || phase === "stream";
   const changeOf = useMemo(() => {
     const m: Record<number, number> = {};
@@ -141,24 +166,20 @@ export default function AiInlineEdit() {
       OPS.forEach((o, i) => o.k !== "ins" && out.push(<span key={i} className="sel">{o.text}</span>));
       return out;
     }
-    const seen = new Map<number, number>(); // op -> tokens shown
-    TOKS.slice(0, cursor).forEach((t) => seen.set(t.op, (seen.get(t.op) ?? 0) + 1));
-    // build per-token nodes
-    const shown = TOKS.slice(0, cursor);
     let idx = 0;
-    shown.forEach((t) => {
+    TOKS.forEach((t, i) => {
+      if (!isShown(i)) {
+        if (t.k !== "ins") out.push(<span key={"t" + i} className="tok-dim">{t.text}</span>);
+        return;
+      }
       const s = status[changeOf[t.op]] ?? "pending";
       const key = idx++;
-      if (t.k === "keep") out.push(<span key={key}>{t.text}</span>);
+      if (t.k === "keep") out.push(<span key={"k" + i}>{t.text}</span>);
       else if (t.k === "del") {
-        if (s !== "accepted") out.push(<span key={key} className="del">{t.text}</span>);
-      } else if (s !== "rejected") out.push(<span key={key} className={s === "accepted" ? undefined : "ins"}>{t.text}</span>);
+        if (s !== "accepted") out.push(<span key={"k" + i} className="del">{t.text}</span>);
+      } else if (s !== "rejected") out.push(<span key={"k" + i} className={s === "accepted" ? undefined : "ins"}>{t.text}</span>);
+      void key;
     });
-    // dim original tail
-    for (let i = cursor; i < TOKS.length; i++) {
-      const t = TOKS[i];
-      if (t.k !== "ins") out.push(<span key={"t" + i} className="tok-dim">{t.text}</span>);
-    }
     return out;
   };
 

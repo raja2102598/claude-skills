@@ -53,24 +53,24 @@
 .gu-sugg small { color: var(--ink3); font-size: 12.5px; margin-top: 4px; }
 
 /* thread */
-.gu-thread { position: absolute; left: 0; right: 0; top: 66px; bottom: 88px; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; padding: 0 0 18px 218px; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22px); mask-image: linear-gradient(to bottom, transparent 0, #000 22px); }
-.gu-col { width: 700px; display: flex; flex-direction: column; gap: 22px; }
+.gu-thread { position: absolute; left: 0; right: 0; top: 66px; height: 606px; overflow: hidden; z-index: 2; padding: 30px 0 18px 218px; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 6px); mask-image: linear-gradient(to bottom, transparent 0, #000 6px); }
+.gu-col { width: 700px; display: flex; flex-direction: column; gap: 25px; }
 .gu-user { align-self: flex-end; background: var(--accent); color: var(--accent-ink); padding: 10px 17px; border-radius: 18px 18px 6px 18px; font-size: 15px; font-weight: 500; animation: gu-rise 250ms var(--ease) both; margin-right: 0; }
 .gu-asst { display: flex; gap: 14px; align-items: flex-start; animation: gu-fade 300ms ease both; }
 .gu-asst .gu-orb { width: 24px; height: 24px; margin-top: 1px; }
 .gu-body { flex: 1; min-width: 0; }
-.gu-steps { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+.gu-steps { display: flex; flex-direction: column; gap: 2px; }
 .gu-step { display: flex; align-items: center; gap: 8px; height: 20px; font-size: 13px; animation: gu-rise-s 250ms var(--ease) both; }
 .gu-step b { font-weight: 500; }
 .gu-step em { font-style: normal; color: var(--ink3); }
 .gu-dot { width: 16px; height: 16px; flex: none; position: relative; display: grid; place-items: center; }
 .gu-dot .spin { width: 13px; height: 13px; border-radius: 50%; border: 1.6px solid #4a443d; border-top-color: var(--ink2); animation: gu-spin 800ms linear infinite; }
 .gu-dot .ok { position: absolute; inset: 0; border-radius: 50%; background: var(--ink); color: #121110; display: grid; place-items: center; animation: gu-pop 360ms var(--ease) both; }
-.gu-text { margin-top: 14px; font-size: 15px; line-height: 1.5; }
+.gu-text { margin-top: 11px; font-size: 15px; line-height: 1.5; }
 .gu-w { display: inline-block; white-space: pre; animation: gu-word 260ms var(--ease) both; }
 
 /* generated card */
-.gu-cardwrap { margin-top: 16px; animation: gu-card-in 460ms var(--ease) both; }
+.gu-cardwrap { margin-top: 13px; animation: gu-card-in 460ms var(--ease) both; }
 .gu-card { width: 382px; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 14px; }
 .gu-ch { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 12px; }
 .gu-ch .l { display: flex; align-items: center; gap: 10px; }
@@ -162,3 +162,9 @@
 @keyframes gu-dots { 0%, 100% { opacity: .25; } 40% { opacity: 1; } }
 .gu-actions .no { transition: width 260ms var(--ease), opacity 200ms, margin 260ms var(--ease), background 150ms; }
 .gu-actions .no.gone { width: 0; opacity: 0; margin-right: -8px; overflow: hidden; }
+
+/* the reference composer sits below the visible stage; fade ours out once the card is on screen so it never shows through or beside the card */
+.gu-composer { transition: opacity 200ms; }
+.gu-root[data-card] .gu-composer { opacity: 0; }
+.gu-collapse.snap { animation: gu-fade 200ms ease both; }
+.gu-foot { animation: gu-fade 250ms ease both; }

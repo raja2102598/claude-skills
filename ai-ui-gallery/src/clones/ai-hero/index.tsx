@@ -16,7 +16,7 @@ const CHIPS = ["Plan next sprint", "Summarize my inbox", "Prep tomorrow's standu
 const BAR_H = [231, 287, 340, 386, 419, 386, 340, 287, 231]; // px at the 1293 px reference width
 const WORD_BASE = 183; // ms, first word starts moving
 const WORD_STEP = 142; // ms per word; line 2 starts two steps after line 1
-const CHIP_DELAY = [340, 392, 445];
+const CHIP_DELAY = [361, 400, 445];
 const PROMPT_DELAY = [0.317, 3.117, 5.917]; // s, 2.8 s apart
 
 const NAV = ["Product", "Agents", "Use cases", "Pricing"];
@@ -89,7 +89,7 @@ export default function AiHero() {
       </header>
 
       <div className="ah-col">
-        <div className="ah-eyebrow ah-in">
+        <div className="ah-eyebrow ah-in ah-snapin">
           <span className="ah-dot" />
           Your assistant, one step ahead
         </div>
@@ -107,11 +107,11 @@ export default function AiHero() {
             </span>
           ))}
         </h1>
-        <p className="ah-sub ah-in">
+        <p className="ah-sub ah-in ah-snapin">
           Describe the outcome in one sentence. Wren drafts it, checks the details and hands back something you can ship.
         </p>
 
-        <div className="ah-comp ah-in">
+        <div className="ah-comp ah-in ah-snapin">
           <div className="ah-card">
             <div className="ah-card-in">
               <textarea
@@ -148,7 +148,7 @@ export default function AiHero() {
               <button
                 key={c}
                 type="button"
-                className="ah-chip ah-in"
+                className="ah-chip ah-in ah-snapin"
                 style={{ ["--d" as string]: `${CHIP_DELAY[i]}ms` }}
                 onClick={() => {
                   setValue(c);

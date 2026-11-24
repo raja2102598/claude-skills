@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { ArrowDown, ArrowUpRight, Check, ExternalLink, Repeat2, Send, ShieldCheck, ArrowUp, X } from "lucide-react";
 import "./generative-ui.css";
@@ -46,6 +46,8 @@ export default function GenerativeUI() {
   const [rate, setRate] = useState(2412.38);
   const [balance, setBalance] = useState(22237.6);
   const timers = useRef<number[]>([]);
+  const threadRef = useRef<HTMLDivElement>(null);
+  const scrollRaf = useRef(0);
   const at = useCallback((ms: number, fn: () => void) => {
     timers.current.push(window.setTimeout(() => flushSync(fn), ms));
   }, []);
@@ -117,12 +119,31 @@ export default function GenerativeUI() {
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
+  // Like the reference: the thread is top-anchored and only scrolls (quick ease-out, ~130 ms) when the content grows past the viewport:
+  // a few px when the card lands, then when the stepper opens and when Confirmed adds the result line.
+  useLayoutEffect(() => {
+    const el = threadRef.current;
+    if (!el) return;
+    const from = el.scrollTop;
+    const to = el.scrollHeight - el.clientHeight;
+    if (to <= from + 0.5) return;
+    cancelAnimationFrame(scrollRaf.current);
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const k = Math.min(1, (now - t0) / 130);
+      el.scrollTop = from + (to - from) * (1 - Math.pow(1 - k, 3));
+      if (k < 1) scrollRaf.current = requestAnimationFrame(tick);
+    };
+    scrollRaf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(scrollRaf.current);
+  }, [think, steps.shown, text, card, stage, progress]);
+
   const receive = (0.5 * rate).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const min = (0.5 * rate * 0.995).toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
   const words = REPLY.split(/(?<= )/);
 
   return (
-    <div className="gu-root" data-gu-root>
+    <div className="gu-root" data-gu-root data-card={card ? "" : undefined}>
       <header className="gu-head">
         <div className="gu-who">
           <span className="gu-orb" style={{ width: 28, height: 28 }} />
@@ -163,7 +184,7 @@ export default function GenerativeUI() {
       ) : null}
 
       {started && user ? (
-        <div className="gu-thread">
+        <div className="gu-thread" ref={threadRef}>
           <div className="gu-col">
             <div className="gu-user">Swap 0.5 LMN to USDX</div>
             {(think || steps.shown > 0) && (
@@ -319,7 +340,7 @@ export default function GenerativeUI() {
                           </div>
                         )}
                         {(stage === "pending" || stage === "confirmed") && (
-                          <div className="gu-collapse in">
+                          <div className="gu-collapse snap">
                             <div>
                               <div className="gu-prog">
                                 <div className="gu-stepper">
@@ -339,12 +360,14 @@ export default function GenerativeUI() {
                                     );
                                   })}
                                 </div>
-                                <div className="gu-foot">
-                                  <code>0x821b…c253</code>
-                                  <span>
-                                    View on explorer <ExternalLink size={12} />
-                                  </span>
-                                </div>
+                                {stage === "confirmed" && (
+                                  <div className="gu-foot">
+                                    <code>0x821b…c253</code>
+                                    <span>
+                                      View on explorer <ExternalLink size={12} />
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>

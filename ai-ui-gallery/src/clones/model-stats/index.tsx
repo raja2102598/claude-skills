@@ -11,7 +11,7 @@ import "./model-stats.css";
  */
 
 const ICON: Record<string, LucideIcon> = { Text: Type, Image: ImageIcon, PDF: FileText, Audio: Mic, Video, Tools: Wrench, Reasoning: Brain };
-const LOOKUP_MS = 40;
+const LOOKUP_MS = 25;
 const RELOAD_MS = 1300;
 const BENCHES: Bench[] = ["swe", "gpqa", "term"];
 
@@ -56,8 +56,8 @@ function Mark({ m, size = 38 }: { m: Model; size?: number }) {
   );
 }
 
-/* number tween: cubic-out over 420 ms, JS-driven so it runs on any clock */
-function useTween(target: number, ms = 420) {
+/* number tween: cubic-out over 240 ms (reference fit: 230 ms), JS-driven so it runs on any clock */
+function useTween(target: number, ms = 240) {
   const [v, setV] = useState(target);
   const cur = useRef(target);
   useEffect(() => {
@@ -103,8 +103,7 @@ function Segmented<T extends string>({ items, value, onChange, className }: { it
   );
 }
 
-function Details({ m, vol, setVol, bench, setBench }: { m: Model; vol: number; setVol: (v: number) => void; bench: Bench; setBench: (b: Bench) => void }) {
-  const est = useTween(monthly(m, vol));
+function Details({ m, vol, est, setVol, bench, setBench }: { m: Model; vol: number; est: number; setVol: (v: number) => void; bench: Bench; setBench: (b: Bench) => void }) {
   const ctxPct = Math.max(6, (m.context / 1000) * 100);
   const rows = [...MODELS].sort((a, b) => b.bench[bench] - a.bench[bench]).slice(0, 3);
   const shown = rows.some((r) => r.id === m.id) ? rows : [...rows.slice(0, 2), m].sort((a, b) => b.bench[bench] - a.bench[bench]);
@@ -265,6 +264,7 @@ export default function ModelStats() {
   const auto = useRef(true);
 
   const m = MODELS.find((x) => x.id === shownId)!;
+  const est = useTween(monthly(m, vol)); /* lives above the swap so the number rolls across a model change instead of remounting */
   const rv = MODELS.find((x) => x.id === (rival === shownId ? MODELS.find((x) => x.id !== shownId)!.id : rival))!;
 
   const later = (fn: () => void, ms: number) => {
@@ -351,7 +351,7 @@ export default function ModelStats() {
         </header>
         <div className="ms-body">
           <Swap k={cmp ? "c-" + rv.id + m.id : "m-" + m.id}>
-            {cmp ? <Compare a={m} b={rv} setRival={user(setRival)} /> : <Details m={m} vol={vol} setVol={user(setVol)} bench={bench} setBench={user(setBench)} />}
+            {cmp ? <Compare a={m} b={rv} setRival={user(setRival)} /> : <Details m={m} vol={vol} est={est} setVol={user(setVol)} bench={bench} setBench={user(setBench)} />}
           </Swap>
         </div>
         <footer className="ms-foot">

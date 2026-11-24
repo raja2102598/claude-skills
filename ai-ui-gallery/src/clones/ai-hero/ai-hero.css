@@ -8,6 +8,7 @@
   --ah-ink: #ffffff;
   --ah-dim: rgba(255,255,255,.58);
   --ah-settle: linear(0, 0.117, 0.239, 0.367, 0.484, 0.588, 0.674, 0.745, 0.803, 0.848, 0.884, 0.913, 0.935, 0.952, 0.966, 0.976, 0.984, 0.99, 0.995, 0.999, 1);
+  --ah-snap: linear(0, 0.276, 0.476, 0.621, 0.726, 0.801, 0.856, 0.896, 0.925, 0.945, 0.961, 0.971, 0.979, 0.985, 0.989, 0.992, 1);
   --ah-rise: linear(0, 0.218, 0.398, 0.541, 0.651, 0.733, 0.796, 0.843, 0.88, 0.908, 0.93, 0.947, 0.96, 0.97, 0.978, 0.984, 0.989, 0.992, 0.995, 0.997, 0.998, 0.999, 0.999, 1, 1);
   position: relative; isolation: isolate; overflow: hidden;
   width: 1134px; height: 738px; background: var(--ah-bg); color: var(--ah-ink);
@@ -20,6 +21,7 @@
 @keyframes ah-rise { from { transform: translateY(var(--dy, 24px)); } to { transform: none; } }
 @keyframes ah-fade { from { opacity: 0; } to { opacity: 1; } }
 .ah-in { animation: ah-rise .62s var(--ah-settle) var(--d, 0s) both, ah-fade .22s ease-out var(--d, 0s) both; }
+.ah-in.ah-snapin { animation: ah-rise .3s var(--ah-snap) var(--d, 0s) both, ah-fade .24s ease-out var(--d, 0s) both; }
 
 /* nav */
 .ah-nav { position: absolute; z-index: 20; left: 16px; top: 8px; width: 1102px; height: 56px; border-radius: 28px;
@@ -43,21 +45,21 @@
 
 /* content column */
 .ah-col { position: absolute; z-index: 10; left: 16px; width: 1102px; top: 138px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.ah-eyebrow { --dy: 10px; --d: .117s; height: 20px; font-size: 14px; color: rgba(255,255,255,.62); display: flex; align-items: center; gap: 8px; }
+.ah-eyebrow { --dy: 10px; --d: .111s; height: 20px; font-size: 14px; color: rgba(255,255,255,.62); display: flex; align-items: center; gap: 8px; }
 .ah-dot { width: 6px; height: 6px; border-radius: 99px; background: #5bf59a; box-shadow: 0 0 10px #5bf59a; }
 .ah h1 { margin: 24px 0 0; max-width: 896px; font-size: 84px; line-height: 82px; font-weight: 500; letter-spacing: -.05em; }
 .ah h1 .ah-line { display: block; }
 .ah h1 .ah-w { display: inline-block; --dy: 28px; will-change: transform; }
 .ah h1 .ah-sp { display: inline-block; width: 12px; }
-.ah-sub { --dy: 14px; --d: .317s; margin: 20px 0 0; max-width: 672px; font-size: 18px; line-height: 28px; color: var(--ah-dim); text-wrap: pretty; }
+.ah-sub { --dy: 14px; --d: .311s; margin: 20px 0 0; max-width: 672px; font-size: 18px; line-height: 28px; color: var(--ah-dim); text-wrap: pretty; }
 
 /* composer */
-.ah-comp { --dy: 18px; --d: .395s; width: 768px; margin-top: 32px; }
+.ah-comp { --dy: 18px; --d: .411s; width: 768px; margin-top: 32px; }
 .ah-card { border-radius: 22px; padding: 1px; background: linear-gradient(160deg, rgba(120,255,214,.35), rgba(255,255,255,.1) 35%, rgba(130,160,255,.28)); box-shadow: 0 30px 80px -20px rgba(0,0,0,.6); }
 .ah-card-in { position: relative; border-radius: 21px; background: rgba(13,19,38,.9); padding: 8px; backdrop-filter: blur(18px); }
 .ah-ta { position: relative; display: block; width: 100%; min-height: 80px; height: 80px; padding: 16px 20px 0; resize: none; border: 0; outline: 0;
   background: transparent; color: #fff; font: inherit; font-size: 18px; line-height: 24px; caret-color: #7cffc4; }
-.ah-ph { position: absolute; left: 28px; top: 24px; margin: 0; font-size: 18px; line-height: 24px; pointer-events: none; opacity: 0;
+.ah-ph { position: absolute; left: 28px; top: 27px; margin: 0; font-size: 18px; line-height: 24px; pointer-events: none; opacity: 0;
   background: linear-gradient(90deg, #c8ffe9 0%, #f2ffd2 60%, #ffe6b0 100%); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
 .ah-ph.is-hidden { display: none; }
 .ah-foot { display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: 6px; }
@@ -67,7 +69,7 @@
 .ah-send:hover { transform: scale(1.06); }
 .ah-send:active { transform: scale(.94); }
 .ah-chips { display: flex; gap: 9px; justify-content: center; margin-top: 16px; }
-.ah-chip { height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.055); font-size: 12px; color: rgba(255,255,255,.52); --dy: 26px; transition: background .2s, color .2s; }
+.ah-chip { height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.055); font-size: 12px; color: rgba(255,255,255,.52); --dy: 8px; transition: background .2s, color .2s; }
 .ah-chip:hover { background: rgba(255,255,255,.12); color: #fff; }
 .ah-sent { position: absolute; right: 60px; bottom: 18px; font-size: 12px; color: #7cffc4; animation: ah-fade .2s ease-out both; }
 

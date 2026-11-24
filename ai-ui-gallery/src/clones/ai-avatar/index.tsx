@@ -23,16 +23,16 @@ const LINE: Record<State, string> = {
 /* The tour measured from the reference trace: durations in ms, looping (20.7 s). */
 const TOUR: { s: State; ms: number }[] = [
   { s: "thinking", ms: 2614 },
-  { s: "writing", ms: 3519 },
+  { s: "writing", ms: 3600 },
   { s: "done", ms: 2315 },
   { s: "idle", ms: 1816 },
   { s: "thinking", ms: 1717 },
-  { s: "error", ms: 2041 },
-  { s: "idle", ms: 4394 },
-  { s: "listening", ms: 2300 },
+  { s: "error", ms: 1960 },
+  { s: "idle", ms: 4050 },
+  { s: "listening", ms: 2200 },
 ];
 const TOUR_MS = TOUR.reduce((a, b) => a + b.ms, 0);
-const START_OFFSET = 900; // the tour is already 0.9 s into its first "thinking" on mount
+const START_OFFSET = 600; // the tour is already 0.6 s into its first "thinking" at the first captured frame
 
 function locate(t: number) {
   let x = ((t % TOUR_MS) + TOUR_MS) % TOUR_MS;
@@ -140,11 +140,12 @@ function Pip({ size, state, mini = false }: { size: number; state: State; mini?:
       P.cop = spring(P.cop, tgt.cop, 0.12);
       P.line = spring(P.line, tgt.line, 0.05);
 
-      /* breathing and the blink (every 3.4 s, 140 ms) */
+      /* breathing and the blink (every 4.2 s, 140 ms) */
       const breath = Math.sin(sec * 1.6);
       const bob = Math.sin(sec * 1.6 + 0.6) * 1.6;
-      const bx = (sec * 1000) % 3400;
-      const blink = bx < 150 ? Math.sin((bx / 150) * Math.PI) : 0;
+      const bx = (sec * 1000) % 4200;
+      let blink = bx < 150 ? Math.sin((bx / 150) * Math.PI) : 0;
+      if ((s === "idle" || s === "listening") && tin < 0.16) blink = Math.max(blink, Math.sin((tin / 0.16) * Math.PI));
       const sy = 1 + breath * 0.012;
       el.body.setAttribute(
         "transform",
