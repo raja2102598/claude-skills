@@ -53,6 +53,13 @@ export function toFieldImage(grid: Float32Array, n: number): FieldImage {
   return { n, col, alpha, radius };
 }
 
+/** Clear the backing store and scale to CSS px. */
+function begin(ctx: CanvasRenderingContext2D, dpr: number) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
 export interface FieldFrame {
   /** 'idle': the static empty-state bump. 'run': wave + colour. */
   mode: "idle" | "run";
@@ -67,11 +74,10 @@ export interface FieldFrame {
 }
 
 /** Draw one frame of a dot field of n x n dots, `pitch` px apart (radius scales with pitch / 8). */
-export function drawField(ctx: CanvasRenderingContext2D, n: number, pitch: number, img: FieldImage | null, f: FieldFrame) {
+export function drawField(ctx: CanvasRenderingContext2D, n: number, pitch: number, img: FieldImage | null, f: FieldFrame, dpr = 1) {
   const size = n * pitch;
   const k = pitch / 8;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, size, size);
+  begin(ctx, dpr);
   const half = pitch / 2;
   if (f.mode === "idle") {
     const cx = size / 2;
@@ -122,10 +128,8 @@ export function drawField(ctx: CanvasRenderingContext2D, n: number, pitch: numbe
 }
 
 /** The soft core of the wave, drawn on a second canvas that CSS blurs. */
-export function drawGlow(ctx: CanvasRenderingContext2D, n: number, pitch: number, f: FieldFrame) {
-  const size = n * pitch;
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.clearRect(0, 0, size, size);
+export function drawGlow(ctx: CanvasRenderingContext2D, n: number, pitch: number, f: FieldFrame, dpr = 1) {
+  begin(ctx, dpr);
   if (f.mode !== "run") return;
   const peak = 0.92 * (1 - f.fade);
   if (peak <= 0.27) return;

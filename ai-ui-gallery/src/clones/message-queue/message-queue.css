@@ -1,0 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Public+Sans:wght@400;500&display=swap");
+
+.mq-root {
+  --mq-fg: oklch(0.145 0.006 106);
+  --mq-muted: oklch(0.556 0.007 106);
+  --mq-bg: oklch(0.992 0.002 106);
+  font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  color: var(--mq-fg);
+}
+.mq-mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: -0.275px;
+  line-height: 16.5px;
+  color: var(--mq-muted);
+}
+@keyframes mq-ping {
+  0% { transform: none; opacity: 1; }
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+@keyframes mq-enter {
+  from { transform: translate3d(0, 4px, 0); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.mq-ping { animation: mq-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+.mq-enter { animation: mq-enter 300ms ease both; }
+@media (prefers-reduced-motion: reduce) {
+  .mq-ping { display: none; }
+  .mq-enter { animation: none; }
+}
