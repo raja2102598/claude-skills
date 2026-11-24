@@ -1,0 +1,89 @@
+/* AI hero clone: clone-local plain CSS. Palette, fonts, icons and copy are our own;
+   layout proportions and motion follow .reanimate/ai-hero/spec.md (measured from the reference trace).
+   All entrance and loop motion is CSS keyframes so it behaves the same on the real and the virtual clock. */
+@import url("https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&display=swap");
+
+.ah {
+  --ah-bg: #04060d;
+  --ah-ink: #ffffff;
+  --ah-dim: rgba(255,255,255,.58);
+  --ah-settle: linear(0, 0.117, 0.239, 0.367, 0.484, 0.588, 0.674, 0.745, 0.803, 0.848, 0.884, 0.913, 0.935, 0.952, 0.966, 0.976, 0.984, 0.99, 0.995, 0.999, 1);
+  --ah-rise: linear(0, 0.218, 0.398, 0.541, 0.651, 0.733, 0.796, 0.843, 0.88, 0.908, 0.93, 0.947, 0.96, 0.97, 0.978, 0.984, 0.989, 0.992, 0.995, 0.997, 0.998, 0.999, 0.999, 1, 1);
+  position: relative; isolation: isolate; overflow: hidden;
+  width: 1134px; height: 738px; background: var(--ah-bg); color: var(--ah-ink);
+  font-family: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+.ah *, .ah *::before, .ah *::after { box-sizing: border-box; }
+:where(.ah) button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+
+/* entrances: a value springs from --dy to 0 along the sampled settle curve while opacity fades in */
+@keyframes ah-rise { from { transform: translateY(var(--dy, 24px)); } to { transform: none; } }
+@keyframes ah-fade { from { opacity: 0; } to { opacity: 1; } }
+.ah-in { animation: ah-rise .62s var(--ah-settle) var(--d, 0s) both, ah-fade .22s ease-out var(--d, 0s) both; }
+
+/* nav */
+.ah-nav { position: absolute; z-index: 20; left: 16px; top: 8px; width: 1102px; height: 56px; border-radius: 28px;
+  border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.035); backdrop-filter: blur(14px);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 12px; }
+.ah-logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 600; letter-spacing: -.04em; }
+.ah-logo svg { width: 28px; height: 28px; }
+.ah-links { position: absolute; left: 340px; top: 9px; display: flex; }
+.ah-links a { padding: 8px 12px; font-size: 14px; color: rgba(255,255,255,.64); text-decoration: none; border-radius: 999px; transition: color .2s, background .2s; }
+.ah-links a:hover { color: #fff; background: rgba(255,255,255,.06); }
+.ah-navr { display: flex; align-items: center; gap: 6px; }
+.ah-login { padding: 8px 12px; font-size: 14px; color: rgba(255,255,255,.7); text-decoration: none; }
+.ah-cta { height: 40px; padding: 0 16px; border-radius: 999px; background: #fff; color: #07101f; font-size: 14px; font-weight: 600; transition: transform .2s; }
+.ah-cta:hover { transform: translateY(-1px); }
+
+/* aurora bars */
+.ah-bars { position: absolute; z-index: 0; left: -7%; right: -7%; bottom: 0; height: 428px; pointer-events: none; }
+.ah-bars-in { width: 100%; height: 100%; transform-origin: bottom; animation: ah-barsgrow 1s var(--ah-rise) .017s both; }
+@keyframes ah-barsgrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.ah-bars svg { width: 100%; height: 100%; display: block; filter: blur(11px); }
+
+/* content column */
+.ah-col { position: absolute; z-index: 10; left: 16px; width: 1102px; top: 138px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.ah-eyebrow { --dy: 10px; --d: .117s; height: 20px; font-size: 14px; color: rgba(255,255,255,.62); display: flex; align-items: center; gap: 8px; }
+.ah-dot { width: 6px; height: 6px; border-radius: 99px; background: #5bf59a; box-shadow: 0 0 10px #5bf59a; }
+.ah h1 { margin: 24px 0 0; max-width: 896px; font-size: 84px; line-height: 82px; font-weight: 500; letter-spacing: -.05em; }
+.ah h1 .ah-line { display: block; }
+.ah h1 .ah-w { display: inline-block; --dy: 28px; will-change: transform; }
+.ah h1 .ah-sp { display: inline-block; width: 12px; }
+.ah-sub { --dy: 14px; --d: .317s; margin: 20px 0 0; max-width: 672px; font-size: 18px; line-height: 28px; color: var(--ah-dim); text-wrap: pretty; }
+
+/* composer */
+.ah-comp { --dy: 18px; --d: .395s; width: 768px; margin-top: 32px; }
+.ah-card { border-radius: 22px; padding: 1px; background: linear-gradient(160deg, rgba(120,255,214,.35), rgba(255,255,255,.1) 35%, rgba(130,160,255,.28)); box-shadow: 0 30px 80px -20px rgba(0,0,0,.6); }
+.ah-card-in { position: relative; border-radius: 21px; background: rgba(13,19,38,.9); padding: 8px; backdrop-filter: blur(18px); }
+.ah-ta { position: relative; display: block; width: 100%; min-height: 80px; height: 80px; padding: 16px 20px 0; resize: none; border: 0; outline: 0;
+  background: transparent; color: #fff; font: inherit; font-size: 18px; line-height: 24px; caret-color: #7cffc4; }
+.ah-ph { position: absolute; left: 28px; top: 24px; margin: 0; font-size: 18px; line-height: 24px; pointer-events: none; opacity: 0;
+  background: linear-gradient(90deg, #c8ffe9 0%, #f2ffd2 60%, #ffe6b0 100%); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
+.ah-ph.is-hidden { display: none; }
+.ah-foot { display: flex; align-items: center; justify-content: space-between; height: 44px; margin-top: 6px; }
+.ah-ib { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: rgba(255,255,255,.06); color: rgba(255,255,255,.55); transition: background .2s, color .2s; }
+.ah-ib:hover { background: rgba(255,255,255,.12); color: #fff; }
+.ah-send { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: #fff; color: #07101f; transition: transform .2s, opacity .2s; }
+.ah-send:hover { transform: scale(1.06); }
+.ah-send:active { transform: scale(.94); }
+.ah-chips { display: flex; gap: 9px; justify-content: center; margin-top: 16px; }
+.ah-chip { height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.055); font-size: 12px; color: rgba(255,255,255,.52); --dy: 26px; transition: background .2s, color .2s; }
+.ah-chip:hover { background: rgba(255,255,255,.12); color: #fff; }
+.ah-sent { position: absolute; right: 60px; bottom: 18px; font-size: 12px; color: #7cffc4; animation: ah-fade .2s ease-out both; }
+
+/* placeholder rotation: 3 texts, one 8.4 s cycle each, offset 2.8 s.
+   enter (+7px -> 0, fades in .2 s) at 0.3 s, hold 2.2 s, exit (0 -> -5px, fades out .19 s) over 0.3 s, then wait. */
+@keyframes ah-ph {
+  0% { opacity: 0; transform: translateY(7px); animation-timing-function: cubic-bezier(.1,.9,.2,1); }
+  3.6% { opacity: 1; transform: none; }
+  29.76% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.1,.9,.2,1); }
+  33.3% { opacity: 0; transform: translateY(-5px); }
+  100% { opacity: 0; transform: translateY(-5px); }
+}
+.ah-ph { animation: ah-ph 8.4s linear infinite both; animation-delay: var(--pd); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ah-in, .ah-bars-in { animation: none; }
+  .ah-ph { animation: none; }
+  .ah-ph:first-of-type { opacity: 1; }
+}

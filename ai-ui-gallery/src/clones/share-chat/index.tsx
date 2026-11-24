@@ -31,12 +31,14 @@ export default function ShareChat() {
   const [menu, setMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [quiet, setQuiet] = useState(false); // demo copies leave the footer caption alone, as the reference does
   const timer = useRef<number>(0);
   const state = useActive(vis);
   
   const off = vis === "me";
 
-  const flashCopied = useCallback(() => {
+  const flashCopied = useCallback((quiet?: boolean) => {
+    setQuiet(!!quiet);
     setCopied(true); setFailed(false);
     window.clearTimeout(timer.current);
     timer.current = window.setTimeout(() => setCopied(false), 1600);
@@ -45,7 +47,7 @@ export default function ShareChat() {
   const doCopy = async () => {
     stop();
     if (off) return;
-    try { await navigator.clipboard.writeText("https://" + URL); flashCopied(); }
+    try { await navigator.clipboard.writeText("https://" + URL); flashCopied(false); }
     catch { setFailed(true); window.clearTimeout(timer.current); timer.current = window.setTimeout(() => setFailed(false), 2400); }
   };
 
@@ -54,24 +56,26 @@ export default function ShareChat() {
   useEffect(() => {
     if (!demoOn.current) return;
     const ids: number[] = [];
-    const at = (ms: number, fn: () => void) => ids.push(window.setTimeout(() => demoOn.current && fn(), ms));
-    const cycle = () => {
-      at(1200, () => setFiles(false));
-      at(2400, flashCopied);
-      at(4600, () => setVis("me"));
-      at(6800, () => { setVis("team"); setExpiry("Never"); setFiles(true); });
-      at(8400, flashCopied);
-      at(10600, () => setVis("any"));
-      at(12000, () => { setExpiry("7 days"); cycle(); });
+    const lag = Number(param("delay")) || 0; // capture-phase alignment only
+    const t0 = performance.now();
+    const at = (ms: number, fn: () => void) => ids.push(window.setTimeout(() => demoOn.current && fn(), Math.max(0, ms - (performance.now() - t0))));
+    const cycle = (base: number) => {
+      at(base + 1200, () => setFiles(false));
+      at(base + 2400, () => flashCopied(true));
+      at(base + 4600, () => setVis("me"));
+      at(base + 6800, () => { setVis("team"); setExpiry("Never"); setFiles(true); });
+      at(base + 8400, () => flashCopied(true));
+      at(base + 10600, () => setVis("any"));
+      at(base + 12000, () => { setExpiry("7 days"); cycle(base + 12000); });
     };
-    cycle();
+    cycle(lag - 150);
     return () => ids.forEach(window.clearTimeout);
   }, [flashCopied]);
   const stop = () => { demoOn.current = false; };
 
   useEffect(() => { if (off) setMenu(false); }, [off]);
   const idx = VIS.indexOf(vis);
-  const captionKey = failed ? "f" : copied ? "c" : "n";
+  const captionKey = failed ? "f" : copied && !quiet ? "c" : "n";
 
   return (
     <div className="sc-root">

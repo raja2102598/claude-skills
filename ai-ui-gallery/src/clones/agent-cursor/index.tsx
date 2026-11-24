@@ -41,6 +41,20 @@ const STATUS: Record<StatusKey, string> = {
 };
 
 interface Pt { x: number; y: number }
+
+/** cubic-bezier(0.22, 1, 0.36, 1) solved numerically, driven by rAF so it follows the page clock. */
+function bez(p1x: number, p1y: number, p2x: number, p2y: number) {
+  const f = (a: number, b: number, c: number, u: number) => ((1 - 3 * c + 3 * a) * u + (3 * c - 6 * a)) * u * u + 3 * a * u;
+  return (x: number) => {
+    let lo = 0, hi = 1, u = x;
+    for (let i = 0; i < 24; i++) {
+      u = (lo + hi) / 2;
+      if (f(p1x, 0, p2x, u) < x) lo = u; else hi = u;
+    }
+    return f(p1y, 0, p2y, u);
+  };
+}
+const ease = bez(0.22, 1, 0.36, 1);
 interface S {
   phase: Phase;
   status: StatusKey;
@@ -88,6 +102,49 @@ function Arrow() {
 export default function AgentCursor() {
   const [s, setS] = useState<S>(INITIAL);
   const timers = useRef<number[]>([]);
+  const els = useRef<Record<"agent" | "human", HTMLDivElement | null>>({ agent: null, human: null });
+  const pos = useRef<Record<"agent" | "human", Pt>>({ agent: { ...HOME }, human: { ...HUMAN_HOME } });
+  const raf = useRef<Record<"agent" | "human", number>>({ agent: 0, human: 0 });
+  const place = (w: "agent" | "human", x: number, y: number) => {
+    pos.current[w] = { x, y };
+    const e = els.current[w];
+    if (e) e.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`;
+  };
+  const selEls = useRef<(HTMLSpanElement | null)[]>([]);
+  const SEL_W = [607, 607, 423];
+  const setSel = (p: number) => {
+    const total = SEL_W.reduce((a, b) => a + b, 0) * p;
+    let used = 0;
+    SEL_W.forEach((w, i) => {
+      const e = selEls.current[i];
+      if (e) e.style.width = `${Math.max(0, Math.min(w, total - used))}px`;
+      used += w;
+    });
+  };
+  const sweep = (ms: number) => {
+    setS((p) => ({ ...p, sel: true }));
+    const t0 = performance.now();
+    const tick = () => {
+      const k = Math.min(1, (performance.now() - t0) / ms);
+      setSel(ease(k));
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    setSel(0);
+    requestAnimationFrame(tick);
+  };
+  const glide = (w: "agent" | "human", x: number, y: number, ms: number) => {
+    cancelAnimationFrame(raf.current[w]);
+    const from = { ...pos.current[w] };
+    if (ms <= 0) return place(w, x, y);
+    const t0 = performance.now();
+    const tick = () => {
+      const k = Math.min(1, (performance.now() - t0) / ms);
+      const e = ease(k);
+      place(w, from.x + (x - from.x) * e, from.y + (y - from.y) * e);
+      if (k < 1) raf.current[w] = requestAnimationFrame(tick);
+    };
+    raf.current[w] = requestAnimationFrame(tick);
+  };
   const runId = useRef(0);
   const patch = useCallback((p: Partial<S> | ((s: S) => Partial<S>)) => setS((prev) => ({ ...prev, ...(typeof p === "function" ? p(prev) : p) })), []);
 
@@ -108,69 +165,78 @@ export default function AgentCursor() {
         );
       };
       const status = (k: StatusKey) => patch((p) => ({ status: k, statusN: p.statusN + 1 }));
-      const fly = (x: number, y: number, ms = 420) => patch((p) => ({ agent: { ...p.agent, x, y, ms } }));
-      const show = (vis: boolean) => patch((p) => ({ agent: { ...p.agent, vis, ms: 0 } }));
-      const nudge = (x: number, y: number, ms: number) => patch((p) => ({ human: { ...p.human, x, y, ms } }));
+      const fly = (x: number, y: number, ms = 420) => { glide("agent", x, y, ms); setS((p) => ({ ...p, agent: { ...p.agent, x, y } })); };
+      const show = (vis: boolean) => patch((p) => ({ agent: { ...p.agent, vis } }));
+      const nudge = (x: number, y: number, ms: number) => { glide("human", x, y, ms); setS((p) => ({ ...p, human: { ...p.human, x, y } })); };
 
       // reset: the doc and the human cursor dip out, then the original run state returns
+      place("agent", HOME.x, HOME.y);
       patch({ fading: true, phase: "running", scenario, bar: "off", human: { ...HUMAN_HOME, vis: false, ms: 0 }, agent: { ...HOME, vis: false, ms: 0 } });
-      at(150, () => patch({ ...INITIAL, scenario, fading: true, human: { ...HUMAN_HOME, vis: false, ms: 0 }, statusN: 0, status: "reading" }));
-      at(170, () => patch({ fading: false }));
-      at(260, () => patch((p) => ({ human: { ...p.human, vis: true } })));
+      at(40, () => {
+        place("human", HUMAN_HOME.x, HUMAN_HOME.y);
+        patch({ ...INITIAL, scenario, fading: true, human: { ...HUMAN_HOME, vis: false, ms: 0 }, statusN: 0, status: "reading" });
+      });
+      at(60, () => patch({ fading: false }));
+      at(70, () => patch((p) => ({ human: { ...p.human, vis: true } })));
 
       // agent flies out of its avatar and reads
-      at(700, () => {
+      at(266, () => {
         show(true);
-        fly(179, 158, 640);
+        fly(178, 158, 483);
       });
 
       if (scenario === "error") {
-        at(1700, () => {
-          fly(HOME.x, HOME.y, 450);
-        });
-        at(2050, () => show(false));
-        at(1300, () => undefined);
-        at(1950, () => patch({ phase: "error" }));
-        at(1950, () => status("error"));
+        at(1400, () => fly(HOME.x, HOME.y, 466));
+        at(1700, () => show(false));
+        at(1700, () => patch({ phase: "error" }));
+        at(1700, () => status("error"));
         return;
       }
 
-      at(1380, () => fly(35, 249, 330));
-      at(1950, () => status("tightening"));
-      at(2180, () => fly(537, 298, 380));
-      at(2350, () => patch({ sel: true }));
-      at(2750, () => patch({ sel: false, para: "dim" }));
-      at(2780, () => nudge(317, 178, 700));
-      at(2900, () => patch({ para: "collapsed" }));
-      at(3250, () => patch({ para: "new" }));
-      CHUNKS.forEach((_, i) => at(3300 + i * 100, () => patch({ chunks: i + 1 })));
-      at(3300, () => fly(541, 275, 300));
-      at(4750, () => fly(45, 299, 420));
-      at(5094, () => status("heading"));
-      at(5200, () => patch({ headOpen: true }));
-      HEAD.split("").forEach((_, i) => at(5520 + i * 60, () => patch({ headChars: i + 1 })));
-      at(5560, () => nudge(317, 186, 120));
-      at(5600, () => fly(76, 316, 220));
-      at(6000, () => fly(82, 317, 160));
-      at(6620, () => fly(241, 342, 300));
-      at(6932, () => status("typo"));
-      at(7350, () => patch({ typoFixed: true }));
-      at(7824, () => patch({ bar: "on" }));
-      at(7984, () => fly(HOME.x, HOME.y, 470));
-      at(8330, () => patch((p) => ({ agent: { ...p.agent, vis: false, ms: 470 } })));
-      at(8430, () => {
+      at(916, () => {
+        fly(35, 249, 316);
+        status("tightening");
+      });
+      at(1350, () => {
+        fly(537, 298, 333);
+        sweep(333);
+      });
+      at(1750, () => patch({ sel: false, para: "dim" }));
+      at(1960, () => patch({ para: "collapsed" }));
+      at(2000, () => patch({ para: "new" }));
+      CHUNKS.forEach((_, i) => at(2000 + i * 45, () => patch({ chunks: i + 1 })));
+      at(2050, () => fly(541, 274, 283));
+      at(2333, () => nudge(319, 178, 316));
+      at(2683, () => fly(35, 301, 566));
+      at(2733, () => status("heading"));
+      at(3300, () => patch({ headOpen: true }));
+      HEAD.split("").forEach((_, i) => at(3450 + i * 30, () => patch({ headChars: i + 1 })));
+      at(3700, () => fly(82, 317, 233));
+      at(4066, () => nudge(335, 185, 383));
+      at(4400, () => {
+        fly(241, 342, 316);
+        status("typo");
+      });
+      at(4650, () => patch({ typoFixed: true }));
+      at(5600, () => {
+        patch({ bar: "on" });
+        fly(HOME.x, HOME.y, 466);
+      });
+      at(5616, () => {
         status("review");
         patch({ phase: "review" });
       });
+      at(5766, () => show(false));
       // the teammate accepts the changes
-      at(9370, () => nudge(454, 422, 560));
-      at(10180, () => patch({ bar: "out", tinted: false }));
-      at(10494, () => {
+      at(5983, () => nudge(349, 184, 316));
+      at(7100, () => nudge(454, 422, 500));
+      at(7766, () => {
+        patch({ bar: "out", tinted: false });
         status("accepted");
         patch({ phase: "accepted" });
       });
-      at(10630, () => nudge(HUMAN_HOME.x, HUMAN_HOME.y, 560));
-      at(12500, () => run("edits"));
+      at(8166, () => nudge(HUMAN_HOME.x, HUMAN_HOME.y, 533));
+      at(9816, () => run("edits"));
     },
     [patch],
   );
@@ -255,9 +321,9 @@ export default function AgentCursor() {
                     <p className="ac-p ac-old" data-dim={para === "dim"}>
                       {OLD_TEXT}
                     </p>
-                    <span className="ac-sel" data-on={s.sel} style={{ top: 0, height: 24, left: -2, right: -2 }} />
-                    <span className="ac-sel" data-on={s.sel} style={{ top: 24, height: 24, left: -2, right: -2 }} />
-                    <span className="ac-sel" data-on={s.sel} style={{ top: 48, height: 24, left: -2, right: 184 }} />
+                    {[0, 1, 2].map((i) => (
+                      <span key={i} ref={(e) => { selEls.current[i] = e; }} className="ac-sel" data-on={s.sel} style={{ top: i * 24, height: 24, left: -2, width: 0 }} />
+                    ))}
                   </>
                 )}
                 {para === "collapsed" && (
@@ -328,7 +394,7 @@ export default function AgentCursor() {
           <div
             className="ac-cursor ac-cursor-human"
             data-vis={s.human.vis}
-            style={{ transform: `translate(${s.human.x}px, ${s.human.y}px)`, ["--ms" as string]: `${s.human.ms}ms` }}
+            ref={(e) => { els.current.human = e; if (e && !e.style.transform) place("human", pos.current.human.x, pos.current.human.y); }}
           >
             <Arrow />
             <span className="ac-tag" data-flip={flipHuman}>
@@ -339,7 +405,7 @@ export default function AgentCursor() {
           <div
             className="ac-cursor ac-cursor-agent"
             data-vis={s.agent.vis}
-            style={{ transform: `translate(${s.agent.x}px, ${s.agent.y}px)`, ["--ms" as string]: `${s.agent.ms}ms` }}
+            ref={(e) => { els.current.agent = e; if (e && !e.style.transform) place("agent", pos.current.agent.x, pos.current.agent.y); }}
           >
             <Arrow />
             <span className="ac-tag" data-flip={flipAgent}>

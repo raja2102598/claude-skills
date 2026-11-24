@@ -11,9 +11,11 @@ import "./generative-ui.css";
  */
 
 // ms from the click on the suggestion
-const T = { user: 40, s1: 200, s1done: 900, s2: 330, s2done: 1650, s3: 1500, s3done: 2250, text: 2300, card: 3300 };
-const SIGN = { sign: 900, submitted: 3000, confirmed: 3500 };
-const WORD_GAP = 34;
+// Times are read from real-clock rAF probes of the reference (steps are paced 512 ms apart, each row appears as the previous one resolves).
+const T = { user: 226, think: 240, s1: 533, s1done: 1046, s2: 1046, s2done: 1558, s3: 1558, s3done: 2094, text: 2094, card: 2611 };
+// ms after Approve: button label swaps, Decline leaves, stepper opens with Sign done, then Submitted + Confirmed land together
+const SIGN = { label: 273, decline: 739, sign: 1485, confirmed: 3120 };
+const WORD_GAP = 21;
 
 const STEPS = [
   { id: 1, label: "Checked balance", note: "3.184 LMN available" },
@@ -32,6 +34,8 @@ type Stage = "quote" | "signing" | "pending" | "confirmed" | "declined";
 export default function GenerativeUI() {
   const [started, setStarted] = useState(false);
   const [user, setUser] = useState(false);
+  const [think, setThink] = useState(false);
+  const [wallet, setWallet] = useState(0); // 0 Approve, 1 Confirm in wallet, 2 + Decline gone
   const [steps, setSteps] = useState<{ shown: number; done: number }>({ shown: 0, done: 0 });
   const [text, setText] = useState(false);
   const [card, setCard] = useState(false);
@@ -53,6 +57,7 @@ export default function GenerativeUI() {
     if (started) return;
     flushSync(() => setStarted(true));
     at(T.user, () => setUser(true));
+    at(T.think, () => setThink(true));
     at(T.s1, () => setSteps((s) => ({ ...s, shown: 1 })));
     at(T.s1done, () => setSteps((s) => ({ ...s, done: 1 })));
     at(T.s2, () => setSteps((s) => ({ ...s, shown: 2 })));
@@ -65,15 +70,16 @@ export default function GenerativeUI() {
 
   const approve = useCallback(() => {
     flushSync(() => setStage("signing"));
+    at(SIGN.label, () => setWallet(1));
+    at(SIGN.decline, () => setWallet(2));
     at(SIGN.sign, () => {
       setProgress(1);
       setStage("pending");
-      setBalance(22233.62);
     });
-    at(SIGN.submitted, () => setProgress(2));
     at(SIGN.confirmed, () => {
       setProgress(3);
       setStage("confirmed");
+      setBalance(22233.62);
     });
   }, [at]);
 
@@ -160,10 +166,17 @@ export default function GenerativeUI() {
         <div className="gu-thread">
           <div className="gu-col">
             <div className="gu-user">Swap 0.5 LMN to USDX</div>
-            {steps.shown > 0 && (
+            {(think || steps.shown > 0) && (
               <div className="gu-asst">
                 <span className="gu-orb" />
                 <div className="gu-body">
+                  {steps.shown === 0 && (
+                    <div className="gu-think">
+                      Thinking<i>.</i>
+                      <i>.</i>
+                      <i>.</i>
+                    </div>
+                  )}
                   <div className="gu-steps">
                     {STEPS.slice(0, steps.shown).map((s) => (
                       <div className="gu-step" key={s.id}>
@@ -291,21 +304,21 @@ export default function GenerativeUI() {
                             Network fee<b>$1.84</b>
                           </div>
                         </div>
-                        {stage === "quote" && (
+                        {(stage === "quote" || stage === "signing") && (
                           <div className="gu-collapse">
                             <div>
                               <div className="gu-actions">
-                                <button className="no" onClick={() => setStage("declined")} data-gu-decline>
+                                <button className={"no" + (wallet > 1 ? " gone" : "")} onClick={() => setStage("declined")} data-gu-decline>
                                   Decline
                                 </button>
                                 <button className="yes" onClick={approve} data-gu-approve>
-                                  Approve
+                                  {wallet > 0 ? "Confirm in wallet" : "Approve"}
                                 </button>
                               </div>
                             </div>
                           </div>
                         )}
-                        {(stage === "signing" || stage === "pending" || stage === "confirmed") && (
+                        {(stage === "pending" || stage === "confirmed") && (
                           <div className="gu-collapse in">
                             <div>
                               <div className="gu-prog">

@@ -61,7 +61,7 @@
 .ac-btn[data-fade="true"] { opacity: 0; pointer-events: none; }
 .ac-btn { transition: opacity 120ms ease-out, background 150ms ease-out, color 150ms ease-out; }
 
-.ac-doc { position: absolute; left: 0; right: 0; top: 56px; padding: 24px 32px 0; transition: opacity 150ms ease-out; }
+.ac-doc { position: absolute; left: 0; right: 0; top: 56px; padding: 24px 32px 0; transition: opacity 60ms ease-out; }
 .ac-doc[data-fading="true"] { opacity: 0; }
 .ac-title { font: 500 20px/22px "Geist", "Inter", sans-serif; margin: 0; letter-spacing: -0.01em; }
 .ac-meta { font-size: 12px; line-height: 20px; color: var(--ac-faint); margin: 2px 0 0; height: 20px; }
@@ -80,7 +80,7 @@
 .ac-chunk[data-pending="false"] { background: transparent; }
 .ac-old { transition: opacity 120ms ease-out; }
 .ac-old[data-dim="true"] { opacity: 0.18; }
-.ac-sel { position: absolute; left: 0; right: 0; background: var(--ac-agent-tint); border-radius: 3px; opacity: 0; transition: opacity 150ms ease-out; pointer-events: none; }
+.ac-sel { position: absolute; background: var(--ac-agent-tint); border-radius: 3px; opacity: 0; pointer-events: none; }
 .ac-sel[data-on="true"] { opacity: 1; }
 .ac-caret { display: inline-block; width: 2px; height: 17px; vertical-align: -3px; border-radius: 1px; background: var(--ac-agent); animation: ac-blink 900ms steps(1) infinite; }
 @keyframes ac-blink { 50% { opacity: 0; } }
@@ -100,7 +100,7 @@
 .ac-bar-label svg { color: var(--ac-agent); }
 
 .ac-cursors { position: absolute; left: 1px; top: 1px; width: 667px; height: 450px; pointer-events: none; overflow: hidden; border-radius: 19px; }
-.ac-cursor { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; transition: opacity 150ms ease-out, transform var(--ms, 450ms) cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
+.ac-cursor { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; transition: opacity 150ms ease-out; will-change: transform; }
 .ac-cursor[data-vis="true"] { opacity: 1; }
 .ac-cursor svg.ac-arrow { position: absolute; left: -2px; top: -2px; color: var(--c); filter: drop-shadow(0 1px 1px rgba(30, 20, 10, 0.18)); }
 .ac-tag {
