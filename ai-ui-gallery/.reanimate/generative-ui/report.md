@@ -5,9 +5,10 @@
 - A "Thinking..." line shows, then three tool steps resolve one by one.
 - A sentence streams in word by word.
 - A generated swap card appears: a quote with a 30 s countdown ring and Decline / Approve buttons.
-- After Approve, the button reads "Confirm in wallet" and Decline leaves. A Sign, Submitted, Confirmed stepper opens, and the header wallet balance ticks down.
+- After Approve, the button reads "Confirm in wallet" and Decline leaves. A Sign, Submitted, Confirmed stepper opens, Submitted and Confirmed land together, the balance ticks down and a "Done" line is added below the card.
+- The thread is top-anchored and scrolls only when the content grows (card entry, stepper open, Confirmed), like the reference.
 
-**Verification status (re-check): frame-compared (reference and clone captured with the same settings, `--clock virtual`, plus real-clock rAF probes for the WAAPI rows).**
+**Verification status: frame-compared** (reference and clone captured with the same viewport, fps and `--clock virtual`, plus real-clock rAF and scrollTop probes for the WAAPI rows).
 
 Styling is original:
 - Warm dark palette with a teal accent.
@@ -28,33 +29,42 @@ Styling is original:
 
 ## Method
 
-Both sides were captured with `capture.ts --clock virtual`, viewport 1440x1100, crop `272,465,1136,600`.
+Both sides were captured with `capture.ts --clock virtual`, viewport 1440x1100.
+- **Reference:** `--clip 272,465,1136,600`.
+- **Clone:** `--selector "[data-stage]"`, which resolves to clip 152,250,1136,600. The clone's stage sits at a different page position than the reference's preview, so the same page-coordinate clip cannot be used on both. An earlier round did that and its numbers were wrong.
 
-- **Main turn:** 25 fps, 6 s. The reference trigger was a click on `button[aria-label="Swap 0.5 ETH to USDC"]`. That invisible overlay button sits on top of the suggestion; clicking the `<p>` text times out because the overlay intercepts the click. The clone trigger was `?auto=0` plus `[data-gu-start]`. Reference frames are `ref-3`, clone frames are `clone-3` (before the fix) and `clone-5` (after).
-- **Approve leg:** `--trigger none` with a `--pre-js` that clicks Swap at 200 ms and Approve at 4000 ms (virtual time), 20 fps, 8.5 s. Reference frames are `ref-ap`, clone frames are `clone-ap` (before) and `clone-ap2` (after).
-- **WAAPI trap:** under the virtual clock the reference's WAAPI entrances (bubble, step rows, card) collapse into single-frame snaps. Their durations and easing therefore come from real-clock rAF probes (`rt-probe*.ts` in `.reanimate/generative-ui/`), run on the reference and the clone with the same click.
-  - The probes log per-frame DOM text changes plus computed opacity, transform and filter, resolved to about 17 ms.
-  - All "ms" values below come from those probes, measured from the click. Clone probe values include about 10 to 20 ms of timer-to-rAF latency, which I compensated for.
-- **Previous version:** the earlier report's times came from a real-clock video taken under heavy load. They were wrong by 0.3 to 0.7 s in places, and the clone was retimed from them.
+Captures:
+- **Main turn:** 25 fps, 6 s. The reference trigger is a click on `button[aria-label="Swap 0.5 ETH to USDC"]`, an invisible overlay that sits over the suggestion; clicking the `<p>` text times out. The clone trigger is `?auto=0` plus `[data-gu-start]`. Reference frames are `ref-3`, clone frames are `clone-6`, comparison is `compare-6`.
+- **Approve leg:** `--trigger none` with a `--pre-js` that clicks Swap at 200 ms and Approve at 4000 ms (virtual time), 20 fps, 8.5 s. Reference frames are `ref-ap`, clone frames are `clone-ap3`, comparison is `compare-ap3`.
 
-## Compare results (final captures)
+Under the virtual clock the reference's WAAPI entrances (bubble, step rows, card) collapse into single-frame snaps. Their durations, easing and the scroll behaviour therefore come from real-clock probes (`rt-probe*.ts` and `rt-scroll.ts` in `.reanimate/generative-ui/`), run on the reference and the clone with the same click.
+- The probes log per-frame DOM text changes, computed opacity, transform and filter, and the thread's `scrollTop`.
+- They resolve to about 17 ms.
+- The "ms" values below are from those probes, measured from the click, and include about 10 to 20 ms of click-to-first-frame latency.
+- The clone constants were shifted by about 15 ms to compensate.
+
+An earlier version of this clone used times read from a real-clock video under heavy load. They were wrong by 0.3 to 0.7 s in places and were replaced.
+
+## Compare results (aligned captures)
 
 | Leg | Frames | Mean mismatch | Timing error (clone minus ref) |
 |---|---|---|---|
-| Main turn (`compare-5`) | 147/151 compared, offset -4 | 3.50 % (threshold 5 %) | start 0 s, end -0.08 s, duration -0.08 s: PASS (limit 0.08 s). `compare.ts` reports peak -0.52 s because the reference's peak is a single-frame WAAPI snap of the card. |
-| Approve leg (`compare-ap2`) | 170/171 compared, offset -1 | 2.87 % | `compare.ts` end -1.25 s, flagged FAIL. This is a metric artefact: the reference's late activity (frame 142) is the Confirmed state, which the clone has at the same time. Real timing from the probes is within 20 ms (below). |
+| Main turn (`compare-6`) | 150 of 151, offset +1 | 2.73 % (limit 5 %) | start -0.04 s, end -0.12 s, duration -0.08 s, peak 0 s |
+| Approve leg (`compare-ap3`) | 168 of 171, offset -3 | 2.45 % | `compare.ts` start -0.20 s, end -0.15 s, peak -0.20 s |
 
-Before the fix the main turn read mismatch 3.56 % with timing error end +0.72 s FAIL, clone card at +3.5 s against the reference's +2.6 s.
+`compare.ts` flags both timing lines as FAIL because they exceed its 0.08 s limit. The main-turn end is one frame past it. On the Approve leg the window metric is distorted by the reference's WAAPI snaps and by the clone's composer fade at the click. The activity tables are more reliable:
+- **Main turn:** the card burst lands on the same frame in both, #65 (2.60 s).
+- **Approve leg:** the stepper opens at clone 5.35 s against reference 5.40 s. Confirmed lands at clone 7.00 s against reference 7.10 s. That is 50 to 100 ms early, within 2 frames at 20 fps.
 
-The mismatch is dominated by layout and styling, not timing:
-- The reference thread is left-aligned, with the bubble above the steps.
-- The clone's bubble sits right and its swap card is taller.
+The remaining mismatch (2.5 to 3.5 %) is mostly colours, fonts, token and orb styling and the bubble width, not timing or layout.
+
+Sheets (final captures): `compare-6/sheets/compare-01.webp` (main turn) and `compare-ap3/sheets/compare-01.webp` (Approve leg).
 
 ## Per-event times, ms after the click (real-clock probes)
 
 **Main turn**
 
-| Row | Reference | Clone (measured, after fix) | Result |
+| Row | Reference | Clone (after fix) | Result |
 |---|---|---|---|
 | Welcome fade-out | starts about +50, 125 ms, opacity only | +0, 125 ms, opacity only | pass |
 | User bubble in | +226 | +231 | pass |
@@ -65,19 +75,22 @@ The mismatch is dominated by layout and styling, not timing:
 | Step 3 done, reply starts | +2094 | +2110 | pass |
 | Reply words | stagger about 21 ms, about 180 ms to opaque, last word done about +2.6 s | 21 ms stagger, 260 ms each, done +2587 | pass, residual about 40 ms |
 | Card in | +2611 | +2618 to +2630 | pass |
+| Thread scroll at card entry | 0 to 16 px in about 50 ms | 0 to about 12 px in about 120 ms | pass (content height 622 against 618) |
 
 **Approve leg**
 
-| Row | Reference | Clone (measured, after fix) | Result |
+| Row | Reference | Clone (after fix) | Result |
 |---|---|---|---|
 | Button label to "Confirm in wallet" | +273 | +286 | pass |
-| Decline gone | text gone at +739 | clone fade starts +480, 260 ms, gone about +740 | pass (reference fade start not resolved) |
+| Decline gone | text gone at +739 | fade starts +480, 260 ms, gone about +740 | pass (the reference's fade start is not resolved) |
 | Stepper opens, Sign done, Submitted spinning | +1485 | +1486 | pass |
-| Submitted done and Confirmed | +3143 (text colour ramp +3143 to +3434) | +3135 | pass |
+| Scroll at stepper open | 16 to 67 px in about 130 ms, ease-out | 22 to 67 px in about 130 ms, ease-out | pass |
+| Submitted done and Confirmed | +3143 (text colour ramp +3143 to +3434) | about +3135 | pass |
 | Balance tick, 22,237.60 to 22,233.62 | +3120 | +3135 | pass |
-| "Done" text and explorer line | +3116 | not in clone (pill and stepper show Confirmed instead) | residual |
+| Scroll at Confirmed | 67 to 135 px, content height 741 | 67 to 135 px, content height 741 | pass |
+| "Done" line and explorer link | +3116 | +3135 | pass |
 
-The reference's step rows alternate every 512 ms. The old assumption that the header pill reads "Confirmed" early (about +3 s before Submitted ended) matches: in the reference all three happen at about +3.1 s.
+The reference steps are paced 512 ms apart, each row appearing as the previous one resolves. In the reference, Submitted done, Confirmed, the balance tick and the "Done" line all happen within about 25 ms, at about +3.1 s.
 
 ## Easing per row (reference, from rAF probes)
 
@@ -89,16 +102,17 @@ The reference's step rows alternate every 512 ms. The old assumption that the he
 | Card | translateY 11 px to 0, blur 6 px to 0, opacity 0 to 1, about 460 ms, exponential ease-out | `gu-card-in`, 460 ms, same values: match |
 | Welcome out | opacity 1 to 0 in about 125 ms | opacity only, 125 ms: match |
 | Confirmed label | colour ramp about 300 ms | CSS transition 200 ms: close |
+| Thread scroll | fast ease-out, about 130 ms | cubic ease-out, 130 ms: match |
 
-The fitted curve family is an exponential ease-out, `cubic-bezier(.16,1,.3,1)`. I read it off the opacity and translate samples. I did not run `easing.ts`, because the reference WAAPI rows have no track under the virtual clock.
+The fitted curve family is an exponential ease-out, `cubic-bezier(.16,1,.3,1)`, read off the opacity and translate samples. I did not run `easing.ts`, because the reference WAAPI rows have no track under the virtual clock.
 
 ## Residual deviations
-- **Card height.** The clone's swap card is about 1.35x taller (66 px legs). Once the stepper opens, the thread overflows the 600 px stage and the card header, including the Confirmed pill, scrolls under the top fade. The reference keeps it in view. This is a styling difference and was left alone as asked. A shorter leg row would fix it.
-- **Thread layout.** The clone's bubble is right-aligned and the reference's is left-aligned. This drives most of the 2.9 to 3.5 % mismatch.
+- **Window metric.** `compare.ts`'s motion window and peak are distorted on the reference because its WAAPI rows snap under the virtual clock. Both legs show a "FAIL" on the timing line (main turn end -0.12 s). The per-event probe times above are the real numbers.
+- **Reference card at 2.6 s.** The reference has already snapped the card in under the virtual clock, while the clone card is still fading in (full by about 2.8 s). This is an artefact, not a real offset.
+- **Confirmed ramp.** In the Approve leg the clone's Confirmed lands 50 to 100 ms before the reference's in the virtual capture (clone 7.00 s against reference 7.10 s). That is within 2 frames at 20 fps. The probe times agree to within 25 ms.
 - **Word stagger.** Measured about 21 ms with about 180 ms to opaque from noisy opacity counts. The clone's word finish is within about 40 ms of the reference. I did not fit the blur curve.
-- **Decline exit.** Only the end time (+739) is known on the reference, so the clone's 260 ms fade-out is an estimate.
-- **Missing end state.** The reference adds a "Done. You swapped 0.5 ETH for ..." line and a "View on explorer" link at +3116. The clone shows the explorer line from stepper open and has no "Done" sentence.
-- **Window metric.** `compare.ts`'s motion window and peak are distorted on the reference because its WAAPI rows snap under the virtual clock. The window is measured on one bursty frame, and the final-frame flags above are artefacts. The per-event times above are the real numbers.
-- **Clock error.** All reference times are probe-resolved to about 17 ms (rAF) and include about 10 to 20 ms of click-to-first-frame latency. The clone's constants were shifted by 15 ms to compensate.
-- **Re-roll and Decline.** The countdown re-roll and the Decline path are additions the reference was not watched for; I did not watch the reference beyond +8 s.
+- **Decline exit.** Only the end time (+739) is known on the reference, so the clone's 260 ms fade is an estimate.
+- **Composer.** The reference's input bar is below the visible stage. The clone keeps its own composer in the welcome state and fades it out when the turn starts.
+- **Bubble width.** The clone's bubble is about 6 px wider than the reference's. This is a styling difference.
 - **Thinking dots.** The clone's three-dot pulse is a simple opacity cycle, not measured on the reference.
+- **Added states.** The countdown re-roll and the Decline path are additions. The reference was not watched beyond +8 s.

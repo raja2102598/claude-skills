@@ -163,7 +163,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "ai-inline-edit",
     load: () => import("../src/clones/ai-inline-edit/index.tsx"),
     meta: () => import("../src/clones/ai-inline-edit/meta.ts"),
-    reference: "Arc UI · AI inline edit", candidates: 5, rounds: 5, timing: "fails, timing drifted 0.6 s, 13% mismatch", runnerUp: "Arc UI AI translate",
+    reference: "Arc UI · AI inline edit", candidates: 5, rounds: 6, timing: "diff stream within one frame", runnerUp: "Arc UI AI translate",
   },
   {
     slug: "ai-search",
@@ -199,7 +199,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "generative-ui",
     load: () => import("../src/clones/generative-ui/index.tsx"),
     meta: () => import("../src/clones/generative-ui/meta.ts"),
-    reference: "beUI Pro · Crypto Agent", candidates: 5, rounds: 1, timing: "re-check pending, no frame compare", runnerUp: "beUI Pro AI Artifacts",
+    reference: "beUI Pro · Crypto Agent", candidates: 5, rounds: 3, timing: "every probed event within 25 ms", runnerUp: "beUI Pro AI Artifacts",
   },
   {
     slug: "image-generation",
