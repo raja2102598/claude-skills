@@ -43,7 +43,7 @@ export const TURN_A: Script = {
         ["**Load into", " a staging table.**", " It has no indexes,", " so every insert stays cheap."],
         ["**Commit in", " batches**", " of about 50,000 rows, so each", " transaction stays small and the", " write-ahead log never backs up."],
         ["**Use `COPY`", " instead of inserts.**", " It streams every row", " through one connection, which", " is several times faster than", " batched `INSERT` calls. [1][2]"],
-        ["**Index at", " the end**", " with `CREATE INDEX", " CONCURRENTLY`,", " then swap", " the tables", " in one quick rename. [1][3]"],
+        ["**Index at", " the end**", " with", " `CREATE INDEX CONCURRENTLY`,", " then swap", " the tables", " in one quick rename. [1][3]"],
       ],
     },
     {
@@ -83,7 +83,7 @@ export const TURN_A: Script = {
     },
   ],
   // t = 0 is the send; rows 2–15 of the spec
-  timing: { chevron: 567, tool: 1450, toolDone: 2300, stream: 2433, tick: 50, stop: 467 },
+  timing: { chevron: 550, tool: 1450, toolDone: 2300, stream: 2433, tick: 50, stop: 433 },
 };
 
 export const TURN_B: Script = {

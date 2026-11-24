@@ -33,6 +33,8 @@ import "./chat-thread.css";
  */
 
 const WIDTH_SPRING = { type: "spring", stiffness: 663, damping: 51.5, mass: 1, restDelta: 0.3, restSpeed: 2 } as const; // ω ≈ 25.75, critically damped
+const SPRING_W = Math.sqrt(WIDTH_SPRING.stiffness);
+const HEAD_S = (16.667 - 6) / 1000;
 const FOLLOW_K = 0.22; // share of the remaining distance per 16.7 ms frame
 const LOOP_REST = 5000; // gallery autoplay: rest after the demo before it plays again
 // The reference fires its steps on timers and shows them on the next frame; a frame that starts up to 12 ms before a
@@ -414,19 +416,29 @@ function Swap({ id, children, reduce }: { id: string; children: ReactNode; reduc
   const [prev, setPrev] = useState<{ key: number; node: ReactNode } | null>(null);
   const seq = useRef(0);
 
+  const leaveRef = useRef<HTMLSpanElement>(null);
+  const pending = useRef(false);
+
   useLayoutEffect(() => {
     if (last.current.id !== id) {
-      const box = boxRef.current;
-      const from = box ? box.getBoundingClientRect().width : 0;
-      const to = measureRef.current ? measureRef.current.getBoundingClientRect().width : from;
+      // 1st pass: keep the old label as a leaving item; its width is measured on the next (still pre-paint) pass.
       setPrev({ key: ++seq.current, node: last.current.node });
-      if (reduce || !box) width.set("auto");
-      else {
-        width.set(from);
-        animate(width, to, { ...WIDTH_SPRING, onComplete: () => width.set("auto") });
-      }
+      pending.current = true;
       const k = seq.current;
       window.setTimeout(() => setPrev((p) => (p && p.key === k ? null : p)), 160);
+    } else if (pending.current) {
+      pending.current = false;
+      const from = leaveRef.current?.getBoundingClientRect().width;
+      const to = measureRef.current?.getBoundingClientRect().width;
+      if (!reduce && from != null && to != null && Math.abs(to - from) > 0.5) {
+        // motion starts the spring on its next frame; the reference's starts ~6 ms after its commit. A head start of
+        // one frame minus 6 ms (the critically damped spring's own position and velocity then) lines the curves up.
+        const d = to - from;
+        const head = from + d * (1 - (1 + SPRING_W * HEAD_S) * Math.exp(-SPRING_W * HEAD_S));
+        width.set(head);
+        if (boxRef.current) boxRef.current.style.width = `${head}px`; // this paint, not motion's next frame
+        animate(width, to, { ...WIDTH_SPRING, velocity: d * SPRING_W * SPRING_W * HEAD_S * Math.exp(-SPRING_W * HEAD_S), onComplete: () => width.set("auto") });
+      }
     }
     last.current = { id, node: children };
   });
@@ -437,7 +449,7 @@ function Swap({ id, children, reduce }: { id: string; children: ReactNode; reduc
         {children}
       </span>
       {prev && (
-        <span className="ct-swap-item" data-leaving key={`p${prev.key}`} aria-hidden>
+        <span className="ct-swap-item" data-leaving key={`p${prev.key}`} ref={leaveRef} aria-hidden style={{ width: "max-content", maxWidth: "none" }}>
           {prev.node}
         </span>
       )}

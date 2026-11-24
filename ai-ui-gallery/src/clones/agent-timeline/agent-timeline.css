@@ -259,7 +259,10 @@
   background: var(--fill);
   color: var(--at-surface);
   cursor: pointer;
-  transition: opacity 150ms var(--at-ease);
+  /* A tool call that fails turns from its colour to the danger tint over 360 ms. */
+  transition:
+    background-color 360ms var(--at-ease),
+    opacity 150ms var(--at-ease);
 }
 .at-span[data-kind="tool"] {
   --fill: var(--c);
@@ -336,13 +339,13 @@
   border-left-width: 1.5px;
   border-bottom-width: 1.5px;
   border-bottom-left-radius: 7px;
-  animation: at-draw-down 360ms var(--at-ease) backwards;
+  animation: at-draw-down 360ms var(--at-ease) -16ms backwards;
 }
 .at-link[data-dir="in"] {
   border-right-width: 1.5px;
   border-bottom-width: 1.5px;
   border-bottom-right-radius: 7px;
-  animation: at-draw-up 360ms var(--at-ease) backwards;
+  animation: at-draw-up 360ms var(--at-ease) -16ms backwards;
 }
 @keyframes at-draw-down {
   from {
@@ -370,7 +373,8 @@
   background: var(--c);
   box-shadow: 0 0 0 1.5px var(--at-surface);
   transition: opacity 150ms var(--at-ease);
-  animation: at-pop 150ms var(--at-ease-in) var(--delay, 0ms) backwards;
+  /* Like the links, the reference's pop is one frame along on the frame the port appears: start 16 ms in. */
+  animation: at-pop 150ms var(--at-ease-in) calc(var(--delay, 0ms) - 16ms) backwards;
 }
 @keyframes at-pop {
   from {

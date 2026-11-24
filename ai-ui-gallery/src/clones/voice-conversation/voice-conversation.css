@@ -1,0 +1,349 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap");
+
+.vc-root {
+  --vc-stage: #eceff2;
+  --vc-card: #ffffff;
+  --vc-fill: #f2f4f7;
+  --vc-border: #e2e7ec;
+  --vc-ink: #141b24;
+  --vc-muted: #4f5a68;
+  --vc-subtle: #7b8593;
+  --vc-track: #c8d0d9;
+  --vc-accent: #0f766e;
+  --vc-accent-soft: #d8efec;
+  --vc-success: #12875a;
+  --vc-success-text: #0e7a50;
+  --vc-danger: #dc3f3a;
+  --vc-std: cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  color: var(--vc-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The reference preview renders its card at zoom 0.92 ("Studio" look); the clone keeps the same proportions. */
+.vc-zoom {
+  zoom: 0.92;
+}
+
+.vc-card {
+  width: 460px;
+  border-radius: 20px;
+  background: var(--vc-card);
+  padding: 16px;
+  box-shadow: 0 0 0 1px rgb(20 27 36 / 0.05), 0 1px 2px rgb(20 27 36 / 0.04);
+}
+
+/* ---------- swaps: the old value blurs up and out, the new one rises in on a spring ---------- */
+.vc-cell {
+  display: grid;
+}
+.vc-cell > * {
+  grid-area: 1 / 1;
+}
+.vc-swap-in {
+  animation:
+    vc-fade-blur-in 450ms var(--vc-enter) both,
+    vc-rise-8 250ms var(--vc-enter-slide) both;
+}
+.vc-swap-out {
+  animation: vc-swap-out 150ms ease-out forwards;
+  pointer-events: none;
+}
+@keyframes vc-fade-blur-in {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+@keyframes vc-rise-8 {
+  from {
+    translate: 0 8px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@keyframes vc-swap-out {
+  to {
+    opacity: 0;
+    filter: blur(2px);
+    translate: 0 -8px;
+  }
+}
+
+/* goal icon: spring pop in, quick shrink out */
+.vc-icon-in {
+  animation: vc-icon-in 500ms var(--vc-icon) both;
+}
+.vc-icon-out {
+  animation: vc-icon-out 120ms ease-out forwards;
+}
+@keyframes vc-icon-in {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes vc-icon-out {
+  to {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+/* ---------- dialing rings and the live dot ---------- */
+.vc-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--vc-subtle);
+  animation: vc-ring 1400ms cubic-bezier(0, 0, 0.58, 1) infinite;
+}
+.vc-ring + .vc-ring {
+  animation-delay: 700ms;
+}
+@keyframes vc-ring {
+  from {
+    opacity: 0.5;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 1.35;
+  }
+}
+.vc-ping {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--vc-success);
+  animation: vc-ping 1600ms cubic-bezier(0, 0, 0.58, 1) infinite;
+}
+@keyframes vc-ping {
+  from {
+    opacity: 0.45;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 2.4;
+  }
+}
+
+.vc-tile {
+  transition: opacity 300ms ease-out;
+}
+.vc-tile[data-ended] {
+  opacity: 0.6;
+}
+
+/* ---------- waveform: 14 bars; idle profile, or a looping per-bar envelope while someone talks ---------- */
+.vc-bar {
+  display: block;
+  width: 3px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--vc-track);
+  transform: scaleY(calc(0.12 + 0.42 * var(--p)));
+}
+.vc-wave[data-speaker] .vc-bar {
+  animation: vc-bar var(--dur) ease-in-out var(--delay) infinite backwards;
+}
+.vc-wave[data-speaker="callee"] .vc-bar {
+  background: var(--vc-muted);
+}
+.vc-wave[data-speaker="agent"] .vc-bar {
+  background: var(--vc-accent);
+}
+@keyframes vc-bar {
+  0% {
+    transform: scaleY(0.16);
+  }
+  25% {
+    transform: scaleY(var(--p));
+  }
+  50% {
+    transform: scaleY(calc(var(--p) * 0.45));
+  }
+  75% {
+    transform: scaleY(calc(var(--p) * 0.85));
+  }
+  100% {
+    transform: scaleY(0.16);
+  }
+}
+
+/* ---------- transcript ---------- */
+.vc-log {
+  scrollbar-width: thin;
+}
+.vc-row-in {
+  animation:
+    vc-fade-in 450ms var(--vc-enter) both,
+    vc-rise-6 250ms var(--vc-enter-slide) both;
+}
+@keyframes vc-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes vc-rise-6 {
+  from {
+    translate: 0 6px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+.vc-word {
+  opacity: 0;
+  filter: blur(3px);
+  transition:
+    opacity 200ms var(--vc-std),
+    filter 200ms var(--vc-std);
+}
+.vc-word[data-on] {
+  opacity: 1;
+  filter: blur(0);
+}
+.vc-avatar {
+  opacity: 0;
+  transition: opacity 200ms var(--vc-std);
+}
+.vc-avatar[data-on] {
+  opacity: 1;
+}
+
+/* ---------- goal: AI working loader (3x3 dots, four lit patterns stepping through an 800 ms loop) ---------- */
+.vc-dots-a {
+  animation: vc-dots-a 800ms linear infinite;
+}
+.vc-dots-b {
+  animation: vc-dots-b 800ms linear infinite;
+}
+.vc-dots-c {
+  animation: vc-dots-c 800ms linear infinite;
+}
+@keyframes vc-dots-a {
+  0%,
+  25% {
+    opacity: 1;
+  }
+  50%,
+  75% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes vc-dots-b {
+  0%,
+  20% {
+    opacity: 0;
+  }
+  40%,
+  60% {
+    opacity: 1;
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes vc-dots-c {
+  0%,
+  25% {
+    opacity: 0;
+  }
+  50%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- controls → outcome ---------- */
+.vc-btn {
+  transition:
+    background-color 150ms var(--vc-std),
+    opacity 150ms var(--vc-std),
+    box-shadow 150ms var(--vc-std);
+}
+.vc-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.vc-btn-secondary {
+  background: var(--vc-card);
+  box-shadow: 0 0 0 1px var(--vc-border), 0 1px 2px rgb(20 27 36 / 0.06);
+}
+.vc-btn-secondary:hover {
+  background: var(--vc-fill);
+}
+.vc-fade-out {
+  animation: vc-fade-out 120ms ease-out forwards;
+  pointer-events: none;
+}
+@keyframes vc-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+.vc-outcome-in {
+  animation:
+    vc-fade-in 450ms var(--vc-enter) both,
+    vc-outcome-rise 250ms var(--vc-enter-slide) both;
+}
+@keyframes vc-outcome-rise {
+  from {
+    translate: 0 8px;
+    scale: 0.98;
+  }
+  to {
+    translate: 0 0;
+    scale: 1;
+  }
+}
+.vc-badge-in {
+  animation: vc-badge-in 680ms var(--vc-badge) both;
+}
+@keyframes vc-badge-in {
+  from {
+    scale: 0.6;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vc-root *,
+  .vc-root *::before,
+  .vc-root *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+  .vc-ring,
+  .vc-ping {
+    display: none;
+  }
+  .vc-word {
+    filter: none !important;
+  }
+}

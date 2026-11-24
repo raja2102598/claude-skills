@@ -51,6 +51,7 @@ export default function AgentTimeline() {
   const [hover, setHover] = useState<Hover | null>(null);
   const [trace, setTrace] = useState<number | null>(null);
   const [scrubbing, setScrubbing] = useState(false);
+  const [done, setDone] = useState(false);
 
   const nowRef = useRef(0);
   const lastRef = useRef<number | null>(null);
@@ -58,22 +59,27 @@ export default function AgentTimeline() {
   const plotRef = useRef<HTMLDivElement>(null);
   const resumeRef = useRef(false);
 
-  const finished = now >= AXIS;
+  const finished = done;
 
-  // The run loop: the first frame after (re)start holds the playhead, every later frame adds the elapsed time.
+  // The run loop: the first frame after (re)start holds the playhead, every later frame adds the elapsed time
+  // (rounded to the microsecond so 120 frames of 1/60 s land exactly on 2.0 s). The frame after the playhead
+  // reaches the end of the axis settles the run, one frame later than the playhead itself, like the reference.
   useEffect(() => {
     if (!playing) return;
     lastRef.current = null;
     let raf = requestAnimationFrame(function tick(t) {
-      const last = lastRef.current ?? t;
-      lastRef.current = t;
-      const next = Math.min(AXIS, nowRef.current + ((t - last) / 1000) * speedRef.current);
-      nowRef.current = next;
-      flushSync(() => setNow(next));
-      if (next >= AXIS) {
-        setPlaying(false);
+      if (nowRef.current >= AXIS) {
+        flushSync(() => {
+          setDone(true);
+          setPlaying(false);
+        });
         return;
       }
+      const last = lastRef.current ?? t;
+      lastRef.current = t;
+      const next = Math.min(AXIS, Math.round((nowRef.current + ((t - last) / 1000) * speedRef.current) * 1e6) / 1e6);
+      nowRef.current = next;
+      flushSync(() => setNow(next));
       raf = requestAnimationFrame(tick);
     });
     return () => cancelAnimationFrame(raf);
@@ -84,6 +90,7 @@ export default function AgentTimeline() {
     nowRef.current = v;
     lastRef.current = null;
     setNow(v);
+    setDone(v >= AXIS);
   }, []);
 
   const restart = () => {
@@ -110,7 +117,7 @@ export default function AgentTimeline() {
   };
   const onAxisDown = (e: PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    resumeRef.current = playing;
+    resumeRef.current = playing || done;
     setPlaying(false);
     setScrubbing(true);
     seek(timeAt(e.clientX));
@@ -121,7 +128,10 @@ export default function AgentTimeline() {
   const onAxisUp = () => {
     if (!scrubbing) return;
     setScrubbing(false);
-    if (resumeRef.current && nowRef.current < AXIS) setPlaying(true);
+    if (resumeRef.current && nowRef.current < AXIS) {
+      setDone(false);
+      setPlaying(true);
+    }
   };
   const onKnobKey = (e: KeyboardEvent<HTMLSpanElement>) => {
     const step = e.shiftKey ? 2.5 : 0.5;
