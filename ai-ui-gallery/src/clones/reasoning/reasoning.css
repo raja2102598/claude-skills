@@ -1,0 +1,101 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500&display=swap");
+
+.rb-demo {
+  --rb-ink: #12141c;
+  --rb-secondary: #4b5162;
+  --rb-muted: #8a8fa0;
+  --rb-border: #e3e5eb;
+  --rb-surface: #ffffff;
+  --rb-surface-muted: #f2f3f7;
+  --rb-success: #0f8a6c;
+  --rb-danger: #d03e5a;
+  --rb-accent: #5b54e0;
+  --rb-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --rb-ease-in: cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  color: var(--rb-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Label shimmer: a darker band sweeps left → right across muted text. 2.4 s cycle: 200 ms rest with the band off the
+   left edge, a 1.75 s linear sweep, then rest with the band off the right edge. The gradient image is 3× the label
+   width with the band in its middle third, so background-position 100% → 0% carries it from off-left to off-right. */
+.rb-shimmer {
+  --rb-shimmer-base: color-mix(in oklab, var(--rb-ink) 14%, var(--rb-muted));
+  background-image: linear-gradient(
+    90deg,
+    var(--rb-shimmer-base) 0%,
+    var(--rb-shimmer-base) 33.3%,
+    color-mix(in oklab, var(--rb-ink) 50%, var(--rb-shimmer-base)) 39.6%,
+    color-mix(in oklab, var(--rb-ink) 90%, var(--rb-shimmer-base)) 45.2%,
+    var(--rb-ink) 50%,
+    color-mix(in oklab, var(--rb-ink) 90%, var(--rb-shimmer-base)) 54.8%,
+    color-mix(in oklab, var(--rb-ink) 50%, var(--rb-shimmer-base)) 60.4%,
+    var(--rb-shimmer-base) 66.7%,
+    var(--rb-shimmer-base) 100%
+  );
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rb-shimmer 2400ms linear infinite;
+}
+
+@keyframes rb-shimmer {
+  0%, 8.33% { background-position: 100% 0; }
+  81.25%, 100% { background-position: 0% 0; }
+}
+
+/* Cross-fades. Exit: 100 ms; enter: 150 ms. The counter also lifts 4 px; a new label rises 2 px into place. */
+.rb-exit { animation: rb-exit 100ms var(--rb-ease) both; }
+.rb-enter { animation: rb-enter 150ms var(--rb-ease-in) both; }
+.rb-count-exit { animation: rb-count-exit 100ms var(--rb-ease) both; }
+.rb-count-enter { animation: rb-count-enter 150ms var(--rb-ease-in) both; }
+.rb-label-enter { animation: rb-label-enter 150ms var(--rb-ease-in) both; }
+.rb-clip-in { animation: rb-enter 150ms var(--rb-ease) both; }
+.rb-clip-out { animation: rb-exit 100ms var(--rb-ease) both; }
+.rb-chunk { animation: rb-enter 150ms var(--rb-ease) both; }
+
+@keyframes rb-exit { to { opacity: 0; } }
+@keyframes rb-enter { from { opacity: 0; } }
+@keyframes rb-count-exit { to { opacity: 0; transform: translateY(-4px); } }
+@keyframes rb-count-enter { from { opacity: 0; transform: translateY(4px); } }
+@keyframes rb-label-enter { from { opacity: 0; transform: translateY(2px); } }
+
+.rb-slot[data-overflow] {
+  -webkit-mask-image: linear-gradient(transparent 0, #000 16px);
+  mask-image: linear-gradient(transparent 0, #000 16px);
+}
+
+.rb-chevron { transition: transform 200ms var(--rb-ease), color 150ms var(--rb-ease); }
+.rb-card[data-open] .rb-chevron { transform: rotate(180deg); }
+
+.rb-toggle { transition: background-color 150ms var(--rb-ease); }
+.rb-toggle:hover { background: color-mix(in oklab, var(--rb-surface-muted) 70%, transparent); }
+.rb-toggle:active { background: var(--rb-surface-muted); }
+.rb-toggle:hover ~ .rb-head .rb-chevron { color: var(--rb-secondary); }
+
+.rb-btn { transition: background-color 150ms var(--rb-ease), color 150ms var(--rb-ease), border-color 150ms var(--rb-ease); }
+.rb-btn-ghost:hover { background: var(--rb-surface-muted); color: var(--rb-ink); }
+.rb-btn-outline:hover { background: var(--rb-surface-muted); }
+
+.rb-step:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 10px;
+  bottom: -26px;
+  left: 10px;
+  width: 1px;
+  background: var(--rb-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-shimmer { animation: none; background: none; -webkit-text-fill-color: currentColor; }
+  .rb-exit, .rb-enter, .rb-count-exit, .rb-count-enter, .rb-label-enter, .rb-clip-in, .rb-clip-out, .rb-chunk {
+    animation: none;
+  }
+  .rb-chevron { transition: none; }
+}
