@@ -11,7 +11,7 @@ const ICONS = { Minimize2, WandSparkles, Smile, Briefcase, SpellCheck } as const
 const CLICK_AFTER = 870;
 const THINK = 2400; // click -> first token
 const STREAM = 3750; // first token -> last token
-const AUTO_ACCEPT = 2600; // review -> auto accept (autoplay only)
+const AUTO_ACCEPT = 4000; // review -> auto accept (autoplay only)
 const RESET = 2800; // resolved -> restart
 const LEAD = 700; // mount -> menu open
 
