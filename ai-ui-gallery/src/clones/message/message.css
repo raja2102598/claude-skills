@@ -1,0 +1,679 @@
+/* Message with actions and feedback: clone-local styles (plain CSS, so the shared dev server never waits on a
+   Tailwind rescan). Palette, fonts, icons and copy are our own; layout proportions and motion follow
+   .reanimate/message/spec.md. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap");
+
+.mf-root {
+  --mf-stage: #f3f1ec;
+  --mf-card: #fffefb;
+  --mf-border: #e6e2da;
+  --mf-hair: #ece8e0;
+  --mf-ink: #1f1d1a;
+  --mf-ink-2: #5f5a52;
+  --mf-muted: #8d877d;
+  --mf-soft: #f3f0ea;
+  --mf-panel: #fbfaf6;
+  --mf-primary: #2b3654;
+  --mf-primary-hover: #36436a;
+  --mf-on-primary: #fbfaf7;
+  --mf-ok: #2f7d4f;
+  --mf-err: #b4412f;
+  --mf-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --mf-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  position: absolute;
+  inset: 0;
+  background: var(--mf-stage);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 18.2px;
+  color: var(--mf-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.mf-root *,
+.mf-root *::before,
+.mf-root *::after {
+  box-sizing: border-box;
+}
+
+:where(.mf-root button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mf-root button:focus-visible,
+.mf-root textarea:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--mf-primary) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.mf-mono {
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* The card sits 16px in from the stage edge and grows downward; the demo switch follows it 16px below. */
+.mf-demo {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.mf-card {
+  width: 600px;
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--mf-border);
+  border-radius: 20px;
+  background: var(--mf-card);
+}
+
+/* ------------------------------------------------------------ prompt + reply */
+
+.mf-prompt {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mf-bubble {
+  width: 440px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: var(--mf-soft);
+  line-height: 20px;
+}
+
+.mf-reply {
+  display: grid;
+  gap: 8px;
+}
+
+.mf-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 20px;
+}
+
+.mf-mark {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  display: grid;
+  place-items: center;
+  background: var(--mf-primary);
+  color: var(--mf-on-primary);
+}
+
+.mf-model {
+  font-weight: 500;
+}
+
+.mf-body {
+  display: grid;
+  gap: 8px;
+  line-height: 22px;
+}
+
+.mf-body p,
+.mf-body ul {
+  margin: 0;
+}
+
+.mf-body ul {
+  display: grid;
+  gap: 4px;
+  padding-left: 20px;
+}
+
+.mf-body li::marker {
+  color: var(--mf-muted);
+}
+
+.mf-code {
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.2px;
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: var(--mf-soft);
+}
+
+/* ------------------------------------------------------------ action row */
+
+.mf-feedback {
+  margin-top: 4px;
+}
+
+.mf-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+}
+
+.mf-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: -8px;
+}
+
+.mf-icon-wrap {
+  position: relative;
+}
+
+.mf-icon-btn {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: var(--mf-ink-2);
+  transition:
+    background-color 150ms var(--mf-quint),
+    color 150ms var(--mf-quint),
+    transform 100ms var(--mf-quint);
+}
+
+.mf-icon-btn:hover {
+  background: var(--mf-soft);
+  color: var(--mf-ink);
+}
+
+.mf-icon-btn:active {
+  transform: scale(0.94);
+}
+
+.mf-icon-btn[aria-pressed="true"] {
+  color: var(--mf-ink);
+}
+
+.mf-glyph {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  display: grid;
+}
+
+.mf-glyph > * {
+  grid-area: 1 / 1;
+}
+
+/* Thumbs: the filled glyph sits on the outline and fades in over 150ms (quint-out). */
+.mf-fill {
+  opacity: 0;
+  transition: opacity 150ms var(--mf-quint);
+}
+
+.mf-icon-btn[aria-pressed="true"] .mf-fill {
+  opacity: 1;
+}
+
+/* Copy → check: the leaving glyph fades out over 100ms and shrinks to 0.7, the entering one fades in over 100ms and
+   springs from 0.7 to 1 (critically damped, ω = 26 rad/s, sampled into --mf-spring). */
+.mf-copy {
+  transition: color 150ms var(--mf-quint);
+}
+
+.mf-copy[data-copied="true"] {
+  color: var(--mf-ok);
+}
+
+.mf-layer {
+  display: grid;
+  place-items: center;
+}
+
+.mf-layer[data-state="off"] {
+  opacity: 0;
+}
+
+.mf-layer[data-state="in"] {
+  animation:
+    mf-fade-in 100ms var(--mf-quint) both,
+    mf-pop-in 360ms var(--mf-spring) both;
+}
+
+.mf-layer[data-state="out"] {
+  animation:
+    mf-fade-out 100ms var(--mf-quint) both,
+    mf-pop-out 360ms var(--mf-spring) both;
+}
+
+@keyframes mf-pop-in {
+  from {
+    transform: scale(0.7);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes mf-pop-out {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.7);
+  }
+}
+
+@keyframes mf-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mf-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------ tooltip */
+
+.mf-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  translate: -50% 0;
+  z-index: 5;
+  pointer-events: none;
+  white-space: nowrap;
+  padding: 5px 9px;
+  border-radius: 9px;
+  background: var(--mf-ink);
+  color: var(--mf-card);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  box-shadow: 0 4px 14px rgb(31 29 26 / 0.16);
+  transform-origin: 50% 100%;
+}
+
+.mf-tip[data-state="in"] {
+  animation: mf-tip-in 150ms var(--mf-expo) both;
+}
+
+.mf-tip[data-state="out"] {
+  animation: mf-tip-out 100ms var(--mf-quint) both;
+}
+
+@keyframes mf-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mf-tip-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+/* ------------------------------------------------------------ feedback panel */
+
+/* Height is a critically damped spring written by JS; the clip fades in or out over 150ms (quint-out). */
+.mf-clip {
+  overflow: hidden;
+  height: 0;
+}
+
+.mf-clip[data-state="in"] {
+  animation: mf-fade-in 150ms var(--mf-quint) both;
+}
+
+.mf-clip[data-state="out"] {
+  animation: mf-fade-out 150ms var(--mf-quint) both;
+}
+
+.mf-pad {
+  padding-top: 8px;
+}
+
+.mf-panel {
+  position: relative;
+  border: 1px solid var(--mf-hair);
+  border-radius: 14px;
+  background: var(--mf-panel);
+  overflow: hidden;
+}
+
+.mf-panel-inner {
+  position: relative;
+  padding: 12px;
+}
+
+.mf-view-leaving {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 12px;
+  pointer-events: none;
+  animation: mf-fade-out 100ms ease-out both;
+}
+
+.mf-view-entering {
+  animation: mf-view-in 150ms var(--mf-quint) 40ms both;
+}
+
+@keyframes mf-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.mf-form {
+  display: grid;
+  gap: 12px;
+}
+
+.mf-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 20px;
+}
+
+.mf-heading {
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.mf-close {
+  width: 28px;
+  height: 28px;
+  margin: -4px -6px -4px 0;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--mf-muted);
+  transition:
+    background-color 150ms var(--mf-quint),
+    color 150ms var(--mf-quint);
+}
+
+.mf-close:hover {
+  background: var(--mf-soft);
+  color: var(--mf-ink);
+}
+
+.mf-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mf-chip {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--mf-hair);
+  background: var(--mf-card);
+  color: var(--mf-ink-2);
+  font-size: 12px;
+  line-height: 12px;
+  transition:
+    background-color 150ms var(--mf-quint),
+    border-color 150ms var(--mf-quint),
+    color 150ms var(--mf-quint);
+}
+
+.mf-chip:hover {
+  background: var(--mf-soft);
+  border-color: #d6d1c7;
+  color: var(--mf-ink);
+}
+
+.mf-chip[aria-pressed="true"] {
+  background: var(--mf-primary);
+  border-color: var(--mf-primary);
+  color: var(--mf-on-primary);
+}
+
+.mf-note {
+  display: block;
+  width: 100%;
+  height: 72px;
+  resize: none;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--mf-hair);
+  background: var(--mf-card);
+  font: inherit;
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--mf-ink);
+}
+
+.mf-note::placeholder {
+  color: var(--mf-muted);
+}
+
+.mf-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+}
+
+.mf-foot-note {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  color: var(--mf-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mf-foot-note[data-error="true"] {
+  color: var(--mf-err);
+}
+
+.mf-foot-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.mf-btn {
+  position: relative;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  display: grid;
+  place-items: center;
+  transition:
+    background-color 150ms var(--mf-quint),
+    color 150ms var(--mf-quint),
+    opacity 150ms var(--mf-quint);
+}
+
+.mf-btn-ghost {
+  color: var(--mf-ink-2);
+}
+
+.mf-btn-ghost:hover {
+  background: var(--mf-soft);
+  color: var(--mf-ink);
+}
+
+.mf-btn-primary {
+  background: var(--mf-soft);
+  color: var(--mf-muted);
+  cursor: default;
+}
+
+.mf-btn-primary[data-ready="true"] {
+  background: var(--mf-primary);
+  color: var(--mf-on-primary);
+  cursor: pointer;
+}
+
+.mf-btn-primary[data-ready="true"]:hover {
+  background: var(--mf-primary-hover);
+}
+
+.mf-btn-primary[data-busy="true"] {
+  opacity: 0.91;
+  cursor: progress;
+}
+
+.mf-btn-cell {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+}
+
+.mf-btn-label {
+  transition: opacity 150ms var(--mf-quint);
+}
+
+.mf-btn[data-busy="true"] .mf-btn-label {
+  opacity: 0;
+}
+
+.mf-btn-loader {
+  opacity: 0;
+}
+
+.mf-btn[data-busy="true"] .mf-btn-loader {
+  animation: mf-fade-in 150ms var(--mf-expo) both;
+}
+
+.mf-spinner {
+  animation: mf-spin 700ms linear infinite;
+}
+
+@keyframes mf-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mf-thanks {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  min-height: 32px;
+  padding-left: 24px;
+  position: relative;
+}
+
+.mf-thanks-icon {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  color: var(--mf-ok);
+}
+
+.mf-thanks-title {
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.mf-thanks-muted {
+  font-size: 12px;
+  color: var(--mf-muted);
+}
+
+/* ------------------------------------------------------------ demo switch */
+
+.mf-controls {
+  height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.mf-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: var(--mf-ink);
+}
+
+.mf-track {
+  width: 40px;
+  height: 24px;
+  border-radius: 999px;
+  background: #dcd8cf;
+  padding: 3px;
+  transition: background-color 150ms var(--mf-quint);
+}
+
+.mf-thumb {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(31 29 26 / 0.18);
+  transition: transform 200ms var(--mf-quint);
+}
+
+.mf-switch[aria-checked="true"] .mf-track {
+  background: var(--mf-primary);
+}
+
+.mf-switch[aria-checked="true"] .mf-thumb {
+  transform: translateX(16px);
+}
+
+.mf-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mf-root *,
+  .mf-root *::before,
+  .mf-root *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}

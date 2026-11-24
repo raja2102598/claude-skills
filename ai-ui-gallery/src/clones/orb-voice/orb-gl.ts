@@ -28,7 +28,6 @@ uniform float uSheenAngle; // sheen position, rad
 uniform float uGlow;       // outer glow
 uniform float uMute;       // desaturation, 0..1
 uniform float uLift;       // brightening with the voice
-uniform float uClock;      // seconds since mount, for the edge ripple
 uniform vec3 uInk;
 uniform vec3 uBloom;
 uniform vec3 uPearl;
@@ -149,7 +148,6 @@ export interface OrbUniforms {
   glow: number;
   mute: number;
   lift: number;
-  clock: number;
 }
 
 export interface OrbRenderer {
@@ -173,7 +171,7 @@ function compile(gl: WebGL2RenderingContext, type: number, src: string) {
 
 const UNIFORMS = [
   "uSize", "uFlow", "uTwist", "uRadius", "uWobble", "uVoice", "uRings", "uRingPhase",
-  "uSheen", "uSheenAngle", "uGlow", "uMute", "uLift", "uClock", "uInk", "uBloom", "uPearl",
+  "uSheen", "uSheenAngle", "uGlow", "uMute", "uLift", "uInk", "uBloom", "uPearl",
 ] as const;
 
 /** Returns null when WebGL2 is unavailable; the caller then shows the CSS fallback. */
@@ -228,7 +226,6 @@ export function createOrbRenderer(canvas: HTMLCanvasElement, palette: OrbPalette
       gl.uniform1f(loc.uGlow, u.glow);
       gl.uniform1f(loc.uMute, u.mute);
       gl.uniform1f(loc.uLift, u.lift);
-      gl.uniform1f(loc.uClock, u.clock);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
