@@ -309,4 +309,22 @@ export const entries: ShowcaseEntry[] = [
     meta: () => import("../src/clones/voice-input/meta.ts"),
     reference: "UIStacks · Voice prompt", candidates: 3, rounds: 3, timing: "all 17 rows pass, within 17 ms", runnerUp: "Arc UI Voice recorder",
   },
+  {
+    slug: "ai-summary",
+    load: () => import("../src/clones/ai-summary/index.tsx"),
+    meta: () => import("../src/clones/ai-summary/meta.ts"),
+    reference: "Arc UI · AI insight card", candidates: 4, rounds: 3, timing: "probed events within 80 ms", runnerUp: "UIStacks AI column",
+  },
+  {
+    slug: "ai-avatar",
+    load: () => import("../src/clones/ai-avatar/index.tsx"),
+    meta: () => import("../src/clones/ai-avatar/meta.ts"),
+    reference: "Arc UI · AI mascot", candidates: 2, rounds: 3, timing: "6 state changes within 50 ms", runnerUp: "Libraries.dev Bot avatars",
+  },
+  {
+    slug: "ai-hero",
+    load: () => import("../src/clones/ai-hero/index.tsx"),
+    meta: () => import("../src/clones/ai-hero/meta.ts"),
+    reference: "beUI Pro · AI Workspace", candidates: 8, rounds: 3, timing: "every element within 17 ms", runnerUp: "Arc UI AI feature launch",
+  },
 ];
