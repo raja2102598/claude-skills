@@ -7,7 +7,7 @@ import "./reasoning-effort.css";
  * Reasoning effort control, pixel-faithful to assistant-ui "Reasoning effort" (MIT).
  * Low/Medium/High/Max rescales the cap (2k / 8k / 24k / 64k) while the used share stays put.
  * Replay (corner button) plays the budget fill in five steps, 14/29/41/52/58 %, one every ~900 ms;
- * the bar's width has a 500 ms ease. The page itself loads already at 58 %.
+ * the bar's width has a 500 ms ease. It plays once on mount.
  */
 type Effort = "Low" | "Medium" | "High" | "Max";
 const EFFORTS: Effort[] = ["Low", "Medium", "High", "Max"];
@@ -26,13 +26,12 @@ const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 export default function ReasoningEffort() {
   const [state, setState] = useState<StateName>("Default");
   const [effort, setEffort] = useState<Effort>("High");
-  const [pct, setPct] = useState(58);
+  const [pct, setPct] = useState(14);
   const [playing, setPlaying] = useState(false);
   const timer = useRef<number[]>([]);
   const readOnly = !!STATES[state].readOnly;
 
   const stop = () => { timer.current.forEach(clearTimeout); timer.current = []; setPlaying(false); };
-  useEffect(() => stop, []);
 
   const pick = (s: StateName) => {
     stop();
@@ -44,18 +43,20 @@ export default function ReasoningEffort() {
     stop();
     if (state !== "Default") return;
     setPlaying(true);
-    STEPS.forEach((v, i) => {
-      timer.current.push(window.setTimeout(() => setPct(v), i * STEP_MS));
+    setPct(STEPS[0]);
+    STEPS.slice(1).forEach((v, i) => {
+      timer.current.push(window.setTimeout(() => setPct(v), (i + 1) * STEP_MS));
     });
     timer.current.push(window.setTimeout(() => setPlaying(false), (STEPS.length - 1) * STEP_MS));
   };
+  useEffect(() => { replay(); return stop; }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const toggle = () => (playing ? stop() : replay());
 
   const cap = CAP[effort];
   const used = (pct / 100) * cap;
   return (
     <div className="re-root">
-      <div data-stage className="re-stage" style={{ width: 784, height: 360 }}>
+      <div className="re-stage" style={{ width: 784, height: 360 }}>
         <div className="re-inner">
           <button type="button" className="re-replay" aria-label={playing ? "Pause animation" : "Replay animation"} onClick={toggle}>
             <Pause className={clsx(!playing && "off")} aria-hidden />
@@ -81,11 +82,11 @@ export default function ReasoningEffort() {
             </span>
           </div>
         </div>
-      </div>
-      <div className="re-tabs" role="radiogroup">
+        <div className="re-tabs" role="radiogroup">
         {(Object.keys(STATES) as StateName[]).map((s) => (
           <button key={s} type="button" role="radio" aria-checked={s === state} className={clsx("re-tab", s === state && "on")} onClick={() => pick(s)}>{s}</button>
         ))}
+        </div>
       </div>
     </div>
   );

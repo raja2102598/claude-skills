@@ -34,7 +34,8 @@ button.re-opt:active { scale: 0.97; }
 .re-replay:active { scale: 0.96; }
 .re-replay svg { grid-area: 1 / 1; width: 14px; height: 14px; transition: opacity 200ms cubic-bezier(.2,0,0,1), scale 200ms cubic-bezier(.2,0,0,1), filter 200ms cubic-bezier(.2,0,0,1); }
 .re-replay svg.off { opacity: 0; scale: 0.25; filter: blur(4px); }
-.re-tabs { display: flex; gap: 4px; padding-top: 14px; }
+.re-tabs { position: absolute; left: 12px; top: 10px; display: flex; gap: 4px; opacity: 0; transition: opacity 150ms; }
+.re-stage:hover .re-tabs, .re-tabs:focus-within { opacity: 1; }
 .re-tab { height: 24px; padding: 0 8px; border: 0; border-radius: 4px; background: transparent; color: var(--re-muted); font: inherit; font-size: 12px; font-weight: 500; cursor: pointer; transition: color 150ms, background-color 150ms; }
 .re-tab:hover { color: oklch(0.145 0.006 106); }
 .re-tab.on { background: oklch(0.145 0.006 106 / 0.06); color: oklch(0.145 0.006 106); }
