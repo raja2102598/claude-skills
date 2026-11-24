@@ -240,26 +240,14 @@ export default function GenerativeUI() {
                             </div>
                           </div>
                           <div className={"gu-pill" + (stage === "confirmed" ? " ok" : "")}>
-                            <span key={stage}>
-                              {stage === "quote" && (
+                            <span key={stage === "signing" || stage === "pending" ? "quote" : stage}>
+                              {(stage === "quote" || stage === "signing" || stage === "pending") && (
                                 <>
-                                  <svg className="gu-ring" viewBox="0 0 16 16" key={cycle}>
+                                  <svg className={"gu-ring" + (stage === "quote" ? "" : " freeze")} viewBox="0 0 16 16" key={cycle}>
                                     <circle className="bg" cx="8" cy="8" r="6" />
                                     <circle className="fg" cx="8" cy="8" r="6" />
                                   </svg>
                                   {secs}s
-                                </>
-                              )}
-                              {stage === "signing" && (
-                                <>
-                                  <i className="gu-spin-s" />
-                                  Signing
-                                </>
-                              )}
-                              {stage === "pending" && (
-                                <>
-                                  <i className="gu-spin-s" />
-                                  Pending
                                 </>
                               )}
                               {stage === "confirmed" && (

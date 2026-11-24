@@ -68,7 +68,7 @@
 .ah-send { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: #fff; color: #07101f; transition: transform .2s, opacity .2s; }
 .ah-send:hover { transform: scale(1.06); }
 .ah-send:active { transform: scale(.94); }
-.ah-chips { display: flex; gap: 9px; justify-content: center; margin-top: 16px; }
+.ah-chips { display: flex; gap: 9px; justify-content: center; margin-top: 22px; }
 .ah-chip { height: 32px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,.055); font-size: 12px; color: rgba(255,255,255,.52); --dy: 8px; transition: background .2s, color .2s; }
 .ah-chip:hover { background: rgba(255,255,255,.12); color: #fff; }
 .ah-sent { position: absolute; right: 60px; bottom: 18px; font-size: 12px; color: #7cffc4; animation: ah-fade .2s ease-out both; }

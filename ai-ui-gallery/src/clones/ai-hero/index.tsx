@@ -16,6 +16,7 @@ const CHIPS = ["Plan next sprint", "Summarize my inbox", "Prep tomorrow's standu
 const BAR_H = [231, 287, 340, 386, 419, 386, 340, 287, 231]; // px at the 1293 px reference width
 const WORD_BASE = 183; // ms, first word starts moving
 const WORD_STEP = 73; // ms per word, one global index across both lines (line 2 simply continues the sequence)
+const CHIP_W = [214, 229, 221]; // px, reference chip widths
 const CHIP_DELAY = [378, 417, 462];
 const PROMPT_DELAY = [0.317, 3.117, 5.917]; // s, 2.8 s apart
 
@@ -149,7 +150,7 @@ export default function AiHero() {
                 key={c}
                 type="button"
                 className="ah-chip ah-in ah-snapin"
-                style={{ ["--d" as string]: `${CHIP_DELAY[i]}ms` }}
+                style={{ ["--d" as string]: `${CHIP_DELAY[i]}ms`, width: CHIP_W[i] }}
                 onClick={() => {
                   setValue(c);
                   taRef.current?.focus();

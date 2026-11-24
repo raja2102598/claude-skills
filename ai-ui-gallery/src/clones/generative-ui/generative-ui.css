@@ -170,3 +170,4 @@
 .gu-foot span { opacity: 0; transition: opacity 250ms; }
 .gu-foot span.show { opacity: 1; }
 .gu-done { margin-top: 16px; height: 52px; font-size: 15px; line-height: 22.5px; animation: gu-fade 300ms ease both; }
+.gu-ring.freeze .fg { animation-play-state: paused; }

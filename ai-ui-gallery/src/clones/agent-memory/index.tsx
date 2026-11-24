@@ -268,10 +268,12 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
             return (
               <Collapse key={c.id} open={groupOpen}>
                 <div role="group" aria-label={c.label}>
-                  <h3 className="am-gh" style={{ margin: 0 }}>
-                    {c.label}
-                    <span>{count(c.id)}</span>
-                  </h3>
+                  <Collapse open={filter === "all"}>
+                    <h3 className="am-gh" style={{ margin: 0 }}>
+                      {c.label}
+                      <span>{count(c.id)}</span>
+                    </h3>
+                  </Collapse>
                   <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
                     {rows.map((m) => (
                       <li key={m.id} data-memory-id={m.id}>

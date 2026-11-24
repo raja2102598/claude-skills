@@ -111,7 +111,7 @@ function Pip({ size, state, mini = false }: { size: number; state: State; mini?:
         /* measured on the reference: period 2.3 s, rightmost point 0.28 s after entry, centre (59.6, 26.4), rx 47.4, ry 9.4 */
         const a = Math.max(0, ((tin + 0.05 - 0.28) / 2.3) * Math.PI * 2);
         const z = Math.sin(a);
-        tgt = { ...tgt, lean: 3, lookX: -3.2, lookY: -3, cx: 59.6 + 47.4 * Math.cos(a), cy: 26.4 + 9.4 * z, cr: 5 * (0.85 + 0.25 * z) };
+        tgt = { ...tgt, lean: 3, lookX: -3.2, lookY: -3, cx: 59.6 + 47.4 * Math.cos(a), cy: 24.8 + 9.4 * z, cr: 5 * (0.85 + 0.25 * z) };
         orbitFront = z > 0;
       } else if (s === "writing") {
         /* measured: sweep starts 0.15 s after entry, 1.2 s across (x 34.9 to 84.3), 0.4 s arced return, period 1.7 s */
@@ -119,12 +119,14 @@ function Pip({ size, state, mini = false }: { size: number; state: State; mini?:
         const ph = u < 0 ? 0.97 : (u % 1.7) / 1.7;
         let cx = 34.9, cy = 119, line = 0, frac = 0;
         if (ph < 0.706) { frac = ease(ph / 0.706); cx = 34.9 + 49.4 * frac; line = 1; }
-        else if (ph < 0.94) { const r = (ph - 0.706) / 0.234; frac = 1 - r; cx = 84.3 - 49.4 * r; cy = 119 - 6.3 * Math.sin(Math.PI * r); }
+        else if (ph < 0.747) { cx = 84.3; frac = 1; line = 1; }
+        else if (ph < 0.92) { const r = (ph - 0.747) / 0.173; frac = 1 - r; cx = 84.3 - 49.4 * r; cy = 119 - 6.3 * Math.sin(Math.PI * r); }
         tgt = { ...tgt, lookX: -3.5 + 7 * frac, lookY: 3.6, lean: 0, dy: 1, cx, cy, cr: 4.4, line };
       } else if (s === "done") {
         tgt = { ...tgt, happy: 1, eyeS: 1, lookX: 0, lookY: 0, dy: -2, cx: 95.3, cy: 24, cr: 4.5, cop: 0 };
       } else if (s === "error") {
-        const sh = Math.exp(-tin * 5) * Math.sin(tin * 42) * 2.8;
+        const te = Math.max(0, tin - 0.04);
+        const sh = Math.exp(-te * 5) * Math.sin(te * 42) * 3.2;
         tgt = { ...tgt, worry: 1, dx: sh, lookX: 0, lookY: 1, eyeS: 0.92, cx: 96, cy: 46, cr: 4, cop: 0.55, lean: 0 };
       }
       if (reduce) { P.lean = tgt.lean; }
