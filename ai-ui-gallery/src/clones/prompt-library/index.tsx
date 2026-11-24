@@ -172,6 +172,7 @@ export default function PromptStudio() {
     let lastTop = -1, count = 0;
     spans.forEach((sp) => { if (sp.offsetTop !== lastTop && count) { lines.push(count); count = 0; } lastTop = sp.offsetTop; count++; });
     if (count) lines.push(count);
+    if (lines.length > 7) lines.splice(0, 2, lines[0] + lines[1]); // reference shows greeting + first body line together
     const n = Math.max(lines.length, 1);
     const T = [800, 917, 1000, 1167, 1200, 1350, 1500]; // reference chunk times
     let acc = 0;
@@ -202,6 +203,8 @@ export default function PromptStudio() {
     ro.observe(el); setOutH(el.offsetHeight);
     return () => ro.disconnect();
   }, []);
+
+  useLayoutEffect(() => { const el = innerRef.current; if (el) setOutH(el.offsetHeight); }, [shown, phase]);
 
   const pickCase = (id: string) => { setCaseId(id as Case); setVars(CASES.find((c) => c.id === id)!.vars); stop(); };
   const busy = phase === "thinking" || phase === "writing";

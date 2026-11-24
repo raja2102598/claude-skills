@@ -16,7 +16,7 @@ const CHIPS = ["Plan next sprint", "Summarize my inbox", "Prep tomorrow's standu
 const BAR_H = [231, 287, 340, 386, 419, 386, 340, 287, 231]; // px at the 1293 px reference width
 const WORD_BASE = 183; // ms, first word starts moving
 const WORD_STEP = 142; // ms per word; line 2 starts two steps after line 1
-const CHIP_DELAY = [361, 400, 445];
+const CHIP_DELAY = [378, 417, 462];
 const PROMPT_DELAY = [0.317, 3.117, 5.917]; // s, 2.8 s apart
 
 const NAV = ["Product", "Agents", "Use cases", "Pricing"];
