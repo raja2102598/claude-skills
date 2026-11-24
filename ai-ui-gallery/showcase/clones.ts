@@ -115,7 +115,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "agent-builder",
     load: () => import("../src/clones/agent-builder/index.tsx"),
     meta: () => import("../src/clones/agent-builder/meta.ts"),
-    reference: "Arc UI · Agent builder", candidates: 3, rounds: 2, timing: "chat events within 40 ms, one flow", runnerUp: "Arc UI AI setup wizard",
+    reference: "Arc UI · Agent builder", candidates: 3, rounds: 4, timing: "all 4 flows within 80 ms", runnerUp: "Arc UI AI setup wizard",
   },
   {
     slug: "agent-card",
