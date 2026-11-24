@@ -42,7 +42,7 @@ const STATUS: Record<StatusKey, string> = {
 
 interface Pt { x: number; y: number }
 
-/** cubic-bezier(0.22, 1, 0.36, 1) solved numerically, driven by rAF so it follows the page clock. */
+/** cubic-bezier(0.4, 0, 0.2, 1) solved numerically, driven by rAF so it follows the page clock. */
 function bez(p1x: number, p1y: number, p2x: number, p2y: number) {
   const f = (a: number, b: number, c: number, u: number) => ((1 - 3 * c + 3 * a) * u + (3 * c - 6 * a)) * u * u + 3 * a * u;
   return (x: number) => {
@@ -54,7 +54,7 @@ function bez(p1x: number, p1y: number, p2x: number, p2y: number) {
     return f(p1y, 0, p2y, u);
   };
 }
-const ease = bez(0.22, 1, 0.36, 1);
+const ease = bez(0.4, 0, 0.2, 1);
 interface S {
   phase: Phase;
   status: StatusKey;

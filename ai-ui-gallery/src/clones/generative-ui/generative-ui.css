@@ -141,7 +141,7 @@
 
 @keyframes gu-spin { to { transform: rotate(360deg); } }
 @keyframes gu-fade { from { opacity: 0; } }
-@keyframes gu-out { to { opacity: 0; transform: translateY(-10px); filter: blur(4px); } }
+@keyframes gu-out { to { opacity: 0; } }
 @keyframes gu-rise { from { opacity: 0; transform: translateY(7.5px); } }
 @keyframes gu-rise-s { from { opacity: 0; transform: translateY(4px); } }
 @keyframes gu-pop { from { opacity: 0; transform: scale(.4); } 60% { opacity: 1; } }
