@@ -29,18 +29,18 @@ export const MODELS = ["Nova 2", "Atlas Mini", "Nova 2 Fast"];
 export interface Chip { tool: "billing" | "docs" | "mail" | "chat" | "issues" | "calendar"; name: string; detail: string; at: number; detailAt: number }
 export interface Scenario { chips: Chip[]; writeAt: number; streamMs: number; doneAt: number; took: string; answer: string }
 
-// Times are ms from the send click. Measured on the reference (virtual clock for the CSV case, real clock for the billing case).
+// Times are ms from the send click. Measured on the reference (virtual clock, 25 fps, all three cases; real-clock probes run slower under CPU load).
 export const SCENARIOS: Scenario[] = [
   {
     chips: [
-      { tool: "billing", name: "Searched customers", detail: "2 charges on Oct 14", at: 1000, detailAt: 1000 },
-      { tool: "docs", name: "Read Refund policy 2026.pdf", detail: "Section 2.1", at: 2250, detailAt: 2250 },
-      { tool: "mail", name: "Drafted reply", detail: "maya@northwind.example", at: 3050, detailAt: 3050 },
+      { tool: "billing", name: "Searched customers", detail: "2 charges on Oct 14", at: 720, detailAt: 1200 },
+      { tool: "docs", name: "Read Refund policy 2026.pdf", detail: "Section 2.1", at: 1240, detailAt: 1720 },
+      { tool: "mail", name: "Drafted reply", detail: "maya@northwind.example", at: 1800, detailAt: 2280 },
     ],
-    writeAt: 3050,
-    streamMs: 2150,
-    doneAt: 5350,
-    took: "3.8s",
+    writeAt: 2320,
+    streamMs: 360,
+    doneAt: 2760,
+    took: "2.7s",
     answer:
       "Maya Chen at Northwind was charged $49.00 twice on Oct 14. The second charge is a duplicate from a retried payment. The refund policy allows a full refund for duplicates within 30 days. I drafted a reply to Maya and can refund $49.00 once you approve.",
   },
@@ -57,11 +57,11 @@ export const SCENARIOS: Scenario[] = [
       "I filed ENG-2481, \"CSV export fails for team workspaces\", with the customer's steps and flagged it in #escalations. I told the customer the team is on it, without promising a date. I'll follow up when the issue moves to in progress.",
   },
   {
-    chips: [{ tool: "billing", name: "Looked up plan", detail: "Team, 14 seats", at: 800, detailAt: 1100 }],
-    writeAt: 1600,
-    streamMs: 1500,
-    doneAt: 3200,
-    took: "2.0s",
+    chips: [{ tool: "billing", name: "Looked up plan", detail: "Team, 14 seats", at: 720, detailAt: 1200 }],
+    writeAt: 1240,
+    streamMs: 280,
+    doneAt: 1520,
+    took: "1.5s",
     answer:
       "Calendar is switched off for this agent, so I can't book the call myself. The Team plan has 14 seats; Enterprise starts at 25. I can draft a note to the sales team so they reach out this week.",
   },

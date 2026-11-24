@@ -40,9 +40,9 @@ const ICONS: Record<ToolId, LucideIcon> = {
 
 // Upload progress as [ms from mount, percent]; the bar's own transform eases 150 ms between steps.
 const UPLOAD_STEPS: [number, number][] = [
-  [600, 10], [750, 15], [990, 25], [1330, 31], [1480, 46], [1830, 61], [2490, 66], [2680, 82], [3010, 97],
+  [640, 9], [760, 12], [880, 21], [1000, 26], [1080, 33], [1200, 43], [1400, 50], [1440, 56], [1560, 61], [1640, 69], [1760, 74], [1800, 80], [1920, 84], [2040, 94], [2120, 97],
 ];
-const UPLOAD_DONE = 3240;
+const UPLOAD_DONE = 2160;
 
 const autoplayEnabled = () => {
   try {
