@@ -50,7 +50,7 @@ const T = { chunk1: 180, chunk2: 230, group: 600, done1: 1800, row2: 2017, done2
 // Follow-ups, ms from the click.
 const RETRY = { done: 700, approval: 960 };
 const ALLOW = { done: 620, collapse: 1100, answer: 1580, chunkGap: 45, runAgain: 2280 };
-const DENY = { answer: 480, runAgain: 1180 };
+const DENY = { collapse: 470, answer: 950, runAgain: 1650 };
 
 // ---------- copy (placeholder) ----------
 
@@ -143,6 +143,7 @@ interface TurnState {
   flag: string | null; // "1 failed" / total time
   failed: boolean;
   open: boolean;
+  toggled: boolean; // the reader opened / closed the card by hand: no auto-collapse at the end
   answer: "allow" | "deny" | null;
   answerChunks: number;
   runAgain: boolean;
@@ -158,6 +159,7 @@ const INITIAL: TurnState = {
   flag: null,
   failed: false,
   open: true,
+  toggled: false,
   answer: null,
   answerChunks: 0,
   runAgain: false,
@@ -235,13 +237,14 @@ const answerSteps = (kind: "allow" | "deny", from: number): Step[] =>
 const ALLOW_STEPS: Step[] = [
   [0, (s, now) => ({ ...setCall(s, 4, { status: "running", title: COPY.chat.running, note: undefined, at: now }), header: using(4), headerAt: now })],
   [ALLOW.done, (s) => ({ ...setCall(s, 4, { status: "success", title: COPY.chat.done, meta: COPY.chat.meta }), header: "Used 4 tools", headerAt: null, flag: "3.0s" })],
-  [ALLOW.collapse, (s) => ({ ...s, open: false })],
+  [ALLOW.collapse, (s) => (s.toggled ? s : { ...s, open: false })],
   ...answerSteps("allow", ALLOW.answer),
   [ALLOW.runAgain, (s) => ({ ...s, runAgain: true })],
 ];
 
 const DENY_STEPS: Step[] = [
   [0, (s) => ({ ...setCall(s, 4, { status: "denied", note: undefined, meta: ["Denied"] }), header: "Used 4 tools", headerAt: null, flag: "2.4s" })],
+  [DENY.collapse, (s) => (s.toggled ? s : { ...s, open: false })],
   ...answerSteps("deny", DENY.answer),
   [DENY.runAgain, (s) => ({ ...s, runAgain: true })],
 ];
@@ -273,13 +276,6 @@ function AutoHeight({
   const st = useRef({ anim: null as { stop(): void } | null, own: false, kids: 0, last: 0, collapsed });
   st.current.collapsed = collapsed;
 
-  const report = useCallback(
-    (d: number) => {
-      st.current.kids += d;
-      notifyParent?.(d);
-    },
-    [notifyParent],
-  );
   const setOwn = (on: boolean) => {
     if (st.current.own === on) return;
     st.current.own = on;
@@ -290,6 +286,23 @@ function AutoHeight({
     if (o) o.style.height = st.current.collapsed ? "0px" : "auto";
     setOwn(false);
   };
+  /** Drop any spring of our own and sit at auto, so a nested AutoHeight drives the height. */
+  const follow = () => {
+    const s = st.current;
+    if (s.collapsed) return;
+    s.anim?.stop();
+    s.anim = null;
+    settle();
+  };
+  const report = useCallback(
+    (d: number) => {
+      st.current.kids += d;
+      if (d > 0) follow();
+      notifyParent?.(d);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [notifyParent],
+  );
   const springTo = (to: number) => {
     const s = st.current;
     s.anim?.stop();
@@ -322,15 +335,7 @@ function AutoHeight({
       const prev = s.last;
       s.last = h;
       if (h === prev || s.collapsed) return;
-      if (s.kids > 0) {
-        // a nested AutoHeight is springing: follow it at auto
-        if (s.anim) {
-          s.anim.stop();
-          s.anim = null;
-          settle();
-        }
-        return;
-      }
+      if (s.kids > 0) return follow(); // a nested AutoHeight is springing: follow it at auto
       if (!s.anim) o.style.height = `${prev}px`;
       springTo(h);
     });
@@ -404,7 +409,11 @@ function SwapText({ text, shimmerFrom, className }: { text: string; shimmerFrom:
           {out.text}
         </span>
       )}
-      <ShimmerLabel key={text} text={text} shimmerFrom={shimmerFrom} className={entered === text ? "tc-swap-in" : undefined} />
+      {/* The blur-in runs on this wrapper and the shimmer on the label inside, so the two animations never share one
+          animation list (or the shimmer's delay). */}
+      <span key={text} className={entered === text ? "tc-swap-in" : undefined}>
+        <ShimmerLabel text={text} shimmerFrom={shimmerFrom} className="tc-label" />
+      </span>
     </span>
   );
 }
@@ -668,7 +677,7 @@ function Turn({ onRunAgain }: { onRunAgain: () => void }) {
                   type="button"
                   className={`tc-card-toggle ${s.open ? "tc-open" : ""}`}
                   aria-expanded={s.open}
-                  onClick={() => setS((cur) => ({ ...cur, open: !cur.open }))}
+                  onClick={() => setS((cur) => ({ ...cur, open: !cur.open, toggled: true }))}
                   data-tc-header
                 >
                   <span className="tc-stack" style={{ "--tc-spring": STACK_SPRING.easing, "--tc-spring-ms": STACK_SPRING.ms } as CSSProperties}>
@@ -764,8 +773,9 @@ export default function ToolCallCard() {
       {run > 0 ? (
         <Turn key={run} onRunAgain={() => setRun((r) => r + 1)} />
       ) : (
-        // Capture mode (?autoplay=0): nothing runs until this invisible full-stage button is clicked.
-        <button type="button" data-tc-start aria-label="Play the demo" className="absolute inset-0 cursor-pointer opacity-0" onClick={() => setRun(1)} />
+        // Capture mode (?autoplay=0): nothing runs until this invisible button is clicked. It sits in the empty top-left
+        // corner so the pointer that clicked it does not rest on the card (no hover fill during the capture).
+        <button type="button" data-tc-start aria-label="Play the demo" className="absolute left-0 top-0 h-6 w-6 cursor-pointer opacity-0" onClick={() => setRun(1)} />
       )}
     </div>
   );

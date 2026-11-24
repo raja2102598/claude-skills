@@ -59,7 +59,7 @@
 
 /* ---------- label swap: old label blurs out, new one blurs in, stacked in place ---------- */
 .tc-swap { position: relative; display: block; min-width: 0; }
-.tc-swap > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tc-swap > span, .tc-label { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tc-swap > .tc-swap-out { position: absolute; inset: 0; animation: tc-label-out 150ms var(--tc-ease-standard) both; pointer-events: none; }
 .tc-swap > .tc-swap-in { animation: tc-label-in 200ms var(--tc-ease-enter) both; }
 @keyframes tc-label-out { from { opacity: 1; filter: blur(0); } to { opacity: 0; filter: blur(2px); } }

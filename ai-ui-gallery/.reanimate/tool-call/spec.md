@@ -50,15 +50,20 @@
 |---|---|---|---|
 | R1 | Retry | row 3 back to running: label crossfade, error → spinner, note removed (height 58 → 40 spring), Retry fades out, "1 failed" fades out, header "Used" → "Using" | 0 |
 | R2 | | row 3 succeeds (as 6–6c) with its meta | 700 |
-| R3 | | approval row mounts (as 7–7c): accent-tinted box, note line, Deny / Allow + shield icon; header → "Waiting for approval" | 975 |
+| R3 | | approval row mounts (as 7–7c): accent-tinted box, note line, Deny / Allow + shield icon; header → "Waiting for approval" | 960–975 (height grows from 977) |
 | A1 | Allow | approval row → running "Posting to …": note removed (58 → 40), buttons fade out, header → "Using 4 tools" | 0 |
 | A2 | | row 4 succeeds; header "Used 4 tools", total time "3.0s" fades in | 620 |
 | A3 | | card collapses: list opacity → 0 (~100 ms), list height → 0 (spring ω ≈ 17.2), header chevron 180° → 0 (440 ms spring curve) | 1100 |
 | A4 | | answer paragraph streams in 5 chunks, ~45 ms apart, 150 ms fade each | 1580 |
 | A5 | | "Run again" appears under the answer (restarts the whole turn) | 2280 |
-| D1 | Deny | row 4 → denied (muted title, "Denied", ban icon); header "Used 4 tools" + total; answer streams after ~480 ms; "Run again" ~700 ms later | 0 |
+| D1 | Deny | row 4 → denied (muted title, "Denied", ban icon), note removed (58 → 40); header "Used 4 tools" + total | 0 |
+| D2 | | card collapses as A3 | 470 |
+| D3 | | answer streams as A4 | 950 |
+| D4 | | "Run again" | 1650 |
+| A3/D2 note | | the auto-collapse is skipped when the reader has opened or closed the card by hand | – |
 | X | row / header click | rows open their input / output details and the header collapses the list with the same height spring and chevron rotation | – |
 
 ## Additions
-- `?autoplay=0` capture mode: the stage stays empty until `[data-tc-start]` (an invisible full-stage button) is clicked, so the clone uses the same click trigger as the reference. The gallery plays on mount.
+- `?autoplay=0` capture mode: the stage stays empty until `[data-tc-start]` (an invisible 24 px button in the empty top-left corner, so the pointer does not rest on the card) is clicked, so the clone uses the same click trigger as the reference. The gallery plays on mount.
+- `ref-deny/`: same as `ref-allow/` with the trigger on `[aria-label^='Deny:']`, `--duration 2500`.
 - `prefers-reduced-motion: reduce`: no shimmer, spinner or springs; states still step on the same timeline.
