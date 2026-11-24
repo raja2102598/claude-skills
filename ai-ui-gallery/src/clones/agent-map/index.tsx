@@ -140,7 +140,7 @@ const FRAMES: [number, number][][] = [
 ];
 
 function Loader({ size }: { size: number }) {
-  const id = useId().replace(/:/g, "");
+  const id = "am" + useId().replace(/[^a-zA-Z0-9_-]/g, "");
   return (
     <svg className="am-loader" width={size} height={size} viewBox="0 0 16 16" aria-hidden>
       <defs>
@@ -213,15 +213,10 @@ function BadgeSlot({ kind }: { kind: BadgeKind }) {
   );
 }
 
-/** Description line: rises in whenever its text changes (and with the panel when the panel swaps). */
+/** Description line: rises in when its text changes, and with the panel when the panel swaps in (100 ms later). */
 function Desc({ text, delay }: { text: string; delay: number | null }) {
-  const first = useRef(true);
-  const animate = delay !== null || !first.current;
-  useEffect(() => {
-    first.current = false;
-  }, []);
   return (
-    <p className="am-desc" data-enter={animate ? "" : undefined} style={delay ? ({ "--am-delay": `${delay}ms` } as CSSProperties) : undefined}>
+    <p className="am-desc" data-enter={delay !== null ? "" : undefined} style={delay ? ({ "--am-delay": `${delay}ms` } as CSSProperties) : undefined}>
       {text}
     </p>
   );
@@ -266,6 +261,9 @@ function PanelBody({ id, phase, enter, onApprove }: { id: NodeId; phase: Phase; 
   const status = statusOf(id, phase);
   const text = id === "buyer" && status === "needs" ? BUYER_ASK : n.task;
   const conns = connectionsOf(id, phase);
+  // The first line is part of the panel's own entrance; a later change of line rises in on its own.
+  const firstText = useRef(text);
+  const descDelay = text === firstText.current ? (enter ? 100 : null) : 0;
   return (
     <>
       <div className="am-panel-col">
@@ -279,7 +277,7 @@ function PanelBody({ id, phase, enter, onApprove }: { id: NodeId; phase: Phase; 
           </div>
         </div>
         <BadgeSlot kind={badgeOf(id, phase)} />
-        <Desc key={text} text={text} delay={enter ? 100 : null} />
+        <Desc key={text} text={text} delay={descDelay} />
         {status === "needs" && (
           <button type="button" className="am-approve" onClick={onApprove}>
             <Check size={16} strokeWidth={2} aria-hidden />
