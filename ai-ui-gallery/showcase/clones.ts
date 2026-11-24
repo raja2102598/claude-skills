@@ -247,7 +247,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "prompt-library",
     load: () => import("../src/clones/prompt-library/index.tsx"),
     meta: () => import("../src/clones/prompt-library/meta.ts"),
-    reference: "Arc UI · Prompt studio", candidates: 5, rounds: 5, timing: "streaming 100 ms late, rest within 33 ms", runnerUp: "UIStacks Prompt versions",
+    reference: "Arc UI · Prompt studio", candidates: 5, rounds: 6, timing: "every timed row within 17 ms", runnerUp: "UIStacks Prompt versions",
   },
   {
     slug: "prompt-mention",
