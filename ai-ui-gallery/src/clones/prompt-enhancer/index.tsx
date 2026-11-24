@@ -9,7 +9,7 @@ import "./prompt-enhancer.css";
  * clock (ms into the cycle), so the virtual clock and the real clock behave the same.
  */
 
-const CYCLE = 11000;
+const CYCLE = 10900;
 const LOOP = 12100;
 const ORIGINAL = "Write a product description for our wool throw";
 const PARTS: [string, boolean][] = [
@@ -47,10 +47,10 @@ function Stream({ n }: { n: number }) {
 export default function PromptEnhancer() {
   const [raw, setT] = useState(0);
   // First run: 0.9 s of placeholder. Every later run starts with 2.0 s of placeholder, and a one-frame
-  // false start ("Write a p") 0.7 s after the reset, as in the reference.
+  // false start ("Write a p") 0.9 s after the reset, as in the reference.
   const u = raw < CYCLE ? -1 : (raw - CYCLE) % LOOP;
   const t = raw < CYCLE ? raw : u - 1100;
-  const falseStart = u >= 700 && u < 900;
+  const falseStart = u >= 800 && u < 1000;
   useEffect(() => {
     const t0 = performance.now();
     const id = setInterval(() => setT(performance.now() - t0), 16);

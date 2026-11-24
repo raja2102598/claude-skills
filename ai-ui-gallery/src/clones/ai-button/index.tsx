@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Check, Sparkles } from "lucide-react";
+import { Check } from "lucide-react";
 import "./ai-button.css";
 
 /*
  * AI action button, motion-faithful to Wensity "AI Button" (Gradient cell). Click runs a fake async action:
  * idle sparkle "Write with AI" -> stop square + shimmering "Reading the page" (2.2 s) -> "Writing" (2.0 s)
- * -> check + "Done" (1.8 s) -> idle. Each swap blurs the old content out and the new one in (~280 ms);
+ * -> check + "Done" (1.8 s) -> idle. Each swap blurs the old content out (110 ms) and the new one in (180 ms);
  * the button width follows the new label ~300 ms later with a fast ease-out. Click while running = stop.
  */
 type Phase = "idle" | "reading" | "writing" | "done";
@@ -39,7 +39,14 @@ function after(ms: number, fn: () => void): Handle {
 const GAP = (() => { try { const g = new URLSearchParams(location.search).get("gap"); return g === null ? 330 : Number(g); } catch { return 330; } })();
 
 function Icon({ phase }: { phase: Phase }) {
-  if (phase === "idle") return <Sparkles className="aib-spark" strokeWidth={2.2} fill="currentColor" />;
+  if (phase === "idle")
+    return (
+      <svg className="aib-spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M10 4C10.7 8.6 12.4 10.3 17 11C12.4 11.7 10.7 13.4 10 18C9.3 13.4 7.6 11.7 3 11C7.6 10.3 9.3 8.6 10 4Z" />
+        <path d="M19 2C19.3 3.7 20 4.4 21.7 4.7C20 5 19.3 5.7 19 7.4C18.7 5.7 18 5 16.3 4.7C18 4.4 18.7 3.7 19 2Z" opacity="0.8" />
+        <circle cx="19.5" cy="18.5" r="1.2" opacity="0.6" />
+      </svg>
+    );
   if (phase === "done") return <Check strokeWidth={2.6} />;
   return <span className="aib-stop" />;
 }

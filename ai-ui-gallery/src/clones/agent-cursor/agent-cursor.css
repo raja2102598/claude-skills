@@ -1,0 +1,122 @@
+/* Agent cursor clone: clone-local styles. Palette, fonts, copy and icons are our own;
+   layout proportions and motion follow .reanimate/agent-cursor/spec.md. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Inter:wght@400;500&display=swap");
+
+.ac-root {
+  --ac-ink: #1d1b19;
+  --ac-mute: #6f6a63;
+  --ac-faint: #9c968d;
+  --ac-line: #e8e3da;
+  --ac-surface: #fffefc;
+  --ac-fill: #f4f1eb;
+  --ac-agent: #0f9b8a;
+  --ac-agent-tint: rgba(15, 155, 138, 0.16);
+  --ac-agent-soft: #e4f5f2;
+  --ac-agent-line: #9ad6cd;
+  --ac-human: #6b4bd8;
+  --ac-human-soft: #eeeafc;
+  --ac-human-line: #c5b8f2;
+  position: relative;
+  width: 669px;
+  height: 511px;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--ac-ink);
+}
+.ac-root *, .ac-root *::before, .ac-root *::after { box-sizing: border-box; }
+
+.ac-card {
+  position: absolute; left: 0; top: 0; width: 669px; height: 452px;
+  background: var(--ac-surface); border: 1px solid var(--ac-line); border-radius: 20px; overflow: hidden;
+}
+.ac-header { position: absolute; left: 0; right: 0; top: 0; height: 56px; border-bottom: 1px solid var(--ac-line); }
+.ac-stack { position: absolute; left: 16px; top: 14px; width: 50px; height: 28px; }
+.ac-avatar {
+  position: absolute; top: 0; width: 28px; height: 28px; border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff; display: grid; place-items: center;
+}
+.ac-avatar-agent { left: 0; background: var(--ac-fill); color: var(--ac-agent); z-index: 1; }
+.ac-avatar-agent svg { transition: none; }
+.ac-avatar-agent[data-working="true"] svg { animation: ac-spin 2400ms linear infinite; }
+.ac-avatar-human, .ac-tag-avatar {
+  background: conic-gradient(from 210deg, #6b4bd8, #3aa6d8, #e58fb0, #6b4bd8);
+}
+.ac-avatar-human { left: 22px; }
+@keyframes ac-spin { to { transform: rotate(360deg); } }
+
+.ac-status { position: absolute; left: 78px; top: 18px; height: 20px; font-size: 12px; line-height: 20px; color: var(--ac-mute); white-space: nowrap; }
+.ac-status-inner { position: absolute; left: 0; top: 0; display: inline-flex; align-items: center; gap: 6px; }
+.ac-status-in { animation: ac-status-in 160ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes ac-status-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.ac-action { position: absolute; right: 12px; top: 12px; height: 32px; }
+.ac-btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 12px; border: 1px solid transparent;
+  background: transparent; font: 500 13px/18px "Inter", system-ui, sans-serif; color: var(--ac-mute); cursor: pointer; white-space: nowrap;
+  transition: background 150ms ease-out, color 150ms ease-out;
+}
+.ac-btn:hover { background: var(--ac-fill); color: var(--ac-ink); }
+.ac-btn-primary { background: var(--ac-ink); color: #fff; border-radius: 16px; padding: 0 16px; height: 32px; }
+.ac-btn-primary:hover { background: #38342f; color: #fff; }
+.ac-btn[data-fade="true"] { opacity: 0; pointer-events: none; }
+.ac-btn { transition: opacity 120ms ease-out, background 150ms ease-out, color 150ms ease-out; }
+
+.ac-doc { position: absolute; left: 0; right: 0; top: 56px; padding: 24px 32px 0; transition: opacity 150ms ease-out; }
+.ac-doc[data-fading="true"] { opacity: 0; }
+.ac-title { font: 500 20px/22px "Geist", "Inter", sans-serif; margin: 0; letter-spacing: -0.01em; }
+.ac-meta { font-size: 12px; line-height: 20px; color: var(--ac-faint); margin: 2px 0 0; height: 20px; }
+.ac-p { font-size: 14px; line-height: 24px; margin: 0; }
+.ac-h { font: 500 14px/15.4px "Inter", sans-serif; margin: 0; }
+.ac-block { margin-top: 16px; }
+.ac-block-h { margin-top: 24px; }
+.ac-block-after-h { margin-top: 4px; }
+.ac-fit { overflow: hidden; transition: height 240ms cubic-bezier(0.22, 1, 0.36, 1); }
+.ac-fit-stack { margin-top: 0; }
+
+.ac-tint { border-radius: 3px; transition: background-color 250ms ease-out; }
+.ac-tint[data-pending="true"] { background: var(--ac-agent-tint); }
+.ac-chunk { transition: opacity 180ms ease-out; background: var(--ac-agent-tint); }
+.ac-chunk[data-shown="false"] { opacity: 0; }
+.ac-chunk[data-pending="false"] { background: transparent; }
+.ac-old { transition: opacity 120ms ease-out; }
+.ac-old[data-dim="true"] { opacity: 0.18; }
+.ac-sel { position: absolute; left: 0; right: 0; background: var(--ac-agent-tint); border-radius: 3px; opacity: 0; transition: opacity 150ms ease-out; pointer-events: none; }
+.ac-sel[data-on="true"] { opacity: 1; }
+.ac-caret { display: inline-block; width: 2px; height: 17px; vertical-align: -3px; border-radius: 1px; background: var(--ac-agent); animation: ac-blink 900ms steps(1) infinite; }
+@keyframes ac-blink { 50% { opacity: 0; } }
+.ac-typo { text-decoration: underline wavy #d9534f; text-decoration-thickness: 1px; text-underline-offset: 3px; transition: opacity 120ms; }
+.ac-swap { position: relative; display: inline-block; }
+.ac-heading-wrap { position: relative; }
+
+.ac-barwrap { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; pointer-events: none; }
+.ac-bar {
+  display: inline-flex; align-items: center; gap: 4px; height: 40px; padding: 4px 4px 4px 16px; border-radius: 22px; background: #fff;
+  border: 1px solid var(--ac-line); box-shadow: 0 8px 24px rgba(40, 30, 20, 0.1), 0 1px 3px rgba(40, 30, 20, 0.06);
+  pointer-events: auto; opacity: 0; transform: translateY(10px) scale(0.98); transition: opacity 320ms cubic-bezier(0.22, 1, 0.36, 1), transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ac-bar[data-on="true"] { opacity: 1; transform: none; }
+.ac-bar[data-out="true"] { opacity: 0; transform: none; transition: opacity 140ms ease-out; }
+.ac-bar-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ac-mute); margin-right: 10px; }
+.ac-bar-label svg { color: var(--ac-agent); }
+
+.ac-cursors { position: absolute; left: 1px; top: 1px; width: 667px; height: 450px; pointer-events: none; overflow: hidden; border-radius: 19px; }
+.ac-cursor { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; transition: opacity 150ms ease-out, transform var(--ms, 450ms) cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
+.ac-cursor[data-vis="true"] { opacity: 1; }
+.ac-cursor svg.ac-arrow { position: absolute; left: -2px; top: -2px; color: var(--c); filter: drop-shadow(0 1px 1px rgba(30, 20, 10, 0.18)); }
+.ac-tag {
+  position: absolute; left: 12px; top: 18px; display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px 0 5px; border-radius: 14px;
+  font: 500 12px/12px "Inter", sans-serif; white-space: nowrap; color: var(--ac-ink);
+  background: var(--tag-bg); border: 1px solid var(--tag-line);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.065), 0 1px 3px rgba(0, 0, 0, 0.035);
+}
+.ac-tag[data-flip="true"] { left: auto; right: 12px; }
+.ac-tag-avatar { width: 16px; height: 16px; border-radius: 50%; }
+.ac-tag-mark { color: var(--ac-agent); display: grid; place-items: center; width: 14px; height: 14px; }
+.ac-cursor-agent { --c: var(--ac-agent); --tag-bg: var(--ac-agent-soft); --tag-line: var(--ac-agent-line); }
+.ac-cursor-human { --c: var(--ac-human); --tag-bg: var(--ac-human-soft); --tag-line: var(--ac-human-line); }
+
+.ac-seg { position: absolute; left: 222px; top: 470px; width: 225px; height: 40px; border-radius: 14px; background: var(--ac-fill); border: 1px solid var(--ac-line); padding: 3px; display: flex; }
+.ac-seg button { position: relative; flex: 0 0 auto; height: 32px; border: 0; background: transparent; border-radius: 10px; font: 500 13px/18px "Inter", sans-serif; color: var(--ac-faint); padding: 0 12px; cursor: pointer; transition: color 200ms ease-out; }
+.ac-seg button[aria-pressed="true"] { color: var(--ac-ink); }
+.ac-seg-pill { position: absolute; left: 3px; top: 3px; height: 32px; border-radius: 10px; background: #fff; border: 1px solid var(--ac-line); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.035); transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), width 260ms cubic-bezier(0.22, 1, 0.36, 1); }
+.ac-seg button span { position: relative; }

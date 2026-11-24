@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, ChevronDown, Clock, Copy, Globe, Link2, Lock, Paperclip, Sparkle, Users, X } from "lucide-react";
+import { Check, ChevronDown, Clock, Copy, Globe, Lock, Paperclip, Sparkle, Users, X } from "lucide-react";
 import clsx from "clsx";
 import "./share-chat.css";
 
@@ -19,8 +19,9 @@ function useActive<T>(value: T) {
   return (k: T) => (k === value ? "active" : k === prev ? "prev" : "idle");
 }
 
+const param = (k: string) => { try { return new URLSearchParams(window.location.search).get(k); } catch { return null; } };
 const autoplayEnabled = () => {
-  try { return new URLSearchParams(window.location.search).get("autoplay") !== "0"; } catch { return true; }
+  return param("autoplay") !== "0";
 };
 
 export default function ShareChat() {
@@ -52,7 +53,7 @@ export default function ShareChat() {
     const T = [
       window.setTimeout(() => setVis("me"), 500),
       window.setTimeout(() => setVis("any"), 1700),
-      window.setTimeout(flashCopied, 2900),
+      ...(param("copy") === "0" ? [] : [window.setTimeout(flashCopied, 2900)]),
       window.setTimeout(() => setMenu(true), 4900),
       window.setTimeout(() => { setExpiry("7 days"); setMenu(false); }, 5900),
     ];
@@ -64,7 +65,7 @@ export default function ShareChat() {
   const captionKey = failed ? "f" : copied ? "c" : "n";
 
   return (
-    <div className="sc-root" data-stage>
+    <div className="sc-root">
       <div className="sc-wrap">
         <section className="sc-card">
           <header className="sc-head">

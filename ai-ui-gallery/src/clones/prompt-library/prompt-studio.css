@@ -29,7 +29,7 @@
 .ps-effort button { flex:1; height:28px; border:0; border-radius:8px; background:var(--sub); font:400 12px "Geist",sans-serif; color:var(--fg2); cursor:pointer; }
 .ps-effort button[aria-pressed=true] { background:var(--fg); color:#fff; }
 
-.ps-bar { display:flex; align-items:center; justify-content:space-between; padding:10px 12px 0; }
+.ps-bar { display:flex; align-items:center; justify-content:space-between; padding:13px 12px 3px; height:46px; box-sizing:border-box; }
 .ps-seg { position:relative; display:inline-flex; padding:0; }
 .ps-seg.boxed { padding:3px; border-radius:999px; background:var(--card); box-shadow:0 0 0 1px rgb(38 35 31 / .1); }
 .ps-hl { position:absolute; top:0; bottom:0; left:0; border-radius:999px; background:var(--sub); transition:transform 220ms cubic-bezier(.22,1,.36,1), width 220ms cubic-bezier(.22,1,.36,1); z-index:0; }
@@ -41,18 +41,18 @@
 .ps-odo-col { display:block; width:8px; height:17px; overflow:hidden; }
 .ps-odo-col > span { display:block; transition:transform 420ms cubic-bezier(.22,1,.36,1); }
 .ps-odo-col i { display:block; height:17px; font-style:normal; text-align:center; }
-.ps-editor-wrap { padding:6px 12px 0; transition:height 220ms cubic-bezier(.22,1,.36,1); overflow:hidden; }
-.ps-pane { padding:6px 12px 6px; white-space:pre-wrap; font-size:14px; line-height:23px; min-height:230px; box-sizing:border-box; animation:ps-pane-in 200ms ease-out both; }
+.ps-editor-wrap { padding:6px 12px 0 12px; transition:height 220ms cubic-bezier(.22,1,.36,1); overflow:hidden; }
+.ps-pane { padding:0 12px; white-space:pre-wrap; font-size:14px; line-height:23px; height:230px; overflow:hidden; box-sizing:border-box; animation:ps-pane-in 200ms ease-out both; }
 @keyframes ps-pane-in { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:none; } }
 .ps-var { display:inline-block; padding:0 8px; border-radius:7px; font-size:13px; line-height:18px; height:18px; vertical-align:1px; }
-.ps-hint { padding:4px 24px 12px; color:var(--fg3); font-size:13px; display:flex; align-items:center; gap:6px; }
+.ps-hint { height:36px; box-sizing:border-box; padding:0 24px 13px; color:var(--fg3); font-size:13px; display:flex; align-items:center; gap:6px; }
 .ps-hint kbd { font:400 12px "Geist Mono",monospace; border-radius:5px; padding:0 5px; background:var(--card); box-shadow:0 0 0 1px rgb(38 35 31 / .14); color:var(--fg2); }
 
 .ps-vars { border-top:1px solid var(--line); padding:14px 12px 12px; }
 .ps-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px 10px; margin-bottom:14px; }
 .ps-field { display:flex; flex-direction:column; gap:6px; }
 .ps-field.wide { grid-column:1 / -1; }
-.ps-flabel { display:flex; align-items:center; gap:6px; font-size:13px; padding-left:12px; }
+.ps-flabel { line-height:16px; display:flex; align-items:center; gap:6px; font-size:13px; padding-left:12px; }
 .ps-flabel i { width:6px; height:6px; border-radius:50%; background:currentColor; }
 .ps-input { height:36px; border:0; border-radius:999px; background:var(--card); box-shadow:0 0 0 1px rgb(38 35 31 / .12); padding:0 14px; font:400 14px "Geist",sans-serif; color:var(--fg); outline:0; transition:box-shadow 140ms ease-out; }
 .ps-input:focus { box-shadow:0 0 0 2px var(--accent); }
@@ -65,7 +65,7 @@
 .ps-runlabel .a { transform:translateY(0); } .ps-runlabel .b { transform:translateY(100%); opacity:0; }
 .ps-run[data-busy=true] .a { transform:translateY(-100%); opacity:0; } .ps-run[data-busy=true] .b { transform:none; opacity:1; }
 
-.ps-outframe { overflow:hidden; border-radius:0 0 24px 24px; transition:height 300ms cubic-bezier(.22,1,.36,1); }
+.ps-outframe { overflow:hidden; border-radius:0 0 24px 24px; transition:height 380ms ease-out; }
 .ps-out { border-top:1px solid var(--line); background:var(--sub); padding:10px 12px 12px; min-height:52px; box-sizing:border-box; }
 .ps-outhead { display:flex; align-items:center; justify-content:space-between; height:32px; padding-left:12px; font-size:13px; color:var(--fg2); }
 .ps-status { display:inline-flex; align-items:center; gap:8px; }
@@ -82,4 +82,4 @@
 .ps-w { display:inline; opacity:0; animation:ps-word 220ms ease-out forwards; }
 @keyframes ps-word { from { opacity:0; filter:blur(3px); } to { opacity:1; filter:none; } }
 .ps-foot { padding:0 12px; font-size:12px; line-height:26px; color:var(--fg3); animation:ps-fade 240ms ease-out both; }
-.ps-empty { padding:0 12px; font-size:13px; color:var(--fg2); line-height:30px; }
+.ps-empty { padding:0 12px; font-size:13px; color:var(--fg2); line-height:29px; }

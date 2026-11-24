@@ -50,7 +50,7 @@ const PROMPTS: Record<"system" | "user", { tokens: number; segs: Seg[] }> = {
   system: {
     tokens: 112,
     segs: [
-      "You are a support agent for Larkspur Home, an online homeware shop.\nWrite a warm, specific reply in under 120 words.\n\nApply this policy exactly: ", "policy",
+      "You are a support agent for Larkspur Home, a homeware shop.\nWrite a warm, specific reply in under 120 words.\n\nApply this policy exactly: ", "policy",
       "\n\n- Greet ", "customer_name", " by first name, once.\n- Quote order ", "order_id",
       " so they can find it.\n- Never promise a delivery date the courier has not confirmed.\n- If the policy does not cover the request, offer to hand over to a team lead.",
     ],
@@ -269,7 +269,7 @@ export default function PromptStudio() {
           </div>
         </div>
 
-        <div className="ps-outframe" style={{ height: outH }}>
+        <div className="ps-outframe" style={{ height: outH, transitionDuration: phase === "writing" ? "140ms" : phase === "done" ? "200ms" : "380ms", transitionTimingFunction: "ease-out" }}>
           <div ref={innerRef}>
             <div className="ps-out">
               {phase === "idle" ? (
