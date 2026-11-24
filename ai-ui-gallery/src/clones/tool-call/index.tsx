@@ -398,7 +398,7 @@ function SwapText({ text, shimmerFrom, className }: { text: string; shimmerFrom:
           key={`out-${out.id}`}
           aria-hidden="true"
           className="tc-swap-out"
-          style={out.shimmer ? { color: "color-mix(in oklab, var(--tc-ink) 12%, var(--tc-muted))" } : undefined}
+          style={out.shimmer ? { color: "color-mix(in oklab, currentColor 12%, var(--tc-muted))" } : undefined}
           onAnimationEnd={() => setOut((o) => (o && o.id === out.id ? null : o))}
         >
           {out.text}
