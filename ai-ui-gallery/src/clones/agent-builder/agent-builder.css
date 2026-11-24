@@ -99,7 +99,7 @@
 .ab-files { list-style: none; margin: 0; padding: 0; }
 .ab-file { position: relative; display: flex; align-items: center; gap: 12px; height: 53px; border-bottom: 1px solid var(--ab-hair); }
 .ab-file:last-child { border-bottom-color: transparent; }
-.ab-file[data-new="true"] { animation: ab-in 320ms var(--ab-quint) both; }
+.ab-file[data-new="true"] { animation: ab-in 200ms var(--ab-quint) both; }
 .ab-x { width: 24px; height: 24px; display: grid; place-items: center; border: 0; background: none; border-radius: 6px; color: var(--ab-muted); cursor: pointer; }
 .ab-x:hover { background: var(--ab-panel); color: var(--ab-ink); }
 .ab-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ab-hair); overflow: hidden; }
@@ -142,10 +142,10 @@
 
 /* foot */
 .ab-foot { flex: none; height: 60px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-top: 1px solid var(--ab-hair); }
-.ab-status { display: inline-flex; align-items: center; gap: 8px; color: var(--ab-ink-2); animation: ab-fade 220ms var(--ab-quint) both; }
+.ab-status { display: inline-flex; align-items: center; gap: 8px; color: var(--ab-ink-2); animation: ab-fade 150ms var(--ab-quint) both; }
 .ab-status svg { color: var(--ab-ok); }
 .ab-status[data-dirty="true"] svg { color: var(--ab-warn); }
-.ab-publish { height: 36px; padding: 0 16px; border: 0; border-radius: 10px; font-weight: 500; background: #8e8a82; color: #fff; cursor: default; transition: background 220ms var(--ab-quint); }
+.ab-publish { height: 36px; padding: 0 16px; border: 0; border-radius: 10px; font-weight: 500; background: #8e8a82; color: #fff; cursor: default; transition: background 150ms var(--ab-quint); }
 .ab-publish[data-ready="true"] { background: var(--ab-accent); color: var(--ab-accent-ink); cursor: pointer; }
 
 @keyframes ab-fade { from { opacity: 0; } to { opacity: 1; } }
