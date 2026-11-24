@@ -19,7 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import clsx from "clsx";
-import { FILES, INSTRUCTIONS, MODELS, SCENARIOS, SUGGESTIONS, TOOLS, UPLOAD, type Scenario, type ToolId } from "./data";
+import { FILES, INSTRUCTIONS, MODELS, SCENARIOS, SUGGESTIONS, TOOLS, UPLOAD, type ToolId } from "./data";
 import "./agent-builder.css";
 
 /*
@@ -53,7 +53,6 @@ const autoplayEnabled = () => {
 };
 
 type Phase = "idle" | "thinking" | "tools" | "writing" | "done";
-const DONE_MS = (sc: Scenario) => sc.doneAt;
 type Mode = "configure" | "test";
 
 function Switch({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
@@ -80,6 +79,9 @@ function AgentBuilder({ restart }: { restart: () => void }) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [asked, setAsked] = useState<string | null>(null);
   const [chars, setChars] = useState(0);
+  const [scn, setScn] = useState(0);
+  const [chips, setChips] = useState(0);
+  const [details, setDetails] = useState(0);
   const [draft, setDraft] = useState("");
   const timers = useRef<number[]>([]);
   const raf = useRef(0);
@@ -116,26 +118,37 @@ function AgentBuilder({ restart }: { restart: () => void }) {
     (q: string) => {
       if (phase !== "idle" && phase !== "done") return;
       clear();
+      const idx = Math.max(0, SUGGESTIONS.indexOf(q));
+      const sc = SCENARIOS[idx];
+      setScn(idx);
       setAsked(q);
       setDraft("");
       setPhase("thinking");
       setChars(0);
+      setChips(0);
+      setDetails(0);
       setDirty(true);
-      later(() => setPhase("tools"), CHAT.tools);
-      later(() => setPhase("writing"), CHAT.chip3);
-      const t0 = performance.now();
+      sc.chips.forEach((c, i) => {
+        later(() => {
+          setChips(i + 1);
+          setPhase((p) => (p === "thinking" ? "tools" : p));
+        }, c.at);
+        later(() => setDetails(i + 1), c.detailAt);
+      });
+      later(() => setPhase("writing"), sc.writeAt);
       later(() => {
+        const t0 = performance.now();
         const step = () => {
-          const k = Math.min(1, (performance.now() - t0 - CHAT.chip3) / CHAT.streamMs);
-          setChars(Math.round(k * ANSWER.length));
+          const k = Math.min(1, (performance.now() - t0) / sc.streamMs);
+          setChars(Math.round(k * sc.answer.length));
           if (k < 1) raf.current = requestAnimationFrame(step);
         };
         step();
-      }, CHAT.chip3);
+      }, sc.writeAt);
       later(() => {
-        setChars(ANSWER.length);
+        setChars(sc.answer.length);
         setPhase("done");
-      }, CHAT.done);
+      }, sc.doneAt);
     },
     [phase, later],
   );
@@ -145,6 +158,8 @@ function AgentBuilder({ restart }: { restart: () => void }) {
     setPhase("idle");
     setAsked(null);
     setChars(0);
+    setChips(0);
+    setDetails(0);
   };
 
   // Gallery autoplay: after the upload, open Test and ask the first suggestion; any input stops it.
@@ -157,7 +172,7 @@ function AgentBuilder({ restart }: { restart: () => void }) {
     window.addEventListener("keydown", stop, { once: true });
     const t1 = window.setTimeout(() => auto.current && setMode("test"), UPLOAD_DONE + 1800);
     const t2 = window.setTimeout(() => auto.current && send(SUGGESTIONS[0]), UPLOAD_DONE + 3200);
-    const t3 = window.setTimeout(() => auto.current && restart(), UPLOAD_DONE + 3200 + CHAT.done + 3500);
+    const t3 = window.setTimeout(() => auto.current && restart(), UPLOAD_DONE + 3200 + SCENARIOS[0].doneAt + 3500);
     return () => {
       [t1, t2, t3].forEach(clearTimeout);
       window.removeEventListener("pointerdown", stop);
@@ -175,7 +190,7 @@ function AgentBuilder({ restart }: { restart: () => void }) {
   const busy = phase === "thinking" || phase === "tools" || phase === "writing";
   const status = dirty ? "Unsaved changes" : "All changes published";
   const label = phase === "thinking" ? "Thinking" : phase === "tools" ? "Using tools" : phase === "writing" ? "Writing" : "";
-  const chipCount = phase === "thinking" ? 0 : phase === "tools" ? 1 : 3;
+  const sc = SCENARIOS[scn];
 
   return (
     <section className="ab-card" aria-label="Agent builder" data-ab-card>
@@ -321,17 +336,27 @@ function AgentBuilder({ restart }: { restart: () => void }) {
                   <span className="ab-avatar">{(name || "A")[0].toUpperCase()}</span>
                   <span className="ab-reply-name">{name || "Agent"}</span>
                   <span className="ab-reply-state" key={phase} data-shimmer={busy}>
-                    {phase === "done" ? `${MODELS[model]} · ${CHAT.took}` : label}
+                    {phase === "done" ? `${MODELS[model]} · ${sc.took}` : label}
                   </span>
                 </div>
-                {chipCount > 0 && (
+                {chips > 0 && (
                   <div className="ab-chips">
-                    <span className="ab-chip" key="c1"><Receipt size={14} /> Searched customers <i>·</i> <em>2 charges on Oct 14</em></span>
-                    {chipCount > 1 && <span className="ab-chip" key="c2"><FileText size={14} /> Read Refund policy 2026.pdf <i>·</i> <em>Section 2.1</em></span>}
-                    {chipCount > 2 && <span className="ab-chip" key="c3"><Mail size={14} /> Drafted reply <i>·</i> <em>maya@northwind.studio</em></span>}
+                    {sc.chips.slice(0, chips).map((c, i) => {
+                      const Icon = ICONS[c.tool];
+                      return (
+                        <span className="ab-chip" key={c.name}>
+                          <Icon size={14} /> {c.name}
+                          {i < details && (
+                            <>
+                              <i>·</i> <em className="ab-chip-detail">{c.detail}</em>
+                            </>
+                          )}
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
-                {(phase === "writing" || phase === "done") && <p className="ab-answer">{ANSWER.slice(0, chars)}</p>}
+                {(phase === "writing" || phase === "done") && <p className="ab-answer">{sc.answer.slice(0, chars)}</p>}
               </div>
             </div>
           )}

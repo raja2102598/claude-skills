@@ -46,9 +46,12 @@
 
 /* Transcript bubble: the wrapper is 16px bigger on every side so the clip never cuts the corners. */
 .vi-bubble-wrap {
-  margin: -16px -16px -16px;
-  padding: 16px;
+  margin: -16px;
   overflow: hidden;
+}
+
+.vi-bubble-pad {
+  padding: 16px;
 }
 
 .vi-bubble {

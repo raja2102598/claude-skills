@@ -133,6 +133,9 @@ function advance(m: Model, t: number) {
   }
 }
 
+/** Exits start one 60 Hz frame after the state change (the reference's exit animations run after the commit). */
+const EXIT_LAG_MS = 1000 / 60;
+
 /** Enter/exit progress of something that appears at `enterAt` and leaves at `exitAt`; null when not mounted. */
 function presence(t: number, enterAt: number | null, exitAt: number | null, reduced: boolean) {
   if (enterAt === null || t < enterAt) return null;
@@ -142,7 +145,7 @@ function presence(t: number, enterAt: number | null, exitAt: number | null, redu
     const dt = t - enterAt;
     return { size: s(dt), opacity: Math.min(1, s(dt, SWAP_MS)), scale: 0.6 + 0.4 * s(dt, SWAP_MS), settled: dt >= 600 };
   }
-  const dt = t - exitAt;
+  const dt = t - exitAt - EXIT_LAG_MS;
   if (dt >= SWAP_MS) return null;
   const from = s(exitAt - enterAt);
   return {
@@ -202,7 +205,7 @@ export default function VoiceInput() {
     const tick = () => {
       const now = performance.now() - origin.current;
       advance(model.current, now);
-      if (bubbleInner.current) bubbleHeight.current = bubbleInner.current.offsetHeight + 32;
+      if (bubbleInner.current) bubbleHeight.current = bubbleInner.current.offsetHeight;
       flushSync(() => setT(now));
       raf = requestAnimationFrame(tick);
     };
@@ -265,7 +268,8 @@ export default function VoiceInput() {
                 transform: `translateY(${reduced ? 0 : 6 * (1 - spring(t - firstWordAt, SLIDE_MS))}px)`,
               }}
             >
-              <div className="vi-bubble" ref={bubbleInner}>
+              <div className="vi-bubble-pad" ref={bubbleInner}>
+                <div className="vi-bubble">
                 <p>
                   {TRANSCRIPT.slice(0, shownWords).map((w, i) => (
                     <Fragment key={i}>
@@ -276,6 +280,7 @@ export default function VoiceInput() {
                     </Fragment>
                   ))}
                 </p>
+                </div>
               </div>
             </div>
           )}
