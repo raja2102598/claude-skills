@@ -13,6 +13,7 @@ import {
   TURNS,
   easeOutExpoLike,
   syntheticLevel,
+  stepMs,
   wordGapMs,
   type OrbShape,
   type VoiceState,
@@ -116,11 +117,12 @@ function VoiceOrb({ feed, label, onClick, disabled }: { feed: React.RefObject<Or
         shape[k] += vel[k] * dt;
       }
 
+      // The pulse starts one frame after the word renders (measured), so the orb swells a frame later.
       if (f.spokenWords !== pulseWords) {
         pulseWords = f.spokenWords;
-        pulseStart = f.spokenWords > 0 ? now : pulseStart;
+        pulseStart = f.spokenWords > 0 ? now + 1000 / 60 : pulseStart;
       }
-      if (pulseStart !== null) {
+      if (pulseStart !== null && now - pulseStart > 1) {
         const { from, to, ms } = TIMING.spokenPulse;
         spoken = from + (to - from) * easeOutExpoLike((now - pulseStart) / ms);
       }
@@ -302,11 +304,17 @@ function Controls({
   const width = useMotionValue<number | "auto">("auto");
   const innerRef = useRef<HTMLDivElement>(null);
   const first = useRef(true);
+  const lastTarget = useRef(0);
   const [panels, setPanels] = useState([{ live: active, key: 0, mode: "rest" as "rest" | "in" | "out" }]);
   const prevActive = useRef(active);
   const startRef = useRef<HTMLButtonElement>(null);
   const muteRef = useRef<HTMLButtonElement>(null);
   const moveFocus = useRef(false);
+  // The mic glyph pops only when the user toggles mute, not when the live panel mounts.
+  const toggledMute = useRef(false);
+  useLayoutEffect(() => {
+    toggledMute.current = false;
+  }, [active]);
 
   useLayoutEffect(() => {
     if (prevActive.current === active) return;
@@ -324,9 +332,13 @@ function Controls({
     const w = el.offsetWidth + 2;
     if (first.current) {
       first.current = false;
+      lastTarget.current = w;
       width.set(w);
       return;
     }
+    // Re-renders (an exiting panel unmounting) must not restart a spring that is already heading there.
+    if (w === lastTarget.current) return;
+    lastTarget.current = w;
     animate(width, w, { type: "spring", visualDuration: 0.3, bounce: 0 });
   }, [panels, width]);
 
@@ -355,9 +367,12 @@ function Controls({
               className="ov-round"
               aria-pressed={muted}
               aria-label={muted ? "Unmute microphone" : "Mute microphone"}
-              onClick={() => onMute(!muted)}
+              onClick={() => {
+                toggledMute.current = true;
+                onMute(!muted);
+              }}
             >
-              <span key={muted ? "off" : "on"} className="ov-glyph">
+              <span key={muted ? "off" : "on"} className={toggledMute.current ? "ov-glyph ov-glyph-in" : "ov-glyph"}>
                 {muted ? <MicOff size={18} strokeWidth={1.75} aria-hidden="true" /> : <Mic size={18} strokeWidth={1.75} aria-hidden="true" />}
               </span>
             </button>
@@ -501,13 +516,13 @@ export default function VoiceOrbDemo() {
       const heard = t.you.split(" ");
       id = window.setTimeout(
         () => (words < heard.length ? setWords(words + 1) : setPhase("thinking")),
-        words === 0 ? TIMING.firstHeardWordMs : words < heard.length ? wordGapMs(heard[words - 1]) : TIMING.afterHeardMs,
+        stepMs(words === 0 ? TIMING.firstHeardWordMs : words < heard.length ? wordGapMs(heard[words - 1]) : TIMING.afterHeardMs),
       );
     } else if (phase === "thinking") {
       id = window.setTimeout(() => {
         setWords(0);
         setPhase("speaking");
-      }, TIMING.thinkingMs);
+      }, stepMs(TIMING.thinkingMs));
     } else {
       const said = t.reply.split(" ");
       id = window.setTimeout(
@@ -519,7 +534,7 @@ export default function VoiceOrbDemo() {
             setPhase("listening");
           }
         },
-        words === 0 ? TIMING.firstSpokenWordMs : words < said.length ? wordGapMs(said[words - 1]) : TIMING.afterSpokenMs,
+        stepMs(words === 0 ? TIMING.firstSpokenWordMs : words < said.length ? wordGapMs(said[words - 1]) : TIMING.afterSpokenMs),
       );
     }
     return () => window.clearTimeout(id);

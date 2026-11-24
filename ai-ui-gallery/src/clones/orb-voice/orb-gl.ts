@@ -85,8 +85,8 @@ void main() {
   float ink = marble(f * 0.7 + 0.55 * warp + vec2(0.17 * t, 2.3));
   float veil = marble(f * 1.05 - 0.4 * warp + vec2(-0.21 * t, 5.1));
 
-  vec3 col = mix(uInk, uBloom, smoothstep(-0.85, 0.85, ink));
-  col = mix(col, uPearl, smoothstep(0.05, 1.0, veil) * 0.45);
+  vec3 col = mix(uInk, uBloom, smoothstep(-0.6, 0.55, ink));
+  col = mix(col, uPearl, smoothstep(0.0, 0.85, veil) * 0.6);
 
   // Light from the upper left, a pearly rim, and a lift toward pearl while the voice is loud.
   vec3 n = normalize(vec3(q * 0.85, z));
@@ -236,7 +236,7 @@ export function createOrbRenderer(canvas: HTMLCanvasElement, palette: OrbPalette
       gl.deleteProgram(program);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
+      // The context is left alive: a remount (fast refresh, strict mode) reuses the same canvas.
     },
   };
 }

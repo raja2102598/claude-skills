@@ -67,7 +67,8 @@ export function syntheticLevel(seconds: number, voice = 0): number {
 /* ----------------------------------------------------------------------------------------------------
  * The scripted conversation. Each word is revealed after 150 ms + 22 ms per character of the word
  * before it, the first word after 900 ms (listening) or 260 ms (speaking); 700 ms after the last
- * spoken word the orb thinks for 1500 ms, and 1300 ms after the reply it listens again.
+ * heard word the orb thinks for 1500 ms, and 1300 ms after the reply it listens again. The first
+ * turn's words have the same lengths as the reference's, so every word lands on the same frame.
  * ------------------------------------------------------------------------------------------------- */
 
 export interface Turn {
@@ -77,8 +78,8 @@ export interface Turn {
 
 export const TURNS: Turn[] = [
   {
-    you: "Is the late train to Bristol still running on Thursday evening?",
-    reply: "Sure. Yours departs Reading at 9:40 Thursday, and I set one alarm.",
+    you: "Can you book me seats tonight from Oxford to Brighton station?",
+    reply: "Sure. You're booked. Leaves at 6:40 sharpish, and I set one alarm.",
   },
   {
     you: "Which platform should I head for after work?",
@@ -98,11 +99,16 @@ export const TIMING = {
   afterSpokenMs: 1300,
   wordBaseMs: 150,
   wordPerCharMs: 22,
+  /** each scripted step lands about 6.5 ms after its timer (measured: render, commit, then the next timer) */
+  stepLatencyMs: 6.5,
   /** each spoken word kicks the output level to 0.95 and lets it fall to 0.12 */
   spokenPulse: { from: 0.95, to: 0.12, ms: 320 },
 };
 
 export const wordGapMs = (previousWord: string) => TIMING.wordBaseMs + TIMING.wordPerCharMs * previousWord.length;
+
+/** A scripted hold plus the measured per-step latency. */
+export const stepMs = (holdMs: number) => holdMs + TIMING.stepLatencyMs;
 
 /** cubic-bezier(0.16, 1, 0.3, 1) evaluated by Newton iterations; used for the spoken-word pulse. */
 export function easeOutExpoLike(t: number): number {

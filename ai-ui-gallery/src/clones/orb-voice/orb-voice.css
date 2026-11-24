@@ -250,7 +250,7 @@
   align-items: center;
   gap: 8px;
   height: 42px;
-  padding: 0 18px 0 16px;
+  padding: 0 15px 0 13px;
   border: 0;
   border-radius: 9999px;
   background: transparent;
@@ -300,6 +300,8 @@
 .ov-glyph {
   display: grid;
   place-items: center;
+}
+.ov-glyph-in {
   animation:
     ov-pop-fade 150ms ease-out both,
     ov-glyph-scale var(--ov-snappy-ms) var(--ov-snappy) both;
@@ -349,7 +351,7 @@
   .ov-word-in,
   .ov-pop-in,
   .ov-pop-out,
-  .ov-glyph {
+  .ov-glyph-in {
     animation-duration: 1ms !important;
   }
 }

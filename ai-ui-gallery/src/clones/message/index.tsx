@@ -33,17 +33,19 @@ const THANKS_HOLD_MS = 1600;
 const COPY_RESET_MS = 1800;
 const VIEW_OUT_MS = 100;
 
-/** The ω = 26 critically damped spring sampled into a CSS linear() easing over 360 ms. */
-const SPRING_EASING = (() => {
-  const ms = 360;
+/** A critically damped spring x(t) = 1 - (1 + ωt)e^(-ωt), sampled every `step` ms into a CSS linear() easing. */
+function springEasing(omega: number, ms: number, step: number) {
   const pts: string[] = [];
-  for (let t = 0; t <= ms; t += 12) {
-    const x = (OMEGA * t) / 1000;
-    const p = t === ms ? 1 : 1 - (1 + x) * Math.exp(-x);
-    pts.push(p.toFixed(4));
+  for (let t = 0; t <= ms; t += step) {
+    const x = (omega * t) / 1000;
+    pts.push((t + step > ms ? 1 : 1 - (1 + x) * Math.exp(-x)).toFixed(4));
   }
   return `linear(${pts.join(", ")})`;
-})();
+}
+/** ω = 26 over 360 ms: the copy check's pop. */
+const SPRING_EASING = springEasing(OMEGA, 360, 12);
+/** ω = 62 over 180 ms: the 2 px settle of a new panel view. */
+const STIFF_EASING = springEasing(62, 180, 6);
 
 type Rating = "up" | "down";
 type Phase = "form" | "sending" | "error" | "thanks";
@@ -91,12 +93,12 @@ function copyText(text: string) {
   }
 }
 
-/** Timers that are cleared on unmount. */
+/** Timers that are cleared on unmount; each callback commits synchronously (flushSync), in the frame it fires. */
 function useTimers() {
   const ids = useRef<number[]>([]);
   useEffect(() => () => ids.current.forEach(clearTimeout), []);
   return useCallback((fn: () => void, ms: number) => {
-    const id = window.setTimeout(fn, ms);
+    const id = window.setTimeout(() => flushSync(fn), ms);
     ids.current.push(id);
     return id;
   }, []);
@@ -179,10 +181,11 @@ function SpringPanel({
     st.raf = requestAnimationFrame(step);
   }, []);
 
-  // open / close
+  // open / close; opening moves focus to the first reason, as the reference does
   useLayoutEffect(() => {
     const st = s.current;
     st.target = open ? inner.current!.offsetHeight : 0;
+    if (open) inner.current!.querySelector<HTMLElement>("[data-mf=chip]")?.focus({ preventScroll: true });
     run();
   }, [open, run]);
 
@@ -298,7 +301,7 @@ function CopyAction({ text }: { text: string }) {
     setAnimated(true);
     setCopied(true);
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCopied(false), COPY_RESET_MS);
+    timer.current = window.setTimeout(() => flushSync(() => setCopied(false)), COPY_RESET_MS);
   };
   const state = (on: boolean) => (on ? (animated ? "in" : "on") : animated ? "out" : "off");
   return (
@@ -646,6 +649,7 @@ export default function MessageFeedback() {
 
   useEffect(() => {
     root.current?.style.setProperty("--mf-spring", SPRING_EASING);
+    root.current?.style.setProperty("--mf-spring-stiff", STIFF_EASING);
   }, []);
 
   useEffect(() => {

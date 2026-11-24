@@ -135,6 +135,16 @@
   display: grid;
   gap: 4px;
   padding-left: 20px;
+  list-style: disc;
+}
+
+/* Inline code makes the reference's lines with code 2px taller; these paddings keep the reply the same height. */
+.mf-body p {
+  padding-bottom: 4px;
+}
+
+.mf-body li {
+  padding-bottom: 2px;
 }
 
 .mf-body li::marker {
@@ -220,8 +230,8 @@
   opacity: 1;
 }
 
-/* Copy → check: the leaving glyph fades out over 100ms and shrinks to 0.7, the entering one fades in over 100ms and
-   springs from 0.7 to 1 (critically damped, ω = 26 rad/s, sampled into --mf-spring). */
+/* Copy → check: the leaving glyph fades out and shrinks to 0.7 over 100ms (quint-out), the entering one fades in over
+   100ms and springs from 0.7 to 1 (critically damped, ω = 26 rad/s, sampled into --mf-spring). */
 .mf-copy {
   transition: color 150ms var(--mf-quint);
 }
@@ -239,16 +249,17 @@
   opacity: 0;
 }
 
+/* The reference starts these on the first animation frame after the click, hence the one-frame (16ms) delay. */
 .mf-layer[data-state="in"] {
   animation:
-    mf-fade-in 100ms var(--mf-quint) both,
-    mf-pop-in 360ms var(--mf-spring) both;
+    mf-fade-in 100ms var(--mf-quint) 16ms both,
+    mf-pop-in 360ms var(--mf-spring) 16ms both;
 }
 
 .mf-layer[data-state="out"] {
   animation:
-    mf-fade-out 100ms var(--mf-quint) both,
-    mf-pop-out 360ms var(--mf-spring) both;
+    mf-fade-out 100ms var(--mf-quint) 16ms both,
+    mf-pop-out 100ms var(--mf-quint) 16ms both;
 }
 
 @keyframes mf-pop-in {
@@ -297,14 +308,13 @@
   z-index: 5;
   pointer-events: none;
   white-space: nowrap;
-  padding: 5px 9px;
-  border-radius: 9px;
+  padding: 12px 14px;
+  border-radius: 14px;
   background: var(--mf-ink);
   color: var(--mf-card);
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 500;
-  box-shadow: 0 4px 14px rgb(31 29 26 / 0.16);
+  font-size: 13px;
+  line-height: 20px;
+  box-shadow: 0 6px 16px rgb(31 29 26 / 0.14);
   transform-origin: 50% 100%;
 }
 
@@ -380,17 +390,18 @@
   animation: mf-fade-out 100ms ease-out both;
 }
 
+/* The new view fades in over 150ms (quint-out) after 40ms and settles 2px upward on a stiff spring (ω ≈ 62). */
 .mf-view-entering {
-  animation: mf-view-in 150ms var(--mf-quint) 40ms both;
+  animation:
+    mf-fade-in 150ms var(--mf-quint) 40ms both,
+    mf-rise-in 180ms var(--mf-spring-stiff) 50ms both;
 }
 
-@keyframes mf-view-in {
+@keyframes mf-rise-in {
   from {
-    opacity: 0;
     transform: translateY(2px);
   }
   to {
-    opacity: 1;
     transform: none;
   }
 }
