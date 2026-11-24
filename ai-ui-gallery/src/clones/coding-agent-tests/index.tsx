@@ -10,7 +10,7 @@ import "./coding-agent.css";
  * Every change is a state swap on a timer (as in the reference's scripted transport); the shimmer is a CSS keyframe.
  */
 
-function TraceLine({ status, children }: { status?: "running"; children: ReactNode }) {
+function TraceLine({ status, children }: { status?: "running" | "error"; children: ReactNode }) {
   return (
     <span data-slot="trace-line" data-status={status} className="ca-line">
       {children}
