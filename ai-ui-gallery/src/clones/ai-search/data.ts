@@ -14,7 +14,7 @@ export interface Script {
 export const A: Script = {
   query: "billing retries",
   answer:
-    "Failed charges are retried 8 times over about 3 days, with exponential backoff starting at 30 seconds [1]. Right now a 410 response stops retries early. The fix is in progress in BILL-2481 [2], first reported by Orbit Labs on October 24 [3]. To retry sooner, replay the charge from the payment log or call `POST /v1/charges/:id/replay` [4].",
+    "Failed charges are retried 8 times over about 3 days, with exponential backoff starting at 30 seconds [1]. Right now a 410 response stops retries early. The fix is in progress in BILL\u20112481 [2], first reported by Orbit Labs on October 24 [3]. To retry sooner, replay the charge from the payment log or call `POST /v1/charges/:id/replay` [4].",
   cites: { 1: "doc0", 2: "issue0", 3: "cust0", 4: "doc1" },
   docs: [
     { title: "Billing retries and backoff", meta: "Payments" },
@@ -26,7 +26,7 @@ export const A: Script = {
     { title: "Pinecrest", meta: "Enterprise · Sam Rivera", right: "$520k ARR", color: "#c2612f" },
     { title: "Harbor Co", meta: "Scale · Jonas Weber", right: "$96k ARR", color: "#5b6bc0" },
   ],
-  issues: [{ title: "BILL-2481 Retries stop on 410", meta: "In progress", right: "Tracker" }],
+  issues: [{ title: "BILL\u20112481 Retries stop on 410", meta: "In progress", right: "Tracker" }],
 };
 
 export const B: Script = {
