@@ -72,9 +72,10 @@ src/clones/<slug>/*              any other files the clone needs (clone-local CS
 
 ## Capturing
 
-- The shared dev server is `http://127.0.0.1:5173`, and a clone renders alone at
-  `http://127.0.0.1:5173/c/<slug>`. If it does not answer, start your own with
-  `npx vite --port <5200 + a random number> --strictPort` from `ai-ui-gallery/` and stop it at the end.
+- **Run your own dev server.** The shared one on port 5173 stopped at the 2-hour limit for background
+  commands. From `ai-ui-gallery/`, start `npx vite --port <5200 + a random number> --strictPort` in the
+  background, render your clone at `http://127.0.0.1:<port>/c/<slug>`, and stop the server when you finish.
+  Use your port wherever this brief says 5173.
 - **Warm the page before every clone capture.** The dev server's Tailwind only learns a file's classes
   once Vite has transformed that file, so the first load of a new or edited clone renders unstyled and
   the CSS arrives mid-capture. Run
