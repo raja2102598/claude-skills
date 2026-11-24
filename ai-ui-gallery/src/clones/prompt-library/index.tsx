@@ -278,8 +278,8 @@ export default function PromptStudio() {
                 <>
                   <div className="ps-outhead">
                     <span className="ps-status">
-                      {phase === "done" ? <Check size={14} className="ok" /> : <span className="ps-spin" />}
-                      <b>{phase === "thinking" ? "Thinking" : phase === "writing" ? "Writing" : "Reply"}</b>
+                      {phase === "done" && <Check size={14} className="ok" />}
+                      <b className={clsx(phase === "thinking" && "ps-shimmer", phase !== "done" && "ps-gray")}>{phase === "thinking" ? "Thinking" : phase === "writing" ? "Writing" : "Reply"}</b>
                       <span>· {CASES.find((c) => c.id === caseId)!.label}</span>
                     </span>
                     {phase === "done" && <button className="ps-copy" type="button" aria-label="Copy reply"><Copy size={15} /></button>}
