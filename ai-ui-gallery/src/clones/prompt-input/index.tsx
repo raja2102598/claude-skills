@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
-import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion } from "motion/react";
+import { flushSync } from "react-dom";
+import { animate, motion, useMotionValue, useReducedMotion } from "motion/react";
 import {
   ArrowUp,
   Bug,
@@ -24,13 +25,15 @@ import "./prompt-input.css";
 const DOCK_TOP_NEW = 294.4; // centred group: greeting 239.6, dock 294.4, suggestions 406.4 (card padding box)
 const DOCK_TOP_THREAD = 558; // foot of the thread, 24px above the card's bottom edge
 const GLIDE = { type: "spring", stiffness: 300, damping: 35, mass: 1 } as const; // critically damped, ω ≈ 17.5/s
-const MORPH = { type: "spring", stiffness: 550, damping: 47, mass: 1 } as const; // critically damped, ω ≈ 23.5/s
-const THINK_END_MS = 680;
-const CHUNK_AT_MS = [700, 750, 800, 850, 900, 950, 1000, 1033];
-const DONE_MS = 1045;
+const MORPH = { type: "spring", stiffness: 600, damping: 49, mass: 1 } as const; // critically damped, ω ≈ 24.5/s
+// Schedule relative to the click. The reference shows each change on the first frame at or after these times.
+const THINK_END_MS = 640;
+const CHUNK_AT_MS = [668, 718, 768, 818, 868, 918, 968, 1001];
+const DONE_MS = 1018;
 const ARC_START = 0.1; // the ring shows a 10% stub while thinking
-const ARC_VMAX = 2.25; // per second, reached after ARC_RAMP_S
-const ARC_RAMP_S = 0.18;
+const ARC_V0 = 0.75; // per second when the first words land
+const ARC_VMAX = 2.3; // per second, reached after ARC_RAMP_S
+const ARC_RAMP_S = 0.17;
 
 const PROMPT = "Summarize the latest sales report";
 const REPLY = [
@@ -74,6 +77,12 @@ export default function PromptComposer() {
   const innerRef = useRef<HTMLDivElement>(null);
   const arcRef = useRef<SVGCircleElement>(null);
   const dockY = useMotionValue(0);
+  // Send glyphs run on motion values (JS frame loop) rather than element tweens, which motion would hand to WAAPI.
+  const arrowO = useMotionValue(1);
+  const arrowY = useMotionValue(0);
+  const stopO = useMotionValue(0);
+  const stopS = useMotionValue(0.7);
+  const wasBusy = useRef(false);
   const flipFrom = useRef<number | null>(null);
   const run = useRef<{ raf: number; stop: boolean } | null>(null);
   const demo = useRef<{ timers: number[]; on: boolean }>({ timers: [], on: autoplayEnabled() });
@@ -81,11 +90,10 @@ export default function PromptComposer() {
   const setArc = (frac: number) => arcRef.current?.setAttribute("stroke-dashoffset", String(1 - frac));
 
   // The reply: a simulated stream on one rAF clock, so the sequence is the same on every run and under a virtual clock.
-  const startStream = useCallback(() => {
+  const startStream = useCallback((t0: number) => {
     if (run.current) cancelAnimationFrame(run.current.raf);
     const state = { raf: 0, stop: false };
     run.current = state;
-    const t0 = performance.now();
     let last = t0;
     let arc = ARC_START;
     let v = 0;
@@ -103,18 +111,21 @@ export default function PromptComposer() {
       if (chunks !== shownChunks || nextPending !== pending || done) {
         shownChunks = chunks;
         pending = nextPending;
-        setTurn((cur) => (cur ? { ...cur, chunks, pending, done } : cur));
+        // Commit inside this frame: a scheduled render would land a frame or more later.
+        flushSync(() => {
+          setTurn((cur) => (cur ? { ...cur, chunks, pending, done } : cur));
+          if (done) setBusy(false);
+        });
       }
       // Arc: chases the reply's progress at a capped speed (it accelerates for ~180 ms, then runs at ~2.2/s).
       const revealed = REPLY.slice(0, chunks).join("").length;
       const target = done ? 1 : ARC_START + (1 - ARC_START) * (revealed / REPLY_CHARS);
       if (arc < target) {
-        v = Math.min(ARC_VMAX, v + (ARC_VMAX / ARC_RAMP_S) * dt);
+        v = Math.min(ARC_VMAX, Math.max(v, ARC_V0) + ((ARC_VMAX - ARC_V0) / ARC_RAMP_S) * dt);
         arc = Math.min(target, arc + v * dt);
       } else v = 0;
       setArc(arc);
       if (done) {
-        setBusy(false);
         run.current = null;
         return;
       }
@@ -127,13 +138,14 @@ export default function PromptComposer() {
     (value?: string) => {
       const prompt = (value ?? text).trim();
       if (!prompt || busy) return;
+      const t0 = performance.now();
       flipFrom.current = dockRef.current?.getBoundingClientRect().top ?? null;
       setMode("thread");
       setTurn({ prompt, chunks: 0, pending: true, done: false });
       setText("");
       setGrowH(26);
       setBusy(true);
-      startStream();
+      startStream(t0);
     },
     [text, busy, startStream],
   );
@@ -163,11 +175,33 @@ export default function PromptComposer() {
     return () => controls.stop();
   }, [mode, dockY, reduce]);
 
+  // Send ↔ stop morph: the arrow lifts out as the stop square springs in; on finish the stop drops and the arrow settles back.
+  useLayoutEffect(() => {
+    if (busy === wasBusy.current) return;
+    wasBusy.current = busy;
+    const fast = (ms: number) => ({ duration: reduce ? 0 : ms / 1000, ease: "linear" as const });
+    const spring = reduce ? { duration: 0 } : MORPH;
+    const runs = busy
+      ? [
+          animate(arrowO, 0, fast(20)),
+          animate(arrowY, -8, { duration: reduce ? 0 : 0.16, ease: [0.7, 0, 0.84, 0] }),
+          (stopS.jump(0.7), stopO.jump(0), animate(stopS, 1, spring)),
+          animate(stopO, 1, fast(70)),
+        ]
+      : [
+          animate(stopO, 0, fast(16)),
+          animate(stopS, 0.7, fast(16)),
+          (arrowY.jump(2.5), arrowO.jump(0), animate(arrowY, 0, spring)),
+          animate(arrowO, 1, fast(30)),
+        ];
+    return () => runs.forEach((r) => r.stop());
+  }, [busy, reduce, arrowO, arrowY, stopO, stopS]);
+
   // The reply body animates its height to the content (one line at a time), so a new line stays clipped until it opens.
   useEffect(() => {
     const el = innerRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setGrowH(Math.max(26, el.offsetHeight)));
+    const ro = new ResizeObserver(() => flushSync(() => setGrowH(Math.max(26, el.offsetHeight))));
     ro.observe(el);
     return () => ro.disconnect();
   }, [turn !== null]);
@@ -373,35 +407,20 @@ export default function PromptComposer() {
                       strokeDashoffset={1 - ARC_START}
                     />
                   </svg>
-                  <AnimatePresence initial={false}>
-                    {busy ? (
-                      <motion.span
-                        key="stop"
-                        className="pi-glyph"
-                        data-pi-glyph="stop"
-                        initial={{ scale: 0.7, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1, transition: { scale: MORPH, opacity: { duration: 0.07, ease: "linear" } } }}
-                        exit={{ scale: 0.7, opacity: 0, transition: { duration: 0.016 } }}
-                      >
-                        <span className="pi-stop" />
-                      </motion.span>
-                    ) : (
-                      <motion.span
-                        key="arrow"
-                        className="pi-glyph"
-                        data-pi-glyph="arrow"
-                        initial={{ y: 2.5, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1, transition: { y: MORPH, opacity: { duration: 0.03, ease: "linear" } } }}
-                        exit={{
-                          y: -8,
-                          opacity: 0,
-                          transition: { y: { duration: 0.16, ease: [0.7, 0, 0.84, 0] }, opacity: { duration: 0.02 } },
-                        }}
-                      >
-                        <ArrowUp size={18} strokeWidth={2} aria-hidden />
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
+                  <motion.span
+                    className="pi-glyph"
+                    data-pi-glyph="arrow"
+                    style={{ opacity: arrowO, y: arrowY }}
+                  >
+                    <ArrowUp size={18} strokeWidth={2} aria-hidden />
+                  </motion.span>
+                  <motion.span
+                    className="pi-glyph"
+                    data-pi-glyph="stop"
+                    style={{ opacity: stopO, scale: stopS }}
+                  >
+                    <span className="pi-stop" />
+                  </motion.span>
                 </button>
               </div>
             </div>

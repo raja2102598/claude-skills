@@ -2,6 +2,7 @@ import {
   memo,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useReducer,
   useRef,
   useState,
@@ -10,7 +11,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import { AnimatePresence, MotionConfig, motion } from "motion/react";
+import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "motion/react";
 import { Check, CornerDownLeft, MessageSquareText, Orbit, Pencil, Play, Plus, RotateCcw, Square, X } from "lucide-react";
 import clsx from "clsx";
 import { AGENT, GOAL, PLAN, TICK, TOOLS, estimate, linesAt, seconds, type StepDef, type ToolId } from "./plan-data";
@@ -20,7 +21,14 @@ import "./agent-plan.css";
 const EXPO = [0.16, 1, 0.3, 1] as const;
 const T = { duration: 0.3, ease: EXPO };
 const AUTO_RUN_MS = 700; // the draft holds this long, then the plan starts by itself
-const HANDOFF_MS = 25; // a finished step hands over to the next one just after its last tick
+const HANDOFF_MS = 8; // a finished step hands over to the next one just after its last tick
+
+/**
+ * Motion hands opacity to WAAPI, which runs on the browser's own animation clock. An `onUpdate` listener keeps
+ * it on Motion's JS frameloop instead, so opacity stays in step with the x / scale / height tweens it pairs with
+ * (and with a virtual capture clock).
+ */
+const onFrameloop = { onUpdate: () => {} };
 
 const C = {
   fg: "var(--ap-fg)",
@@ -157,7 +165,7 @@ function usePlanRun() {
 
   // Auto-run after the draft has been on screen for AUTO_RUN_MS, unless the person starts editing.
   const autoRun = useRef<number | null>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     autoRun.current = window.setTimeout(() => {
       autoRun.current = null;
       clock.set({ total: 0, step: 0 });
@@ -202,7 +210,7 @@ function usePlanRun() {
       window.clearInterval(id);
       if (handoff !== null) window.clearTimeout(handoff);
     };
-  }, [state.phase, state.current, clock]);
+  }, [state.phase, clock]);
 
   const act = useCallback(
     (a: Action) => {
@@ -306,7 +314,7 @@ function Spinner({ spinning }: { spinning: boolean }) {
   );
 }
 
-const pop = { initial: { scale: 0.4, opacity: 0 }, animate: { scale: 1, opacity: 1 }, transition: T };
+const pop = { initial: { scale: 0.4, opacity: 0 }, animate: { scale: 1, opacity: 1 }, transition: T, ...onFrameloop };
 
 function Marker({ status, index }: { status: StepStatus; index: number }) {
   if (status === "draft")
@@ -377,6 +385,7 @@ function Output({ step, shown, status, onRetry }: { step: StepDef; shown: number
   return (
     <motion.div
       data-part="output"
+      {...onFrameloop}
       className="overflow-hidden"
       initial={{ height: 0 }}
       animate={{ height: "auto" }}
@@ -389,6 +398,7 @@ function Output({ step, shown, status, onRetry }: { step: StepDef; shown: number
           return (
             <motion.li
               key={i}
+              {...onFrameloop}
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
               transition={T}
@@ -404,6 +414,7 @@ function Output({ step, shown, status, onRetry }: { step: StepDef; shown: number
         {failed && step.failure && (
           <motion.li
             key="failure"
+            {...onFrameloop}
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
             transition={T}
@@ -489,7 +500,7 @@ const StepRow = memo(function StepRow({ step, index, status, shown, last, clock,
               type="button"
               aria-label={`Remove step: ${step.title}`}
               onClick={() => onRemove(step.id)}
-              className="-mr-1 grid size-6 shrink-0 place-items-center rounded-full opacity-0 transition-opacity group-hover/step:opacity-100 focus-visible:opacity-100"
+              className="-my-0.5 -mr-1 grid size-6 shrink-0 place-items-center rounded-full opacity-0 transition-opacity group-hover/step:opacity-100 focus-visible:opacity-100"
               style={{ color: C.muted }}
             >
               <X size={14} />
@@ -673,6 +684,8 @@ function AgentPlan() {
       </header>
 
       <div className="px-4 pb-3 pt-4">
+        {/* LayoutGroup: when one row grows by a streamed line, every row below measures and glides too. */}
+        <LayoutGroup>
         <ul className="flex flex-col">
           {state.steps.map((step, i) => {
             const status = statusOf(state, i);
@@ -692,6 +705,7 @@ function AgentPlan() {
             );
           })}
         </ul>
+        </LayoutGroup>
       </div>
 
       <Composer phase={state.phase} act={act} />

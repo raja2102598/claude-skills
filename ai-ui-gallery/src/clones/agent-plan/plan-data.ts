@@ -28,7 +28,7 @@ export const GOAL = "Add CSV export to the invoices page";
 export const PLAN: StepDef[] = [
   {
     id: "locate",
-    title: "Locate the invoice table component",
+    title: "Find the invoice table view",
     tool: "search",
     ms: 1800,
     lines: ['rg "InvoiceTable" src/invoices', "9 matches across 4 files", "open invoices/table.tsx"],
@@ -42,7 +42,7 @@ export const PLAN: StepDef[] = [
   },
   {
     id: "serializer",
-    title: "Write the invoice CSV serializer",
+    title: "Write the CSV serializer",
     tool: "write",
     ms: 2600,
     lines: ["create export/invoices-csv.ts", "map invoice → csv row", "register route GET /invoices/export"],
