@@ -205,7 +205,7 @@ export const entries: ShowcaseEntry[] = [
     slug: "image-generation",
     load: () => import("../src/clones/image-generation/index.tsx"),
     meta: () => import("../src/clones/image-generation/meta.ts"),
-    reference: "Arc UI · Image generation", candidates: 6, rounds: 3, timing: "15 of 18 rows pass, 2 fail", runnerUp: "Kobra Image Generation",
+    reference: "Arc UI · Image generation", candidates: 6, rounds: 4, timing: "16 of 18 rows pass; image colour differs", runnerUp: "Kobra Image Generation",
   },
   {
     slug: "mcp-servers",
