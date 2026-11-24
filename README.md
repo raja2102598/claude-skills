@@ -43,10 +43,15 @@ Verify with `/skills` in a Claude Code session, or just `ls ~/.claude/skills`.
 | `prune-tests` | Remove redundant tests and tests that guard no intended behavior. From [Caldo](https://github.com/caldoai/skills), MIT. |
 | `untangle-codebase` | Refactor structural coupling while preserving intended behavior. From [Caldo](https://github.com/caldoai/skills), MIT. Explicit invocation. |
 | `wait-what` | Ask the agent to explain its last response again in simpler language. From Matt Pocock’s skills; MIT license. |
+| `reanimate` | Clone an animation, widget or section from a site, video, gif or Lottie file, then verify the clone frame by frame against the reference. From [NiazMorshed2007/reanimate](https://github.com/NiazMorshed2007/reanimate); MIT. Needs Bun. |
 
 ## Pick a UI library
 
 `/pick-ui-library <task>` in Claude Code or `$pick-ui-library <task>` in Codex checks existing dependencies and native features first. It uses Emil Kowalski’s library catalog and public UI references to recommend open-source components or original implementations inspired by the demos. Browse the [UI reference index](pick-ui-library/references/ui-reference-index.md) for component links, demos, and a short description of each. Explicit invocation only; importing this folder does not install its listed UI packages.
+
+## Reanimate
+
+`/reanimate <what>, <where it is>, <where it goes>` records the reference in headless Chromium, rebuilds it in your stack, records the clone the same way, and iterates until timing, easing and pixels match. Say "match it exactly" for pixel-faithful output; motion-faithful is the default. Install Bun 1.1+ first; the first run downloads Playwright's Chromium and a static ffmpeg (about 250 MB). See [reanimate/UPSTREAM.md](reanimate/UPSTREAM.md) if a preinstalled Playwright makes the capture fail.
 
 ## Estimation and refactoring
 

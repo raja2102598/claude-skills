@@ -1,0 +1,105 @@
+<title>AI UI Gallery</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: one centred column of specimens, each a labelled live stage, like a bench of instruments under test. */
+  :root {
+    --bg: #eef0f3;
+    --surface: #ffffff;
+    --fg: #15181e;
+    --muted: #596071;
+    --line: #d9dde5;
+    --accent: #2d4fd0;
+    --accent-soft: #e5eafc;
+    --exact: #12715a;
+    --exact-soft: #dff3ec;
+    --font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --font-data: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1014; --surface: #161920; --fg: #e7e9ee; --muted: #9aa1b1; --line: #2a2f3a;
+      --accent: #93a8ff; --accent-soft: #1d2440; --exact: #6fd3b1; --exact-soft: #12302a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1014; --surface: #161920; --fg: #e7e9ee; --muted: #9aa1b1; --line: #2a2f3a;
+    --accent: #93a8ff; --accent-soft: #1d2440; --exact: #6fd3b1; --exact-soft: #12302a;
+    color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+
+  .sc-page {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding-block: 2.5rem 4rem;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    gap: 3.5rem;
+  }
+  .sc-page > *, .sc-specimen > *, .sc-intro > * { min-width: 0; }
+  .sc-intro { display: grid; gap: 0.9rem; }
+  .sc-eyebrow {
+    margin: 0; font-family: var(--font-data); font-size: 0.75rem; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .sc-intro h1 {
+    margin: 0; font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 600; letter-spacing: -0.025em;
+    line-height: 1.05; text-wrap: balance;
+  }
+  .sc-lede { margin: 0; max-width: 62ch; font-size: 1.0625rem; line-height: 1.6; }
+  .sc-note { margin: 0; max-width: 62ch; font-size: 0.875rem; line-height: 1.6; color: var(--muted); }
+  .sc-note strong { color: var(--fg); font-weight: 500; }
+  .sc-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
+  .sc-nav a {
+    font-size: 0.8125rem; color: var(--fg); text-decoration: none; padding: 0.3rem 0.7rem;
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  }
+  .sc-nav a:hover { border-color: var(--accent); color: var(--accent); }
+  .sc-nav a:focus-visible, .sc-replay:focus-visible, .sc-facts a:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+
+  .sc-specimen { display: grid; gap: 0.9rem; scroll-margin-top: 1.5rem; }
+  .sc-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .sc-titles { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; min-width: 0; }
+  .sc-head h2 { margin: 0; font-size: 1.375rem; font-weight: 600; letter-spacing: -0.015em; }
+  .sc-pill {
+    font-family: var(--font-data); font-size: 0.6875rem; letter-spacing: 0.03em; padding: 0.2rem 0.55rem;
+    border-radius: 999px; background: var(--accent-soft); color: var(--accent);
+  }
+  .sc-pill-exact { background: var(--exact-soft); color: var(--exact); }
+  .sc-replay {
+    font: inherit; font-size: 0.8125rem; font-weight: 500; cursor: pointer; color: var(--fg);
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 0.4rem 0.85rem;
+  }
+  .sc-replay:hover { border-color: var(--accent); color: var(--accent); }
+  .sc-replay:active { transform: translateY(1px); }
+
+  .sc-facts {
+    margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.6rem 1.25rem;
+  }
+  .sc-facts div { min-width: 0; }
+  .sc-facts dt {
+    font-family: var(--font-data); font-size: 0.6875rem; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 0.15rem;
+  }
+  .sc-facts dd { margin: 0; font-size: 0.875rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+  .sc-facts a { color: var(--accent); text-decoration: none; }
+  .sc-facts a:hover { text-decoration: underline; }
+  .sc-why { margin: 0; max-width: 62ch; font-size: 0.9375rem; line-height: 1.6; color: var(--muted); }
+
+  .sc-frame {
+    border: 1px solid var(--line); border-radius: 14px; overflow: hidden; padding-block: 1rem;
+    max-width: 100%; min-width: 0;
+  }
+  .sc-wait { margin: 0; padding: 1rem; font-family: var(--font-data); font-size: 0.8125rem; color: #6b7280; }
+  .sc-page > .sc-wait { color: var(--muted); }
+</style>
+<link rel="stylesheet" href="assets/index.css">
+<div id="root"></div>
+<script type="module" src="assets/showcase.js"></script>

@@ -1,0 +1,312 @@
+/* Streaming response text: clone-local styles. Plain CSS, so the clone renders even before the shared
+   dev server's Tailwind has scanned it. The palette, fonts, icons and copy are our own. The layout
+   proportions and every timing follow .reanimate/streaming-text/spec.md. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap");
+
+.stx {
+  --stx-paper: #f7f5f0;
+  --stx-ink: #24201b;
+  --stx-muted: #7c756c;
+  --stx-card: #fffdf9;
+  --stx-line: #e7e2d8;
+  /* the trail a fresh word runs through before it settles into ink */
+  --stx-trail-1: oklch(0.8 0.13 85);
+  --stx-trail-2: oklch(0.68 0.17 52);
+  --stx-trail-3: oklch(0.56 0.15 30);
+
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  width: 544px;
+  margin: 0 auto;
+  color: var(--stx-ink);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 24.375px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Two layers in one grid cell: the invisible full reply sets the height, the live layer streams over it. */
+.stx-grid {
+  display: grid;
+  width: 100%;
+}
+.stx-layer {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.stx-ghost {
+  visibility: hidden;
+}
+
+/* ---------- blocks ---------- */
+.stx-h {
+  margin: 0;
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: -0.45px;
+}
+.stx-p {
+  margin: 0;
+  text-wrap: pretty;
+}
+.stx-ul {
+  margin: 0;
+  padding-left: 20px;
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stx-ul li::marker {
+  color: var(--stx-muted);
+}
+.stx-ul strong {
+  font-weight: 500;
+}
+
+/* source pill */
+.stx-pill-slot {
+  display: inline-block;
+}
+.stx-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+  padding: 2px 6px 2px 4px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(36 32 27 / 0.07);
+  color: var(--stx-muted);
+  font: inherit;
+  font-size: 11px;
+  line-height: 16px;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+.stx-pill:hover,
+.stx-pill:focus-visible {
+  background: var(--stx-ink);
+  color: var(--stx-paper);
+  outline: none;
+}
+.stx-pill-mark {
+  display: grid;
+  place-items: center;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgb(36 32 27 / 0.1);
+}
+.stx-pill-mark svg {
+  width: 8px;
+  height: 8px;
+  stroke-width: 2.4;
+}
+.stx-pill-more {
+  opacity: 0.6;
+}
+
+/* code card */
+.stx-card {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--stx-line);
+  border-radius: 14px;
+  background: var(--stx-card);
+}
+.stx-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 41px;
+  padding: 6px 6px 6px 12px;
+  border-bottom: 1px solid var(--stx-line);
+  box-sizing: border-box;
+}
+.stx-card-icon {
+  width: 15px;
+  height: 15px;
+  color: var(--stx-muted);
+  stroke-width: 1.8;
+}
+.stx-card-label {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 16px;
+}
+.stx-card-tools {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+.stx-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--stx-muted);
+  cursor: pointer;
+}
+.stx-icon-btn:hover {
+  background: rgb(36 32 27 / 0.05);
+  color: var(--stx-ink);
+}
+.stx-icon-btn:focus-visible {
+  outline: 2px solid var(--stx-trail-2);
+  outline-offset: 1px;
+}
+.stx-icon-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.8;
+}
+.stx-code {
+  margin: 0;
+  padding: 10px 16px 10px 10px;
+  overflow-x: auto;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 24px;
+}
+.stx-code code {
+  display: block;
+  width: max-content;
+  font: inherit;
+}
+
+/* Replay */
+.stx-replay-row {
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+.stx-replay-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #fffefb;
+  color: var(--stx-ink);
+  font: inherit;
+  font-size: 12.8px;
+  line-height: 1;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 -1px 0 rgb(36 32 27 / 0.05),
+    0 0 0 1px rgb(36 32 27 / 0.08),
+    0 1px 1px rgb(36 32 27 / 0.05),
+    0 3px 6px -3px rgb(36 32 27 / 0.08);
+  transition: transform 150ms ease-out, background-color 150ms ease-out;
+}
+.stx-replay-btn:hover {
+  background: #ffffff;
+}
+.stx-replay-btn:active {
+  transform: scale(0.985);
+}
+.stx-replay-btn:focus-visible {
+  outline: 2px solid var(--stx-trail-2);
+  outline-offset: 2px;
+}
+.stx-replay-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 2;
+}
+
+/* ---------- motion ---------- */
+
+/* each word: 180 ms fade (ease) while its colour runs the trail into ink (linear between stops) */
+.stx-w {
+  animation:
+    stx-fade 180ms ease both,
+    stx-trail 180ms linear both;
+}
+@keyframes stx-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes stx-trail {
+  0% {
+    color: var(--stx-trail-1);
+  }
+  30% {
+    color: var(--stx-trail-2);
+  }
+  60% {
+    color: var(--stx-trail-3);
+  }
+  100% {
+    color: inherit;
+  }
+}
+
+/* the code card fades in as one unit */
+.stx-card-in {
+  animation: stx-fade 300ms ease both;
+}
+
+/* Replay rises 4 px as it fades in (out-quint, about 280 ms) */
+.stx-replay {
+  animation: stx-rise 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes stx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.stx-replay-out {
+  animation: stx-out 200ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+@keyframes stx-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Replay blurs the reply out on a critically damped spring (ω = 25 rad/s), sampled into linear(). It starts one
+   frame in (-16 ms): the reference's spring counts from the click's frame, not from the first frame it paints. */
+.stx-leaving {
+  animation: stx-leave 430ms
+    linear(0, 0.0748 4.2%, 0.226 8.3%, 0.3886 12.5%, 0.5347 16.7%, 0.655 20.8%, 0.7491 25%, 0.8202 29.2%,
+      0.8727 33.3%, 0.9107 37.5%, 0.9379 41.7%, 0.957 45.8%, 0.9705 50%, 0.9798 54.2%, 0.9863 58.3%,
+      0.9907 62.5%, 0.9937 66.7%, 0.9958 70.8%, 0.9971 75%, 0.9981 79.2%, 0.9987 83.3%, 0.9991 87.5%,
+      0.9994 91.7%, 0.9996 95.8%, 1)
+    -16ms both;
+}
+@keyframes stx-leave {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+
+/* reduced motion: words still arrive, but without the fade, trail, blur or rise */
+.stx[data-reduced] .stx-w,
+.stx[data-reduced] .stx-card-in,
+.stx[data-reduced] .stx-replay,
+.stx[data-reduced] .stx-replay-out,
+.stx[data-reduced] .stx-leaving {
+  animation: none;
+}

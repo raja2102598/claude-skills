@@ -1,0 +1,1513 @@
+[
+ {
+  "id": "orb-presence",
+  "title": "Assistant orb (idle presence / launcher)",
+  "candidates": [
+   {
+    "source": "Rare UI",
+    "name": "Fluid Orb",
+    "url": "https://www.rareui.com/components/fluidorb"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "ChatGPT Orb",
+    "url": "https://ui.wensity.com/components/chatgpt-orb"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "AI Orb",
+    "url": "https://ui.wensity.com/components/ai-orb"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "Liquid Glass Orb",
+    "url": "https://ui.wensity.com/components/liquid-glass-orb"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Orb",
+    "url": "https://www.assistant-ui.com/elements/orb"
+   },
+   {
+    "source": "Libraries.dev",
+    "name": "Thinking orbs",
+    "url": "https://libraries.dev/orbs"
+   },
+   {
+    "source": "Rare UI",
+    "name": "Matrix orb",
+    "url": "https://www.rareui.com/components/matrixorb"
+   }
+  ]
+ },
+ {
+  "id": "orb-voice",
+  "title": "Voice-reactive orb / Siri-style visualizer",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "Voice orb",
+    "url": "https://uiarc.dev/components/voice-orb"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "Voice Reactive Orb",
+    "url": "https://ui.wensity.com/components/voice-aurora-wave"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "Siri Orb",
+    "url": "https://ui.wensity.com/components/siri-orb"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "iPhone Siri",
+    "url": "https://ui.wensity.com/components/iphone-siri"
+   },
+   {
+    "source": "Libraries.dev",
+    "name": "Voice ring",
+    "url": "https://libraries.dev/voice-ring"
+   },
+   {
+    "source": "Libraries.dev",
+    "name": "Voice",
+    "url": "https://libraries.dev/voice"
+   }
+  ]
+ },
+ {
+  "id": "ai-button",
+  "title": "AI action button / spark",
+  "candidates": [
+   {
+    "source": "Wensity UI components",
+    "name": "AI Button",
+    "url": "https://ui.wensity.com/components/ai-button"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI spark",
+    "url": "https://uiarc.dev/components/ai-spark"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI command",
+    "url": "https://uiarc.dev/components/ai-command"
+   }
+  ]
+ },
+ {
+  "id": "ai-avatar",
+  "title": "AI mascot / bot avatars",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "AI mascot",
+    "url": "https://uiarc.dev/components/ai-mascot"
+   },
+   {
+    "source": "Libraries.dev",
+    "name": "Bot avatars",
+    "url": "https://libraries.dev/bots"
+   }
+  ]
+ },
+ {
+  "id": "agent-cursor",
+  "title": "Agent cursor (AI acting on the page)",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "Agent cursor",
+    "url": "https://uiarc.dev/components/agent-cursor"
+   }
+  ]
+ },
+ {
+  "id": "thinking-indicator",
+  "title": "Thinking / status line",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Thinking indicator",
+    "url": "https://www.assistant-ui.com/elements/thinking-indicator"
+   },
+   {
+    "source": "Rare UI",
+    "name": "Inline AI Status",
+    "url": "https://www.rareui.com/components/aistatus"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Thinking state",
+    "url": "https://uistacks.dev/components/thinking-state"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "AI Thinking Loaders",
+    "url": "https://pro.beui.dev/components/ai-thinking-loader"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "ChatShimmer",
+    "url": "https://ui.nuxt.com/docs/components/chat-shimmer"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent status",
+    "url": "https://uiarc.dev/components/agent-status"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Agent status",
+    "url": "https://www.assistant-ui.com/elements/agent-status"
+   }
+  ]
+ },
+ {
+  "id": "typing-indicator",
+  "title": "Typing dots",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Typing indicator",
+    "url": "https://www.assistant-ui.com/elements/typing-indicator"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "AI Typing Indicator",
+    "url": "https://ui.wensity.com/components/ai-typing-indicator"
+   }
+  ]
+ },
+ {
+  "id": "streaming-text",
+  "title": "Streaming response text",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Streaming text",
+    "url": "https://www.assistant-ui.com/elements/streaming-text"
+   },
+   {
+    "source": "Kobra",
+    "name": "Streaming Text",
+    "url": "https://kobra.systems/components/streaming-text"
+   },
+   {
+    "source": "Rare UI",
+    "name": "Streaming Response",
+    "url": "https://www.rareui.com/components/streamingresponse"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Realtime stream",
+    "url": "https://uiarc.dev/components/realtime-stream"
+   },
+   {
+    "source": "Aceternity UI",
+    "name": "Text Generate Effect",
+    "url": "https://ui.aceternity.com/components/text-generate-effect"
+   },
+   {
+    "source": "Magic UI",
+    "name": "Typing Animation",
+    "url": "https://magicui.design/docs/components/typing-animation"
+   },
+   {
+    "source": "Animate UI",
+    "name": "Typing Text",
+    "url": "https://animate-ui.com/docs/primitives/animate-ui/typing-text"
+   }
+  ]
+ },
+ {
+  "id": "image-generation",
+  "title": "Image generation loader",
+  "candidates": [
+   {
+    "source": "Aceternity UI",
+    "name": "Image Generation Loader",
+    "url": "https://ui.aceternity.com/components/image-generation-loader"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Image generation",
+    "url": "https://www.assistant-ui.com/elements/image-generation"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Image generation",
+    "url": "https://uiarc.dev/components/image-generation"
+   },
+   {
+    "source": "Kobra",
+    "name": "Image Generation",
+    "url": "https://kobra.systems/components/image-generation"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "AI Image Loading Animation",
+    "url": "https://ui.wensity.com/components/ai-image-generator"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Image generations",
+    "url": "https://uistacks.dev/components/image-generations"
+   }
+  ]
+ },
+ {
+  "id": "prompt-input",
+  "title": "Prompt input / composer (full)",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Prompt Input",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/prompt-input"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Composer",
+    "url": "https://www.assistant-ui.com/elements/composer"
+   },
+   {
+    "source": "Kobra",
+    "name": "Chat Input",
+    "url": "https://kobra.systems/components/chat-input"
+   },
+   {
+    "source": "Kobra",
+    "name": "Composer",
+    "url": "https://kobra.systems/components/composer"
+   },
+   {
+    "source": "Rare UI",
+    "name": "AI Prompt Box",
+    "url": "https://www.rareui.com/components/promptbox"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "AI Prompt Input",
+    "url": "https://ui.wensity.com/components/liquid-multimodal-input"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Prompt input",
+    "url": "https://uistacks.dev/components/prompt-input"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Prompt with attachments",
+    "url": "https://uistacks.dev/components/prompt-attachments"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Docked composer",
+    "url": "https://uistacks.dev/components/prompt-composer-docked"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Agent Chat Input",
+    "url": "https://pro.beui.dev/components/agent-chat-input"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI composer",
+    "url": "https://uiarc.dev/components/blocks/ai-composer"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "ChatPrompt",
+    "url": "https://ui.nuxt.com/docs/components/chat-prompt"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "ChatPromptSubmit",
+    "url": "https://ui.nuxt.com/docs/components/chat-prompt-submit"
+   }
+  ]
+ },
+ {
+  "id": "prompt-mini",
+  "title": "Compact / mobile prompt",
+  "candidates": [
+   {
+    "source": "UIStacks",
+    "name": "Mini prompt",
+    "url": "https://uistacks.dev/components/mini-prompt"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Mobile composer",
+    "url": "https://www.assistant-ui.com/elements/mobile-composer"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Prompt input",
+    "url": "https://pro.beui.dev/components/mobile/prompt-input"
+   }
+  ]
+ },
+ {
+  "id": "prompt-mention",
+  "title": "@-mention and context picker in the composer",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Composer trigger popover",
+    "url": "https://www.assistant-ui.com/elements/composer-trigger-popover"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Mention prompt",
+    "url": "https://uistacks.dev/components/mention-prompt"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Context",
+    "url": "https://www.assistant-ui.com/elements/composer-context"
+   }
+  ]
+ },
+ {
+  "id": "prompt-enhancer",
+  "title": "Prompt enhancer / copy-prompt box",
+  "candidates": [
+   {
+    "source": "UIStacks",
+    "name": "Prompt enhancer",
+    "url": "https://uistacks.dev/components/prompt-enhancer"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Copy-prompt box",
+    "url": "https://uistacks.dev/components/copy-prompt-box"
+   }
+  ]
+ },
+ {
+  "id": "voice-input",
+  "title": "Voice prompt / recorder",
+  "candidates": [
+   {
+    "source": "UIStacks",
+    "name": "Voice prompt",
+    "url": "https://uistacks.dev/components/voice-prompt"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Voice recorder",
+    "url": "https://uiarc.dev/components/voice-recorder"
+   },
+   {
+    "source": "Rare UI",
+    "name": "Voice note",
+    "url": "https://www.rareui.com/components/voicenote"
+   }
+  ]
+ },
+ {
+  "id": "suggestions",
+  "title": "Prompt suggestions",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Suggestion",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/suggestion"
+   }
+  ]
+ },
+ {
+  "id": "message",
+  "title": "Message bubble with actions and feedback",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Message",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/message"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Message actions",
+    "url": "https://www.assistant-ui.com/elements/message-actions"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Message pair",
+    "url": "https://www.assistant-ui.com/elements/message-pair"
+   },
+   {
+    "source": "Kobra",
+    "name": "Message",
+    "url": "https://kobra.systems/components/message"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Message",
+    "url": "https://uistacks.dev/components/message"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Response feedback",
+    "url": "https://uiarc.dev/components/response-feedback"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "ChatMessage",
+    "url": "https://ui.nuxt.com/docs/components/chat-message"
+   },
+   {
+    "source": "shadcn/ui",
+    "name": "Message",
+    "url": "https://ui.shadcn.com/docs/components/base/message"
+   },
+   {
+    "source": "daisyUI",
+    "name": "Chat bubble",
+    "url": "https://daisyui.com/components/chat/"
+   }
+  ]
+ },
+ {
+  "id": "message-branches",
+  "title": "Message branches / edit a sent message",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Message branches",
+    "url": "https://www.assistant-ui.com/elements/message-branches"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Edit a sent message",
+    "url": "https://www.assistant-ui.com/elements/edit-message"
+   }
+  ]
+ },
+ {
+  "id": "message-queue",
+  "title": "Queued messages / message timing",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Message queue",
+    "url": "https://www.assistant-ui.com/elements/message-queue"
+   },
+   {
+    "source": "AI Elements",
+    "name": "Queue",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/queue"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Message timing",
+    "url": "https://www.assistant-ui.com/elements/message-timing"
+   }
+  ]
+ },
+ {
+  "id": "sources",
+  "title": "Sources and inline citations",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Sources",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/sources"
+   },
+   {
+    "source": "AI Elements",
+    "name": "Inline Citation",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/inline-citation"
+   }
+  ]
+ },
+ {
+  "id": "chat-thread",
+  "title": "Full chat thread",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Chat",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/chat"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Thread",
+    "url": "https://www.assistant-ui.com/elements/thread"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI chat",
+    "url": "https://uiarc.dev/components/blocks/ai-chat"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Chat thread",
+    "url": "https://uiarc.dev/components/chat-thread"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "AI Chat Interface",
+    "url": "https://ui.wensity.com/components/ai-chat-interface"
+   },
+   {
+    "source": "Kobra",
+    "name": "Conversation",
+    "url": "https://kobra.systems/components/conversation"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "Chat",
+    "url": "https://ui.nuxt.com/docs/components/chat"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "ChatMessages",
+    "url": "https://ui.nuxt.com/docs/components/chat-messages"
+   },
+   {
+    "source": "shadcn/ui",
+    "name": "Message Scroller",
+    "url": "https://ui.shadcn.com/docs/components/base/message-scroller"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Support conversation",
+    "url": "https://uiarc.dev/components/screens/support-conversation"
+   }
+  ]
+ },
+ {
+  "id": "thread-list",
+  "title": "Thread list / chat history / conversation search",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Thread list",
+    "url": "https://www.assistant-ui.com/elements/thread-list"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Thread list sidebar",
+    "url": "https://www.assistant-ui.com/elements/thread-list-sidebar"
+   },
+   {
+    "source": "Kobra",
+    "name": "Chat History",
+    "url": "https://kobra.systems/components/chat-history"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Conversation list",
+    "url": "https://uistacks.dev/components/conversation-list"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Thread search",
+    "url": "https://www.assistant-ui.com/elements/thread-search"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Search in conversation",
+    "url": "https://www.assistant-ui.com/elements/conversation-search"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Conversation map",
+    "url": "https://www.assistant-ui.com/elements/conversation-map"
+   }
+  ]
+ },
+ {
+  "id": "assistant-surface",
+  "title": "Assistant modal / sidebar / pill launcher",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Assistant modal",
+    "url": "https://www.assistant-ui.com/elements/assistant-modal"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Assistant sidebar",
+    "url": "https://www.assistant-ui.com/elements/assistant-sidebar"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Chat panel",
+    "url": "https://www.assistant-ui.com/elements/chat-panel"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI side panel",
+    "url": "https://uiarc.dev/components/blocks/ai-side-panel"
+   },
+   {
+    "source": "HorizonX",
+    "name": "Assistant Pill",
+    "url": "https://horizonx.so/tools/assistant-pill"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "ChatPalette",
+    "url": "https://ui.nuxt.com/docs/components/chat-palette"
+   }
+  ]
+ },
+ {
+  "id": "share-chat",
+  "title": "Share a conversation",
+  "candidates": [
+   {
+    "source": "UIStacks",
+    "name": "Share chat",
+    "url": "https://uistacks.dev/components/share-chat"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Shared conversation",
+    "url": "https://www.assistant-ui.com/elements/shared-conversation"
+   }
+  ]
+ },
+ {
+  "id": "reasoning",
+  "title": "Reasoning / chain of thought",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Reasoning",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/reasoning"
+   },
+   {
+    "source": "AI Elements",
+    "name": "Chain of Thought",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/chain-of-thought"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Reasoning",
+    "url": "https://www.assistant-ui.com/elements/reasoning"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Reasoning block",
+    "url": "https://uiarc.dev/components/reasoning-block"
+   },
+   {
+    "source": "Kobra",
+    "name": "Reasoning Steps",
+    "url": "https://kobra.systems/components/reasoning-steps"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "ChatReasoning",
+    "url": "https://ui.nuxt.com/docs/components/chat-reasoning"
+   }
+  ]
+ },
+ {
+  "id": "reasoning-tree",
+  "title": "Reasoning tree",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "Reasoning tree",
+    "url": "https://uiarc.dev/components/reasoning-tree"
+   }
+  ]
+ },
+ {
+  "id": "reasoning-effort",
+  "title": "Reasoning effort control",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Reasoning effort",
+    "url": "https://www.assistant-ui.com/elements/reasoning-effort"
+   }
+  ]
+ },
+ {
+  "id": "tool-call",
+  "title": "Tool call card",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Tool",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/tool"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Tool call",
+    "url": "https://www.assistant-ui.com/elements/tool-call"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Tool group",
+    "url": "https://www.assistant-ui.com/elements/tool-group"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Tool failure",
+    "url": "https://www.assistant-ui.com/elements/tool-error"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Tool fallback",
+    "url": "https://www.assistant-ui.com/elements/tool-fallback"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Tool call",
+    "url": "https://uiarc.dev/components/tool-call"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Tool call",
+    "url": "https://uistacks.dev/components/tool-call"
+   },
+   {
+    "source": "Nuxt UI",
+    "name": "ChatTool",
+    "url": "https://ui.nuxt.com/docs/components/chat-tool"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Agent Tool",
+    "url": "https://www.assistant-ui.com/components/agent-tools"
+   }
+  ]
+ },
+ {
+  "id": "agent-timeline",
+  "title": "Agent run timeline / loop",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Tool timeline",
+    "url": "https://www.assistant-ui.com/elements/tool-timeline"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent timeline",
+    "url": "https://uiarc.dev/components/agent-timeline"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent run",
+    "url": "https://uiarc.dev/components/blocks/agent-run"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent loop",
+    "url": "https://uiarc.dev/components/agent-loop"
+   }
+  ]
+ },
+ {
+  "id": "trace-waterfall",
+  "title": "Trace waterfall",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Trace waterfall",
+    "url": "https://www.assistant-ui.com/elements/trace-waterfall"
+   },
+   {
+    "source": "Kobra",
+    "name": "Trace Waterfall",
+    "url": "https://kobra.systems/components/trace-waterfall"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Trace waterfall",
+    "url": "https://uistacks.dev/components/trace-waterfall"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Agent Traces",
+    "url": "https://pro.beui.dev/components/agent-traces"
+   },
+   {
+    "source": "shadcn/ui",
+    "name": "Trace",
+    "url": "https://ui.shadcn.com/docs/components/base/trace"
+   }
+  ]
+ },
+ {
+  "id": "agent-plan",
+  "title": "Agent plan",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Plan",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/plan"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Agent plan",
+    "url": "https://www.assistant-ui.com/elements/agent-plan"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent plan",
+    "url": "https://uiarc.dev/components/agent-plan"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Agent Plan",
+    "url": "https://pro.beui.dev/components/agent-plan"
+   },
+   {
+    "source": "Kobra",
+    "name": "Plan Card",
+    "url": "https://kobra.systems/components/plan-card"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Plan card",
+    "url": "https://uistacks.dev/components/plan-card"
+   }
+  ]
+ },
+ {
+  "id": "agent-tasks",
+  "title": "Agent tasks / background agents",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Task",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/task"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent tasks",
+    "url": "https://uiarc.dev/components/blocks/agent-tasks"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Agent tasks",
+    "url": "https://pro.beui.dev/components/mobile/agent-tasks"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Background Agents",
+    "url": "https://pro.beui.dev/components/background-agents"
+   }
+  ]
+ },
+ {
+  "id": "approval",
+  "title": "Tool approval / confirmation",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Confirmation",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/confirmation"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Approval card",
+    "url": "https://www.assistant-ui.com/elements/approval-card"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent approvals",
+    "url": "https://uiarc.dev/components/blocks/agent-approvals"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Tool Approval",
+    "url": "https://pro.beui.dev/components/tool-approval"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Approval Queue",
+    "url": "https://pro.beui.dev/components/approval-queue"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Approval request",
+    "url": "https://uistacks.dev/components/approval-request"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Agent permissions",
+    "url": "https://uistacks.dev/components/agent-permissions"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Agent questions",
+    "url": "https://pro.beui.dev/components/mobile/agent-questions"
+   }
+  ]
+ },
+ {
+  "id": "checkpoint",
+  "title": "Checkpoint / restore point",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Checkpoint",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/checkpoint"
+   }
+  ]
+ },
+ {
+  "id": "agent-handoff",
+  "title": "Subagent / agent handoff",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Subagent",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/subagent"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Handoff",
+    "url": "https://www.assistant-ui.com/elements/agent-handoff"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent handoff",
+    "url": "https://uiarc.dev/components/agent-handoff"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Agent handoff",
+    "url": "https://uistacks.dev/components/agent-handoff"
+   }
+  ]
+ },
+ {
+  "id": "coding-agent",
+  "title": "Coding-agent output (terminal, tests, file tree, stack trace)",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Terminal",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/terminal"
+   },
+   {
+    "source": "AI Elements",
+    "name": "Test Results",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/test-results"
+   },
+   {
+    "source": "AI Elements",
+    "name": "File Tree",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/file-tree"
+   },
+   {
+    "source": "AI Elements",
+    "name": "Stack Trace",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/stack-trace"
+   }
+  ]
+ },
+ {
+  "id": "generative-ui",
+  "title": "Generative UI / artifacts in chat",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Generative UI",
+    "url": "https://www.assistant-ui.com/elements/generative-ui"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Channel message",
+    "url": "https://www.assistant-ui.com/elements/generative-channel-message"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Response time",
+    "url": "https://www.assistant-ui.com/elements/generative-chart-line"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "AI Artifacts",
+    "url": "https://pro.beui.dev/components/ai-artifacts"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Crypto Agent",
+    "url": "https://pro.beui.dev/components/crypto-agent"
+   }
+  ]
+ },
+ {
+  "id": "model-selector",
+  "title": "Model selector",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Model Selector",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/model-selector"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Model selector",
+    "url": "https://www.assistant-ui.com/elements/model-selector"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Model picker",
+    "url": "https://uiarc.dev/components/blocks/model-picker"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Model Picker",
+    "url": "https://pro.beui.dev/components/model-picker"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "AI Model Selector",
+    "url": "https://ui.wensity.com/components/model-context-switcher"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Model picker",
+    "url": "https://uistacks.dev/components/model-picker"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Assistant picker",
+    "url": "https://uistacks.dev/components/assistant-picker"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Model logos",
+    "url": "https://www.assistant-ui.com/elements/logos"
+   }
+  ]
+ },
+ {
+  "id": "model-fallback",
+  "title": "Model fallback notice",
+  "candidates": [
+   {
+    "source": "UIStacks",
+    "name": "Model fallback",
+    "url": "https://uistacks.dev/components/model-fallback"
+   }
+  ]
+ },
+ {
+  "id": "context-meter",
+  "title": "Context window meter",
+  "candidates": [
+   {
+    "source": "AI Elements",
+    "name": "Context",
+    "url": "https://ui.shadcn.com/docs/ai-elements/base/context"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Context display",
+    "url": "https://www.assistant-ui.com/elements/context-display"
+   },
+   {
+    "source": "assistant-ui",
+    "name": "Context breakdown",
+    "url": "https://www.assistant-ui.com/elements/context-breakdown"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Context window",
+    "url": "https://uiarc.dev/components/context-window"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Context Window",
+    "url": "https://pro.beui.dev/components/context-window"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Usage & context",
+    "url": "https://pro.beui.dev/components/mobile/usage-and-context"
+   },
+   {
+    "source": "Bencho",
+    "name": "Context meter",
+    "url": "https://bencho.dev/blocks/context-meter"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Context meter",
+    "url": "https://uistacks.dev/components/context-meter"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Prompt cache",
+    "url": "https://uiarc.dev/components/prompt-cache"
+   }
+  ]
+ },
+ {
+  "id": "model-stats",
+  "title": "Model card / arena / generation stats / cost",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "Model card",
+    "url": "https://uiarc.dev/components/model-card"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Model card",
+    "url": "https://uistacks.dev/components/model-card"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Model arena",
+    "url": "https://uiarc.dev/components/blocks/model-arena"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Generation stats",
+    "url": "https://uiarc.dev/components/generation-stats"
+   },
+   {
+    "source": "Arc UI",
+    "name": "LLM cost calculator",
+    "url": "https://uiarc.dev/components/llm-cost-calculator"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Model training",
+    "url": "https://uiarc.dev/components/model-training"
+   }
+  ]
+ },
+ {
+  "id": "agent-card",
+  "title": "Agent card / roster / team",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Agent card",
+    "url": "https://www.assistant-ui.com/elements/agent-card"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Agent card",
+    "url": "https://uistacks.dev/components/agent-card"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Agent roster",
+    "url": "https://uistacks.dev/components/agent-roster"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Agent Team",
+    "url": "https://pro.beui.dev/components/agent-team"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent gallery",
+    "url": "https://uiarc.dev/components/blocks/agent-gallery"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Agent control frame",
+    "url": "https://uistacks.dev/components/agent-control-frame"
+   }
+  ]
+ },
+ {
+  "id": "agent-map",
+  "title": "Agent map / orchestrator / workflow graph",
+  "candidates": [
+   {
+    "source": "Kobra",
+    "name": "Agent Map",
+    "url": "https://kobra.systems/components/agent-map"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Agent map",
+    "url": "https://uistacks.dev/components/agent-map"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent orchestrator",
+    "url": "https://uiarc.dev/components/blocks/agent-orchestrator"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI workflow",
+    "url": "https://uiarc.dev/components/ai-workflow"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Weave Workflow Builder",
+    "url": "https://pro.beui.dev/components/weave-workflow-builder"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Automation card",
+    "url": "https://uistacks.dev/components/automation-card"
+   }
+  ]
+ },
+ {
+  "id": "agent-builder",
+  "title": "Agent builder / setup wizard",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "Agent builder",
+    "url": "https://uiarc.dev/components/blocks/agent-builder"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Agent Builder",
+    "url": "https://pro.beui.dev/components/agent-builder"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI setup wizard",
+    "url": "https://uiarc.dev/components/blocks/ai-setup-wizard"
+   }
+  ]
+ },
+ {
+  "id": "agent-memory",
+  "title": "Agent memory / routines",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "Agent memory",
+    "url": "https://uiarc.dev/components/blocks/agent-memory"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Agent routines",
+    "url": "https://uiarc.dev/components/blocks/agent-routines"
+   }
+  ]
+ },
+ {
+  "id": "mcp-servers",
+  "title": "MCP servers / connectors",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "MCP config dialog",
+    "url": "https://www.assistant-ui.com/elements/mcp-config"
+   },
+   {
+    "source": "Arc UI",
+    "name": "MCP servers",
+    "url": "https://uiarc.dev/components/blocks/mcp-servers"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "MCP Connectors",
+    "url": "https://pro.beui.dev/components/mcp-connectors"
+   },
+   {
+    "source": "UIStacks",
+    "name": "MCP servers",
+    "url": "https://uistacks.dev/components/mcp-servers"
+   }
+  ]
+ },
+ {
+  "id": "prompt-library",
+  "title": "Prompt library / versions / studio",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Prompt library",
+    "url": "https://www.assistant-ui.com/elements/prompt-library"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Prompt Library",
+    "url": "https://pro.beui.dev/components/prompt-library"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Prompt library",
+    "url": "https://uistacks.dev/components/prompt-library"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Prompt versions",
+    "url": "https://uistacks.dev/components/prompt-versions"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Prompt studio",
+    "url": "https://uiarc.dev/components/blocks/prompt-studio"
+   }
+  ]
+ },
+ {
+  "id": "voice-conversation",
+  "title": "Voice agent / call / live transcript",
+  "candidates": [
+   {
+    "source": "assistant-ui",
+    "name": "Voice conversation",
+    "url": "https://www.assistant-ui.com/elements/voice-conversation"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Voice Agent",
+    "url": "https://pro.beui.dev/components/voice-agent"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Voice Conversation",
+    "url": "https://pro.beui.dev/components/voice-conversation"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Voice mode",
+    "url": "https://pro.beui.dev/components/mobile/voice-mode"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Voice call",
+    "url": "https://uistacks.dev/components/voice-call"
+   },
+   {
+    "source": "UIStacks",
+    "name": "Live transcript",
+    "url": "https://uistacks.dev/components/live-transcript"
+   },
+   {
+    "source": "Arc UI",
+    "name": "Speech player",
+    "url": "https://uiarc.dev/components/speech-player"
+   }
+  ]
+ },
+ {
+  "id": "ai-search",
+  "title": "AI search bar / answer",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "AI search bar",
+    "url": "https://uiarc.dev/components/blocks/ai-search-bar"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI answer",
+    "url": "https://uiarc.dev/components/blocks/ai-answer"
+   }
+  ]
+ },
+ {
+  "id": "ai-inline-edit",
+  "title": "AI inline edit / editor / translate / form fill",
+  "candidates": [
+   {
+    "source": "Arc UI",
+    "name": "AI inline edit",
+    "url": "https://uiarc.dev/components/blocks/ai-inline-edit"
+   },
+   {
+    "source": "Kobra",
+    "name": "AI Editor",
+    "url": "https://kobra.systems/components/ai-editor"
+   },
+   {
+    "source": "Kobra",
+    "name": "Document Agent",
+    "url": "https://kobra.systems/components/document-agent"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI translate",
+    "url": "https://uiarc.dev/components/ai-translate"
+   },
+   {
+    "source": "UIStacks",
+    "name": "AI form fill",
+    "url": "https://uistacks.dev/components/ai-form-fill"
+   }
+  ]
+ },
+ {
+  "id": "ai-summary",
+  "title": "AI summary / recap / insight / column",
+  "candidates": [
+   {
+    "source": "UIStacks",
+    "name": "AI summary",
+    "url": "https://uistacks.dev/components/ai-summary"
+   },
+   {
+    "source": "UIStacks",
+    "name": "AI recap",
+    "url": "https://uistacks.dev/components/ai-recap"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI insight card",
+    "url": "https://uiarc.dev/components/blocks/ai-insight-card"
+   },
+   {
+    "source": "UIStacks",
+    "name": "AI column",
+    "url": "https://uistacks.dev/components/ai-column"
+   }
+  ]
+ },
+ {
+  "id": "ai-hero",
+  "title": "AI product hero / feature section",
+  "candidates": [
+   {
+    "source": "beUI Pro",
+    "name": "AI Agent Landing",
+    "url": "https://pro.beui.dev/components/ai-landing"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "AI Workspace",
+    "url": "https://pro.beui.dev/components/ai-workspace-landing"
+   },
+   {
+    "source": "beUI Pro",
+    "name": "Pair AI Workspace",
+    "url": "https://pro.beui.dev/components/pair-ai-workspace"
+   },
+   {
+    "source": "Magic UI Pro",
+    "name": "AI Agent",
+    "url": "https://pro.magicui.design/docs/templates/agent"
+   },
+   {
+    "source": "Arc UI",
+    "name": "AI feature launch",
+    "url": "https://uiarc.dev/components/blocks/ai-feature-launch"
+   },
+   {
+    "source": "Wensity UI blocks and templates",
+    "name": "Feature Section With Blurred Prompt Stage",
+    "url": "https://ui.wensity.com/blocks/feature-sections#feature-section-with-blurred-prompt-stage"
+   },
+   {
+    "source": "Wensity UI blocks and templates",
+    "name": "Feature Section With Workspace Composer",
+    "url": "https://ui.wensity.com/blocks/feature-sections#feature-section-with-workspace-composer"
+   },
+   {
+    "source": "Wensity UI components",
+    "name": "AI Agent UI",
+    "url": "https://ui.wensity.com/components/ai-agent-ui"
+   }
+  ]
+ }
+]

@@ -1,0 +1,357 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500&display=swap");
+
+/* Clone-local styles, plain CSS so the clone renders before the shared dev server's Tailwind rescans.
+   Short enter/exit motion is CSS keyframes (springs sampled into linear()), so it runs the same on a
+   real clock and on reanimate's virtual clock. */
+
+.ov-card {
+  --ov-ink: #1f1d2b;
+  --ov-muted: #6c6878;
+  --ov-faint: #8e8a98;
+  --ov-line: #e7e3da;
+  --ov-surface: #fffdf9;
+  --ov-coral: #c4441a;
+  --ov-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ov-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 20px 20px;
+  border: 1px solid var(--ov-line);
+  border-radius: 24px;
+  background: var(--ov-surface);
+  color: var(--ov-ink);
+  font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 21px;
+  letter-spacing: -0.15px;
+}
+
+.ov-card *,
+.ov-card *::before,
+.ov-card *::after {
+  box-sizing: border-box;
+}
+
+/* Status label */
+.ov-status {
+  position: relative;
+  margin: 0;
+  height: 18px;
+  font-size: 13px;
+  line-height: 18.2px;
+  color: var(--ov-muted);
+  white-space: nowrap;
+}
+.ov-status-text {
+  display: inline-block;
+}
+.ov-swap-in {
+  animation: ov-swap-in 200ms var(--ov-enter) both;
+}
+.ov-swap-out {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  animation: ov-swap-out 100ms ease-out both;
+}
+@keyframes ov-swap-in {
+  from { opacity: 0; translate: 0 4px; filter: blur(4px); }
+  to { opacity: 1; translate: 0 0; filter: blur(0); }
+}
+@keyframes ov-swap-out {
+  from { opacity: 1; translate: 0 0; filter: blur(0); }
+  to { opacity: 0; translate: 0 4px; filter: blur(4px); }
+}
+
+/* Orb */
+.ov-orb {
+  position: relative;
+  flex: none;
+  width: 200px;
+  height: 200px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.2s var(--ov-standard);
+  -webkit-tap-highlight-color: transparent;
+}
+.ov-orb:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.ov-orb:disabled {
+  cursor: default;
+}
+.ov-orb:focus-visible {
+  outline: 2px solid #6d5ae6;
+  outline-offset: -16px;
+}
+.ov-canvas,
+.ov-fallback {
+  display: block;
+  width: 200px;
+  height: 200px;
+}
+.ov-fallback {
+  margin: 40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #ffdcc8 0%, #6d5ae6 45%, #27235c 100%);
+}
+
+/* Transcript */
+.ov-transcript {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 478px;
+  height: 42px;
+}
+.ov-line {
+  margin: 0;
+  text-align: center;
+  color: var(--ov-ink);
+}
+.ov-line[data-speaker="user"] {
+  color: #57535f;
+}
+.ov-line[data-speaker="system"] {
+  color: var(--ov-faint);
+  font-size: 13px;
+}
+.ov-line-in {
+  animation:
+    ov-line-fade var(--ov-smooth-ms) var(--ov-smooth) both,
+    ov-line-y var(--ov-smooth-ms) var(--ov-smooth) both;
+}
+.ov-line-in.ov-rise-a {
+  animation:
+    ov-line-fade var(--ov-smooth-ms) var(--ov-smooth) both,
+    ov-line-y var(--ov-smooth-ms) var(--ov-smooth) both,
+    ov-rise-a var(--ov-smooth-ms) var(--ov-smooth) both;
+}
+.ov-line-in.ov-rise-b {
+  animation:
+    ov-line-fade var(--ov-smooth-ms) var(--ov-smooth) both,
+    ov-line-y var(--ov-smooth-ms) var(--ov-smooth) both,
+    ov-rise-b var(--ov-smooth-ms) var(--ov-smooth) both;
+}
+.ov-line-out {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  animation: ov-line-out 140ms var(--ov-standard) both;
+}
+@keyframes ov-line-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ov-line-y {
+  from { translate: 0 10px; }
+  to { translate: 0 0; }
+}
+@keyframes ov-rise-a {
+  from { transform: translateY(var(--ov-rise)); }
+  to { transform: none; }
+}
+@keyframes ov-rise-b {
+  from { transform: translateY(var(--ov-rise)); }
+  to { transform: none; }
+}
+@keyframes ov-line-out {
+  from { opacity: 1; translate: 0 0; filter: blur(0); }
+  to { opacity: 0; translate: 0 -10px; filter: blur(4px); }
+}
+.ov-word {
+  display: inline-block;
+  white-space: pre;
+}
+.ov-word-in {
+  animation: ov-word-in 340ms var(--ov-enter) both;
+}
+@keyframes ov-word-in {
+  from { opacity: 0; translate: 0 3px; filter: blur(4px); }
+  to { opacity: 1; translate: 0 0; filter: blur(0); }
+}
+.ov-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Controls pill */
+.ov-controls {
+  position: relative;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  height: 44px;
+  border: 1px solid var(--ov-line);
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(31 29 43 / 0.04);
+  overflow: hidden;
+}
+.ov-idle,
+.ov-live {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: 42px;
+  width: max-content;
+}
+.ov-live {
+  gap: 4px;
+  padding: 0 4px;
+}
+.ov-pop-in {
+  animation:
+    ov-pop-fade 150ms ease-out both,
+    ov-pop-scale var(--ov-snappy-ms) var(--ov-snappy) both;
+}
+.ov-pop-out {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: ov-pop-out 100ms ease-out both;
+}
+@keyframes ov-pop-fade {
+  from { opacity: 0; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
+}
+@keyframes ov-pop-scale {
+  from { scale: 0.92; }
+  to { scale: 1; }
+}
+@keyframes ov-pop-out {
+  from { opacity: 1; scale: 1; filter: blur(0); }
+  to { opacity: 0; scale: 0.92; filter: blur(4px); }
+}
+.ov-start {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 15px 0 13px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--ov-ink);
+  font: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+.ov-start:hover {
+  background: #f6f3ec;
+}
+.ov-round,
+.ov-end {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--ov-ink);
+  cursor: pointer;
+  transition: background-color 0.15s var(--ov-standard), color 0.15s var(--ov-standard);
+}
+.ov-round:hover {
+  background: #f3f0e8;
+}
+.ov-round[aria-pressed="true"] {
+  color: var(--ov-coral);
+}
+.ov-end {
+  color: var(--ov-coral);
+  background: rgb(196 68 26 / 0.11);
+}
+.ov-end:hover {
+  background: rgb(196 68 26 / 0.18);
+}
+.ov-start:focus-visible,
+.ov-round:focus-visible,
+.ov-end:focus-visible,
+.ov-link:focus-visible {
+  outline: 2px solid #6d5ae6;
+  outline-offset: 2px;
+}
+.ov-glyph {
+  display: grid;
+  place-items: center;
+}
+.ov-glyph-in {
+  animation:
+    ov-pop-fade 150ms ease-out both,
+    ov-glyph-scale var(--ov-snappy-ms) var(--ov-snappy) both;
+}
+@keyframes ov-glyph-scale {
+  from { scale: 0.6; }
+  to { scale: 1; }
+}
+.ov-clock {
+  min-width: 44px;
+  padding: 0 8px;
+  font-size: 13px;
+  line-height: 18.2px;
+  color: var(--ov-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+/* Note */
+.ov-note {
+  margin: 0;
+  min-height: 34px;
+  max-width: 300px;
+  font-size: 12px;
+  line-height: 16.8px;
+  color: var(--ov-faint);
+  text-align: center;
+}
+.ov-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #5b48d6;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ov-swap-in,
+  .ov-swap-out,
+  .ov-line-in,
+  .ov-line-in.ov-rise-a,
+  .ov-line-in.ov-rise-b,
+  .ov-line-out,
+  .ov-word-in,
+  .ov-pop-in,
+  .ov-pop-out,
+  .ov-glyph-in {
+    animation-duration: 1ms !important;
+  }
+}

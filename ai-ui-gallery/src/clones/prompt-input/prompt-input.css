@@ -1,0 +1,378 @@
+/* Prompt input clone: clone-local styles (plain CSS so the shared dev server never depends on a Tailwind rescan).
+   Palette, fonts, icons and copy are our own; layout proportions and motion follow .reanimate/prompt-input/spec.md. */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Instrument+Serif&display=swap");
+
+.pi-root {
+  --pi-page: #f3f1ec;
+  --pi-card: #fdfcf9;
+  --pi-line: #e6e1d8;
+  --pi-ink: #1e1c19;
+  --pi-muted: #746e66;
+  --pi-dim: #aaa49b;
+  --pi-fill: #f1eee8;
+  --pi-accent: #0e7c6b;
+  --pi-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: absolute;
+  inset: 0;
+  background: var(--pi-page);
+  font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--pi-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 745x680 card with a 1px border: its padding box is 743x678, the coordinate space of everything below. */
+.pi-card {
+  position: absolute;
+  left: 1px;
+  top: 0;
+  width: 745px;
+  height: 680px;
+  box-sizing: border-box;
+  border: 1px solid var(--pi-line);
+  border-radius: 24px;
+  background: var(--pi-card);
+  overflow: hidden;
+}
+
+.pi-greeting {
+  position: absolute;
+  left: 24px;
+  top: 239.6px;
+  width: 695px;
+  height: 30.8px;
+  margin: 0;
+  text-align: center;
+  font-family: "Instrument Serif", ui-serif, Georgia, serif;
+  font-weight: 400;
+  font-size: 31px;
+  line-height: 30.8px;
+  letter-spacing: -0.01em;
+}
+
+.pi-suggestions {
+  position: absolute;
+  left: 24px;
+  top: 406.4px;
+  width: 695px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pi-chip,
+.pi-suggestion,
+.pi-model {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  border-radius: 9999px;
+  font: inherit;
+  color: var(--pi-muted);
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.1s var(--pi-ease), color 0.15s var(--pi-ease), border-color 0.15s var(--pi-ease);
+}
+.pi-suggestion {
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--pi-line);
+}
+.pi-suggestion:hover,
+.pi-chip:hover,
+.pi-model:hover,
+.pi-icon:hover,
+.pi-foot button:hover,
+.pi-topbar:hover {
+  background: var(--pi-fill);
+  color: var(--pi-ink);
+}
+
+/* The composer dock. Its top switches between the centred group and the foot of the thread; the move is
+   played back as a FLIP translate (see index.tsx). */
+.pi-dock {
+  position: absolute;
+  left: 24px;
+  width: 695px;
+  height: 96px;
+  will-change: transform;
+}
+.pi-surface {
+  box-sizing: border-box;
+  height: 96px;
+  padding: 10px;
+  border: 1px solid var(--pi-line);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(30 28 25 / 0.04), 0 6px 20px -12px rgb(30 28 25 / 0.12);
+}
+.pi-input {
+  display: block;
+  box-sizing: border-box;
+  width: 673px;
+  height: 40px;
+  margin: 0 0 2px;
+  padding: 8px;
+  border: 0;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  line-height: 22.5px;
+  color: var(--pi-ink);
+}
+.pi-input::placeholder {
+  color: var(--pi-dim);
+}
+.pi-toolbar {
+  display: flex;
+  justify-content: space-between;
+  height: 32px;
+}
+.pi-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pi-chip {
+  padding: 0 12px 0 10px;
+  border: 1px solid var(--pi-line);
+}
+.pi-chip[aria-pressed="true"] {
+  color: var(--pi-accent);
+  border-color: color-mix(in oklab, var(--pi-accent) 35%, white);
+  background: color-mix(in oklab, var(--pi-accent) 8%, white);
+}
+.pi-model {
+  padding: 0 8px 0 10px;
+  border: 0;
+  color: var(--pi-ink);
+}
+.pi-model b {
+  font-weight: 600;
+}
+.pi-model span {
+  color: var(--pi-muted);
+}
+.pi-mark {
+  color: var(--pi-accent);
+}
+.pi-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--pi-muted);
+  cursor: pointer;
+  transition: background-color 0.1s var(--pi-ease), color 0.15s var(--pi-ease);
+}
+.pi-icon[data-dim="true"] {
+  color: var(--pi-dim);
+}
+
+/* Send / stop. Ready = ink disc; busy = soft disc with a stop square and a progress ring; empty = soft and muted. */
+.pi-send {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--pi-fill);
+  color: var(--pi-dim);
+  cursor: pointer;
+  transition: background-color 0.15s var(--pi-ease), color 0.15s var(--pi-ease);
+}
+.pi-send[data-state="ready"] {
+  background: var(--pi-ink);
+  color: var(--pi-card);
+}
+.pi-send[data-state="busy"] {
+  color: var(--pi-ink);
+}
+.pi-glyph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+.pi-stop {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: currentColor;
+}
+.pi-ring {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 40px;
+  height: 40px;
+  transform: rotate(-90deg);
+  pointer-events: none;
+  overflow: visible;
+}
+.pi-ring circle {
+  fill: none;
+  stroke-width: 1.6;
+}
+.pi-ring .pi-track {
+  stroke: var(--pi-line);
+}
+.pi-ring .pi-arc {
+  stroke: var(--pi-accent);
+  stroke-linecap: round;
+}
+
+/* fades in 183ms after the thread appears (easeOutQuad, from the real-clock probe) */
+.pi-topbar {
+  animation: pi-show 220ms cubic-bezier(0.5, 1, 0.89, 1) 183ms both;
+  position: absolute;
+  left: 698px;
+  top: 12px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--pi-card);
+  color: var(--pi-ink);
+  cursor: pointer;
+}
+
+/* Thread */
+.pi-thread {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 743px;
+  height: 558px;
+  box-sizing: border-box;
+  padding: 56px 24px 8px;
+  overflow: hidden;
+}
+.pi-sent {
+  display: flex;
+  justify-content: flex-end;
+}
+.pi-bubble {
+  margin: 0;
+  max-width: 80%;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: var(--pi-fill);
+  font-size: 15px;
+  line-height: 22.5px;
+}
+.pi-reply {
+  margin-top: 20px;
+}
+.pi-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 18px;
+  color: var(--pi-muted);
+}
+.pi-grow {
+  margin-top: 10px;
+  min-height: 26px;
+  overflow: hidden;
+  transition: height 158ms ease-out;
+}
+/* "Thinking": a slow, soft sweep. A 600px gradient slides right at 100px/s; its 110px ramp reaches the label 160ms in. */
+.pi-pending {
+  display: inline-block;
+  height: 26px;
+  line-height: 26px;
+  font-size: 13px;
+  color: var(--pi-muted);
+  background: linear-gradient(90deg, var(--pi-muted) 0px, var(--pi-muted) 330px, var(--pi-ink) 440px, var(--pi-muted) 550px, var(--pi-muted) 600px);
+  background-size: 600px 100%;
+  background-repeat: no-repeat;
+  background-position: -550px 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: pi-shimmer 4000ms linear 160ms infinite;
+}
+@keyframes pi-shimmer {
+  from { background-position: -550px 0; }
+  to { background-position: -150px 0; }
+}
+.pi-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 24px;
+}
+.pi-chunk {
+  animation: pi-chunk-in 150ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes pi-show {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pi-chunk-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* fades in with the reply's end (easeOutQuad 160ms), one frame after mount like the send glyphs */
+.pi-foot {
+  animation: pi-show 160ms cubic-bezier(0.5, 1, 0.89, 1) 16ms both;
+  display: flex;
+  gap: 4px;
+  margin: 10px 0 0 -6px;
+  height: 32px;
+  color: var(--pi-muted);
+}
+.pi-foot button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  min-width: 32px;
+  justify-content: center;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pi-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pi-chunk,
+  .pi-pending,
+  .pi-topbar,
+  .pi-foot {
+    animation: none;
+  }
+  .pi-grow {
+    transition: none;
+  }
+}

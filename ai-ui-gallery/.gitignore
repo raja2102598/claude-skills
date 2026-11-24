@@ -1,0 +1,13 @@
+node_modules
+dist
+# reanimate working files: commit only the three notes per clone and the final compare sheet (WebP),
+# never raw captures or GL traces (they hold the reference's own shaders and assets)
+.reanimate/**
+!.reanimate/*/
+!.reanimate/*/spec.md
+!.reanimate/*/report.md
+!.reanimate/*/selection.md
+!.reanimate/*/compare-*/
+!.reanimate/*/compare-*/sheets/
+!.reanimate/*/compare-*/sheets/*.webp
+dist-showcase
