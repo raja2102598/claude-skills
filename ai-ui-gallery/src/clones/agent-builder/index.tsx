@@ -19,7 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import clsx from "clsx";
-import { ANSWER, FILES, INSTRUCTIONS, MODELS, SUGGESTIONS, TOOLS, UPLOAD, type ToolId } from "./data";
+import { FILES, INSTRUCTIONS, MODELS, SCENARIOS, SUGGESTIONS, TOOLS, UPLOAD, type Scenario, type ToolId } from "./data";
 import "./agent-builder.css";
 
 /*
@@ -44,16 +44,6 @@ const UPLOAD_STEPS: [number, number][] = [
 ];
 const UPLOAD_DONE = 3240;
 
-// Chat timeline, ms from the send click.
-const CHAT = {
-  tools: 900, // "Using tools", chip 1
-  chip2: 2250,
-  chip3: 3050, // chip 3 and "Writing"; the answer starts streaming
-  streamMs: 2150, // answer streaming duration
-  done: 5300,
-  took: "3.8s",
-};
-
 const autoplayEnabled = () => {
   try {
     return new URLSearchParams(window.location.search).get("autoplay") !== "0";
@@ -63,6 +53,7 @@ const autoplayEnabled = () => {
 };
 
 type Phase = "idle" | "thinking" | "tools" | "writing" | "done";
+const DONE_MS = (sc: Scenario) => sc.doneAt;
 type Mode = "configure" | "test";
 
 function Switch({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
