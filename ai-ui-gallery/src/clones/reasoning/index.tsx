@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { Check, ChevronDown, CircleAlert, Copy, Sparkle, Square } from "lucide-react";
 import { INTERRUPTED_STEPS, MODEL, STEPS, paragraph } from "./data";
 import "./reasoning.css";
@@ -14,19 +15,22 @@ import "./reasoning.css";
  * the label shimmer are CSS animations, so they run the same on a real or a frame-stepped clock.
  */
 
-// Timeline of a live run in ms, read off the reference's virtual-clock track.
-const STREAM_AT = 900;
+// Timeline of a live run in ms, read off the reference's virtual-clock track (60 Hz rAF samples) and its 25 fps
+// frames. Each value sits inside the window where the reference's change first shows on both, so the clone's
+// changes land on the same rAF tick and the same captured frame. F() moves a tick time 2 ms early for that.
+const F = (ms: number) => ms - 2;
+const STREAM_AT = F(900);
 const CHUNK_AT = [
-  [900, 950, 1000, 1033, 1067, 1100, 1150],
-  [1967, 1983, 2033, 2083, 2117, 2167, 2200, 2250],
-  [3050, 3067, 3100, 3150, 3200, 3233],
-  [4050, 4083, 4117, 4167, 4200],
+  [900, 950, 1000, 1033, 1067, 1100, 1150].map(F),
+  [1955, ...[1983, 2033, 2083, 2117, 2167, 2200, 2250].map(F)],
+  [3037, ...[3067, 3100, 3150, 3200, 3233].map(F)],
+  [4037, ...[4083, 4117, 4167, 4200].map(F)],
 ];
-const TICK_AT = [1040, 2120, 3200];
-const DONE_AT = 4233;
-const OPEN_AT = 5350;
-const CLOSE_AT = 9950;
-const LOOP_AT = 10867;
+const TICK_AT = [1037, 2118, 3197];
+const DONE_AT = F(4233);
+const OPEN_AT = F(5350);
+const CLOSE_AT = F(9950);
+const LOOP_AT = F(10867);
 const DONE_SECONDS = TICK_AT.length + 1;
 const EVENTS = [...new Set([STREAM_AT, ...CHUNK_AT.flat(), ...TICK_AT, DONE_AT, OPEN_AT, CLOSE_AT])].sort((a, b) => a - b);
 
@@ -37,11 +41,13 @@ const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 /**
- * Critically damped spring from `from` to `to` (stiffness 685, damping 52.4, mass 1: motion's
+ * Critically damped spring from `from` to `to`. The default is stiffness 685, damping 52.4, mass 1 (motion's
  * { visualDuration: 0.2, bounce: 0 }). It starts on the next animation frame, like the reference's.
  */
-const SPRING_W = (2 * Math.PI) / (0.2 * 1.2);
-function spring(from: number, to: number, apply: (v: number) => void, done?: () => void) {
+const springW = (visualDuration: number) => (2 * Math.PI) / (visualDuration * 1.2);
+const SPRING_W = springW(0.2);
+const THUMB_W = springW(0.3);
+function spring(from: number, to: number, apply: (v: number) => void, done?: () => void, w = SPRING_W, rest = 0.1) {
   if (from === to || reducedMotion()) {
     apply(to);
     done?.();
@@ -51,8 +57,8 @@ function spring(from: number, to: number, apply: (v: number) => void, done?: () 
   let raf = requestAnimationFrame(function tick(now) {
     if (start === null) start = now;
     const s = (now - start) / 1000;
-    const v = to + (from - to) * (1 + SPRING_W * s) * Math.exp(-SPRING_W * s);
-    if (Math.abs(to - v) < 0.1) {
+    const v = to + (from - to) * (1 + w * s) * Math.exp(-w * s);
+    if (Math.abs(to - v) < rest) {
       apply(to);
       done?.();
       return;
@@ -64,7 +70,7 @@ function spring(from: number, to: number, apply: (v: number) => void, done?: () 
 }
 
 /** A height clip that springs open or shut and fades (in 150 ms, out 100 ms); unmounts its content once shut. */
-function Clip({ open, appear = true, children }: { open: boolean; appear?: boolean; children: ReactNode }) {
+function Clip({ name, open, appear = true, children }: { name: string; open: boolean; appear?: boolean; children: ReactNode }) {
   const [mounted, setMounted] = useState(open);
   const [animated, setAnimated] = useState(appear);
   const outer = useRef<HTMLDivElement>(null);
@@ -97,8 +103,10 @@ function Clip({ open, appear = true, children }: { open: boolean; appear?: boole
 
   if (!mounted) return null;
   return (
-    <div ref={outer} className={animated ? (open ? "rb-clip-in" : "rb-clip-out") : undefined} style={{ overflow: "hidden", height: 0 }}>
-      <div ref={inner}>{children}</div>
+    <div ref={outer} data-rb-clip={name} className={open ? (animated ? "rb-clip-in" : undefined) : "rb-clip-out"} style={{ overflow: "hidden", height: 0 }}>
+      <div ref={inner} style={{ display: "flow-root" }}>
+        {children}
+      </div>
     </div>
   );
 }
@@ -109,13 +117,13 @@ function Swap({
   children,
   enter,
   exit = "rb-exit",
-  leaveStyle,
+  box = { display: "inline-flex", gridArea: "1 / 1", minWidth: 0 },
 }: {
   id: string;
   children: ReactNode;
   enter: string;
   exit?: string;
-  leaveStyle?: React.CSSProperties;
+  box?: CSSProperties;
 }) {
   const [state, setState] = useState<{ id: string; entered: boolean; leaving: { id: string; node: ReactNode } | null }>({
     id,
@@ -135,11 +143,11 @@ function Swap({
 
   return (
     <>
-      <span key={state.id} className={state.entered ? enter : undefined} style={{ display: "inline-flex", gridArea: "1 / 1", minWidth: 0 }}>
+      <span key={state.id} className={state.entered ? enter : undefined} style={box}>
         {current}
       </span>
       {state.leaving && (
-        <span key={state.leaving.id} className={exit} aria-hidden style={{ display: "inline-flex", gridArea: "1 / 1", ...leaveStyle }}>
+        <span key={state.leaving.id} className={exit} aria-hidden style={box}>
           {state.leaving.node}
         </span>
       )}
@@ -195,7 +203,7 @@ function StreamLayer({ step, shown, className }: { step: number; shown: number; 
 function LiveWindow({ step, shown }: { step: number; shown: number }) {
   return (
     <div data-rb-live style={{ position: "relative", height: WINDOW, margin: "4px 16px 0 46px", fontSize: 13, lineHeight: `${LINE}px`, color: "var(--rb-muted)" }}>
-      <Swap id={String(step)} enter="rb-enter" leaveStyle={{ position: "absolute", inset: 0 }}>
+      <Swap id={String(step)} enter="rb-enter" box={{ position: "absolute", inset: 0 }}>
         <StreamLayer step={step} shown={shown} />
       </Swap>
     </div>
@@ -326,7 +334,7 @@ function ReasoningCard({ labelId, label, actions, chevron, open, onToggle, live,
             <Sparkle size={18} strokeWidth={1.5} style={{ color: "var(--rb-accent)", fill: "var(--rb-accent)" }} />
           </span>
           <span data-rb-label style={{ position: "relative", display: "grid", alignItems: "center", height: 20, minWidth: 0 }}>
-            <Swap id={labelId} enter="rb-label-enter" leaveStyle={{ position: "absolute", left: 0, top: 0, height: 20, alignItems: "center" }}>
+            <Swap id={labelId} enter="rb-label-enter">
               {label}
             </Swap>
           </span>
@@ -341,13 +349,13 @@ function ReasoningCard({ labelId, label, actions, chevron, open, onToggle, live,
         </div>
         {live && (
           <div style={{ position: "relative", zIndex: 1, pointerEvents: "none" }}>
-            <Clip open={live.open}>
+            <Clip name="live" open={live.open}>
               <LiveWindow step={live.step} shown={live.shown} />
             </Clip>
           </div>
         )}
       </div>
-      <Clip open={open} appear={appearPanel}>
+      <Clip name="panel" open={open} appear={appearPanel}>
         <Steps steps={steps} foot={foot} />
       </Clip>
       <span aria-live="polite" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" }}>
@@ -388,12 +396,15 @@ function LiveRun() {
   const halt = () => timers.current.forEach(clearTimeout);
 
   useEffect(() => {
-    timers.current = EVENTS.map((at) => setTimeout(() => setT(at), at));
+    // flushSync commits each step inside its timer, so it lands on the next frame rather than after it.
+    timers.current = EVENTS.map((at) => setTimeout(() => flushSync(() => setT(at)), at));
     timers.current.push(
       setTimeout(() => {
-        setT(0);
-        setStreamHidden(false);
-        setLoop((l) => l + 1);
+        flushSync(() => {
+          setT(0);
+          setStreamHidden(false);
+          setLoop((l) => l + 1);
+        });
       }, LOOP_AT),
     );
     return halt;
@@ -449,7 +460,7 @@ function LiveRun() {
       label={
         phase === "thinking" ? (
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-            <span key={loop} className="rb-shimmer">
+            <span className="rb-shimmer">
               Thinking
             </span>
             <Counter seconds={seconds} />
@@ -542,6 +553,81 @@ const TABS = [
 ] as const;
 type Tab = (typeof TABS)[number][0];
 
+/** The demo's state switch. The pill slides to the chosen tab on a softer spring (visual duration 0.3 s). */
+function StateTabs({ tab, onSelect }: { tab: Tab; onSelect: (t: Tab) => void }) {
+  const buttons = useRef<Partial<Record<Tab, HTMLButtonElement | null>>>({});
+  const thumb = useRef<HTMLSpanElement>(null);
+  const box = useRef<{ x: number; w: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const el = thumb.current;
+    const target = buttons.current[tab];
+    if (!el || !target) return;
+    const to = { x: target.offsetLeft, w: target.offsetWidth };
+    const from = box.current ?? to;
+    const place = (p: number) => {
+      const x = from.x + (to.x - from.x) * p;
+      const w = from.w + (to.w - from.w) * p;
+      box.current = { x, w };
+      el.style.transform = `translateX(${x}px)`;
+      el.style.width = `${w}px`;
+    };
+    place(0);
+    return spring(0, 1, place, undefined, THUMB_W, 0.002);
+  }, [tab]);
+
+  return (
+    <div
+      role="tablist"
+      aria-label="Reasoning state"
+      style={{ position: "relative", display: "inline-flex", gap: 2, padding: 3, border: "1px solid var(--rb-border)", borderRadius: 14, background: "var(--rb-surface-muted)" }}
+    >
+      <span
+        ref={thumb}
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: 3,
+          left: 0,
+          height: 32,
+          borderRadius: 10,
+          background: "var(--rb-surface)",
+          boxShadow: "0 1px 2px rgb(18 20 28 / 0.08), 0 0 0 1px rgb(18 20 28 / 0.04)",
+        }}
+      />
+      {TABS.map(([id, name]) => {
+        const active = id === tab;
+        return (
+          <button
+            key={id}
+            ref={(el) => {
+              buttons.current[id] = el;
+            }}
+            type="button"
+            role="tab"
+            data-rb-tab={id}
+            aria-selected={active}
+            onClick={() => onSelect(id)}
+            className="rb-btn"
+            style={{
+              position: "relative",
+              height: 32,
+              padding: "0 12px",
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 500,
+              color: active ? "var(--rb-ink)" : "var(--rb-muted)",
+              background: "transparent",
+            }}
+          >
+            {name}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function ReasoningBlock() {
   const [tab, setTab] = useState<Tab>("live");
   const [run, setRun] = useState(0);
@@ -552,38 +638,7 @@ export default function ReasoningBlock() {
 
   return (
     <div className="rb-demo" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 20, paddingTop: 10 }}>
-      <div
-        role="tablist"
-        aria-label="Reasoning state"
-        style={{ display: "inline-flex", gap: 2, padding: 3, border: "1px solid var(--rb-border)", borderRadius: 14, background: "var(--rb-surface-muted)" }}
-      >
-        {TABS.map(([id, name]) => {
-          const active = id === tab;
-          return (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              data-rb-tab={id}
-              aria-selected={active}
-              onClick={() => select(id)}
-              className="rb-btn"
-              style={{
-                height: 32,
-                padding: "0 12px",
-                borderRadius: 10,
-                fontSize: 13,
-                fontWeight: 500,
-                color: active ? "var(--rb-ink)" : "var(--rb-muted)",
-                background: active ? "var(--rb-surface)" : "transparent",
-                boxShadow: active ? "0 1px 2px rgb(18 20 28 / 0.08), 0 0 0 1px rgb(18 20 28 / 0.04)" : "none",
-              }}
-            >
-              {name}
-            </button>
-          );
-        })}
-      </div>
+      <StateTabs tab={tab} onSelect={select} />
       <div style={{ width: 580 }}>
         {tab === "live" && <LiveRun key={run} />}
         {tab === "finished" && <FinishedCard />}
