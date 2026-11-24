@@ -3,7 +3,7 @@ import { flushSync } from "react-dom";
 import { Briefcase, Check, CornerDownLeft, Minimize2, Redo2, Smile, SpellCheck, Sparkles, Undo2, WandSparkles } from "lucide-react";
 import clsx from "clsx";
 import "./editor.css";
-import { AFTER_PARAS, CHANGES, COMMANDS, OPS, TITLE, TOKS } from "./doc";
+import { PARA_BEFORE, AFTER_PARAS, CHANGES, COMMANDS, OPS, TITLE, TOKS } from "./doc";
 
 const ICONS = { Minimize2, WandSparkles, Smile, Briefcase, SpellCheck } as const;
 
@@ -14,6 +14,17 @@ const STREAM = 3750; // first token -> last token
 const AUTO_ACCEPT = 4000; // review -> auto accept (autoplay only)
 const RESET = 2800; // resolved -> restart
 const LEAD = 700; // mount -> menu open
+
+// Reveal progress (fraction of tokens) vs ms after the click; the reference streams in uneven bursts.
+const ANCHORS: [number, number][] = [[THINK, 0], [3750, 0.3], [5400, 0.75], [THINK + STREAM, 1]];
+function frac(ms: number) {
+  for (let i = 1; i < ANCHORS.length; i++) {
+    const [t1, f1] = ANCHORS[i];
+    const [t0, f0] = ANCHORS[i - 1];
+    if (ms <= t1) return f0 + ((f1 - f0) * Math.max(0, ms - t0)) / (t1 - t0);
+  }
+  return 1;
+}
 
 type Status = "pending" | "accepted" | "rejected";
 
@@ -30,8 +41,7 @@ export default function AiInlineEdit() {
   const [top, setTop] = useState(260);
   const interacted = useRef(false);
 
-  const tick = STREAM / TOKS.length;
-
+  
   const replay = (lead = LEAD) => {
     clock.current = { menuAt: performance.now() + lead, clickAt: null, cmd: 0, resolvedAt: null };
     interacted.current = false;
@@ -71,7 +81,7 @@ export default function AiInlineEdit() {
   else if (c.clickAt !== null) phase = "think";
   else if (sinceMenu >= 0) phase = "menu";
 
-  const cursor = phase === "stream" ? Math.min(TOKS.length, Math.floor((sinceClick - THINK) / tick) + 1) : phase === "review" || phase === "done" ? TOKS.length : 0;
+  const cursor = phase === "stream" ? Math.min(TOKS.length, Math.ceil(frac(sinceClick) * TOKS.length)) : phase === "review" || phase === "done" ? TOKS.length : 0;
   const dimming = phase === "think" || phase === "stream";
   const changeOf = useMemo(() => {
     const m: Record<number, number> = {};
@@ -154,7 +164,7 @@ export default function AiInlineEdit() {
 
   const words = useMemo(() => {
     const p0 = OPS.filter((o) => o.k !== "ins").map((o) => o.text).join("");
-    return [TITLE, p0, ...AFTER_PARAS].join(" ").split(/\s+/).length - TITLE.split(" ").length;
+    return [TITLE, PARA_BEFORE, p0, ...AFTER_PARAS].join(" ").split(/\s+/).length - TITLE.split(" ").length;
   }, []);
 
   return (
@@ -174,6 +184,7 @@ export default function AiInlineEdit() {
       </header>
       <div className="page">
         <h1>{TITLE}</h1>
+        <p>{PARA_BEFORE}</p>
         <p className="target" ref={para} contentEditable={false}>{renderPara()}</p>
         {AFTER_PARAS.map((t, i) => (
           <p key={i}>{t}</p>

@@ -17,7 +17,12 @@ export interface AgentDef {
 }
 
 /** Event times are the reference's, minus half a 10 fps frame (the frame in which the change is first seen). */
-export const AGENTS: AgentDef[] = [
+/**
+ * The reference's virtual-clock capture starts about 300 ms after the demo mounts (click -> first frame), and the
+ * event times below were read off those frames; the same offset is added so the clone's frames line up with them.
+ */
+const T = 300;
+const RAW: AgentDef[] = [
   { id: "helm", name: "Helm", model: "Nova 2", task: "Launch the spring pricing page by Friday", icon: "workflow", tools: ["file", "chat", "code"], hue: "helm", start: 0, end: 18250, cost: 0.41 },
   { id: "scout", name: "Scout", model: "Atlas Pro", task: "Compare yearly discount depth across six rival plans", icon: "search", tools: ["web", "file"], hue: "scout", start: 850, end: 11850, cost: 0.23 },
   { id: "crawler", name: "Crawler", model: "Atlas Flash", task: "Pull the plan tables from each rival pricing page", icon: "scan", tools: ["web"], hue: "crawler", start: 1850, end: 6650, cost: 0.03 },
@@ -26,6 +31,8 @@ export const AGENTS: AgentDef[] = [
   { id: "forge", name: "Forge", model: "Orion Pro", task: "Build the plan switch and yearly prices into checkout", icon: "code", tools: ["code", "term", "tag"], hue: "forge", start: 6250, end: 16250, cost: 0.17 },
   { id: "probe", name: "Probe", model: "Orion Mini", task: "Run checkout tests for monthly and yearly billing", icon: "flask", tools: ["code", "term"], hue: "probe", start: 10850, end: 15850, cost: 0.02 },
 ];
+
+export const AGENTS: AgentDef[] = RAW.map((a) => ({ ...a, start: a.start === 0 ? 0 : a.start + T, end: a.end + T }));
 
 export const byId = Object.fromEntries(AGENTS.map((a) => [a.id, a])) as Record<AgentId, AgentDef>;
 

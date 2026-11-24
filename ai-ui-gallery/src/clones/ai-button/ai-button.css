@@ -1,0 +1,93 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500&display=swap");
+
+.aib-stage {
+  width: 260px;
+  height: 110px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+.aib-btn {
+  --aib-dim: rgba(255, 255, 255, 0.5);
+  --aib-bright: #fff;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  font: 500 15px/1 "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  color: #fff;
+  background: linear-gradient(180deg, #2bc4b4 0%, #0b6b73 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0 1px #0b5a62, 0 1px 2px rgba(0, 0, 0, 0.2),
+    0 6px 14px -6px rgba(0, 0, 0, 0.6);
+  transition: filter 150ms ease-out;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.aib-btn:hover { filter: brightness(1.12); }
+.aib-btn:active { filter: brightness(0.96); }
+.aib-btn:focus-visible { outline: 2px solid rgba(160, 240, 230, 0.7); outline-offset: 2px; }
+
+.aib-sheen { position: absolute; inset: 0; z-index: 0; opacity: 0; pointer-events: none; }
+.aib-btn[data-status="loading"] .aib-sheen {
+  opacity: 1;
+  background-image: linear-gradient(105deg, transparent 32%, rgba(255, 255, 255, 0.16) 50%, transparent 68%);
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  animation: aib-sheen 2.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes aib-sheen { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+
+.aib-clip {
+  position: relative;
+  z-index: 1;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: width 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.aib-layer { position: absolute; left: 0; top: 0; height: 100%; display: flex; align-items: center; gap: 8px; }
+.aib-measure { position: absolute; visibility: hidden; pointer-events: none; display: flex; gap: 8px; white-space: nowrap; font: inherit; }
+.aib-icon { display: inline-flex; width: 20px; height: 20px; align-items: center; justify-content: center; flex: none; }
+.aib-icon svg { width: 20px; height: 20px; }
+.aib-label { display: inline-block; }
+
+.aib-enter .aib-icon { animation: aib-in-icon 280ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+.aib-enter .aib-label { animation: aib-in-label 280ms cubic-bezier(0.23, 1, 0.32, 1) both; }
+.aib-exit .aib-icon { animation: aib-out-icon 150ms ease-in both; }
+.aib-exit .aib-label { animation: aib-out-label 150ms ease-in both; }
+.aib-exit { pointer-events: none; }
+@keyframes aib-in-icon { from { opacity: 0; filter: blur(6px); transform: scale(0.5); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
+@keyframes aib-in-label { from { opacity: 0; filter: blur(6px); transform: translateY(0.4em); } to { opacity: 1; filter: blur(0); transform: none; } }
+@keyframes aib-out-icon { to { opacity: 0; filter: blur(6px); transform: scale(0.5); } }
+@keyframes aib-out-label { to { opacity: 0; filter: blur(6px); transform: translateY(-0.4em); } }
+
+.aib-shimmer {
+  color: transparent;
+  background-image: linear-gradient(90deg, var(--aib-dim) 0%, var(--aib-dim) 36%, var(--aib-bright) 50%, var(--aib-dim) 64%, var(--aib-dim) 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: aib-shimmer 1.8s linear infinite;
+}
+@keyframes aib-shimmer { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+
+.aib-stop { width: 11px; height: 11px; border-radius: 3px; background: #fff; display: block; }
+.aib-spark { transition: transform 600ms cubic-bezier(0.23, 1, 0.32, 1); }
+.aib-btn:hover .aib-spark { transform: rotate(90deg) scale(1.07); }
+
+@media (prefers-reduced-motion: reduce) {
+  .aib-shimmer, .aib-btn[data-status="loading"] .aib-sheen { animation: none; }
+  .aib-shimmer { color: var(--aib-dim); background: none; }
+  .aib-enter .aib-icon, .aib-enter .aib-label, .aib-exit .aib-icon, .aib-exit .aib-label { animation: none; }
+  .aib-exit { display: none; }
+}

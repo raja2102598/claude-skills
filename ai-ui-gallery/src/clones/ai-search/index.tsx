@@ -22,6 +22,7 @@ const TYPE_START = 1070;
 const TYPE_MS = 25;
 const TOKEN_MS = 14.5;
 const DONE_LAG = 100;
+const START_OFFSET = 500;
 
 interface Run { script: Script; ask: number; thinkEnd: number; reset: number; typed: boolean }
 const RUNS: Run[] = [
@@ -45,7 +46,8 @@ function Hl({ text, query }: { text: string; query: string }) {
 
 function useClock() {
   const [t, setT] = useState(0);
-  const t0 = useRef(performance.now());
+  // the capture starts the loop clock at navigation; mounting takes ~0.5 s there, so start 0.5 s in
+  const t0 = useRef(performance.now() - START_OFFSET);
   useEffect(() => {
     let raf = 0;
     const tick = () => {
