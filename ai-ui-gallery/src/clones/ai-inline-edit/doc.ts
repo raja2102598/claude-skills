@@ -2,11 +2,11 @@ export type Op = { k: "keep" | "del" | "ins"; text: string };
 
 export const TITLE = "Harbor Lights festival plan";
 export const PARA_BEFORE =
-  "We plan to open the Harbor Lights festival on the first Friday of June. This is a really big night for the town, and it basically touches every single part of the waterfront, so we want to be very careful about how we set the lanterns out for visitors.";
+  "We plan to open the Harbor Lights festival on the first Friday of June. This is a really big night for the town, and it touches every part of the waterfront, so we want to be careful about how we set it up.";
 export const AFTER_PARAS = [
   "Volunteers in the east ward has been asking for lanterns for over a year. Right now, if a family loses the trail in the middle of the dusk parade, the route just stops lighting and they have to start over when they get back to the pier, which is honestly a really confusing experience.",
-  "The first night runs in three stages. Boat crews and 20 local vendors set up on the quay on Friday. We open the lantern walk to every ticket holder on Saturday if the weather stays clear, and the walk becomes a yearly event in the autumn.",
-  "Stewards should expect questions about queues, where two groups arrives at the same gate while the tide is high. The map shows both routes and asks the last group to wait which one to take, so nobody is lost in the crowd.",
+  "The first night runs in three stages. Boat crews and 20 local vendors set up on the quay on Friday. We open the lantern walk to every ticket holder on Saturday if the weather stays clear.",
+  "Stewards should expect questions about queues, where two groups arrives at the same gate. The map shows both routes and asks the last group to wait, so nobody is lost in the crowd.",
   "Next week we will",
 ];
 
@@ -33,7 +33,7 @@ export const OPS: Op[] = [
   { k: "del", text: "they have " },
   { k: "ins", text: "has " },
   { k: "keep", text: "to start " },
-  { k: "del", text: "over when they get back to the pier, which is really confusing." },
+  { k: "del", text: "over when they get back to the pier." },
   { k: "ins", text: "over." },
 ];
 
