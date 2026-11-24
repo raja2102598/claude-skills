@@ -1,0 +1,456 @@
+/* Model selector clone: clone-local styles (plain CSS so the shared dev server never depends on a Tailwind rescan).
+   Palette, font, marks and copy are our own; layout proportions and motion follow .reanimate/model-selector/spec.md. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap");
+
+.ms-root {
+  --ms-page: #f6f4f0;
+  --ms-surface: #fffefb;
+  --ms-raised: #fffefc;
+  --ms-line: #e6e1d8;
+  --ms-line-strong: #cdc6ba;
+  --ms-line-subtle: #ece8e1;
+  --ms-fill: #f1ede6;
+  --ms-ink: #1f1c18;
+  --ms-ink-2: #5f584e;
+  --ms-muted: #918a7e;
+  --ms-ok: #2e8a5a;
+  --ms-shadow: 0 20px 48px rgb(48 36 18 / 0.1), 0 3px 10px rgb(48 36 18 / 0.045);
+  /* Easings (spec rows 2–21). The spring is our own critically damped spring (omega 18.25/s) sampled over 440 ms. */
+  --ms-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ms-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ms-spring: linear(0, 0.053, 0.167, 0.3, 0.43, 0.546, 0.645, 0.726, 0.791, 0.842, 0.882, 0.912, 0.935, 0.953, 0.966,
+    0.976, 0.983, 0.988, 0.992, 0.995, 0.997, 0.999, 1);
+  position: absolute;
+  inset: 0;
+  background: var(--ms-page);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--ms-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 440 px column; the pill's top edge sits at y 193.6 of the 745x620 stage, as in the reference crop. */
+.ms-column {
+  position: absolute;
+  top: 193.6px;
+  left: 152.5px;
+  width: 440px;
+  display: grid;
+  justify-items: center;
+  gap: 20px;
+}
+
+.ms-anchor {
+  position: relative;
+  max-width: 100%;
+}
+
+/* ---------- pill ---------- */
+.ms-trigger {
+  display: inline-flex;
+  height: 40px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 13px;
+  border: 1px solid var(--ms-line);
+  border-radius: 999px;
+  background: var(--ms-surface);
+  color: var(--ms-ink);
+  font: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 100ms var(--ms-ease),
+    border-color 150ms var(--ms-ease),
+    box-shadow 150ms var(--ms-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ms-trigger:hover {
+    border-color: var(--ms-line-strong);
+    background: var(--ms-fill);
+  }
+}
+.ms-trigger[data-state="open"] {
+  border-color: var(--ms-line-strong);
+  background: var(--ms-fill);
+}
+.ms-trigger:focus-visible {
+  box-shadow: 0 0 0 3px rgb(224 104 63 / 0.25);
+}
+
+.ms-trigger-mark,
+.ms-trigger-text {
+  position: relative;
+  display: inline-grid;
+  flex: 0 0 auto;
+}
+.ms-trigger-mark {
+  width: 16px;
+  height: 16px;
+}
+.ms-trigger-text {
+  overflow-x: clip;
+  height: 18px;
+}
+.ms-inner {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  white-space: nowrap;
+  line-height: 18px;
+}
+.ms-inner-name {
+  font-weight: 500;
+}
+.ms-inner-effort {
+  color: var(--ms-muted);
+}
+.ms-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.ms-chevron {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  color: var(--ms-muted);
+  stroke-width: 1.75;
+  transition: transform 440ms var(--ms-spring);
+}
+.ms-trigger[data-state="open"] .ms-chevron {
+  transform: rotate(180deg);
+}
+
+/* ---------- menu ---------- */
+.ms-menu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 50%;
+  width: 304px;
+  margin-left: -152px;
+  overflow: hidden;
+  border: 1px solid var(--ms-line);
+  border-radius: 20px;
+  background: var(--ms-raised);
+  box-shadow: var(--ms-shadow);
+  outline: none;
+  transform-origin: 50% -8px;
+  animation:
+    ms-fade-in 150ms var(--ms-ease-enter) both,
+    ms-menu-pop 440ms var(--ms-spring) both;
+}
+.ms-menu[data-state="closed"] {
+  pointer-events: none;
+  animation: ms-menu-out 100ms var(--ms-ease) both;
+}
+@keyframes ms-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ms-menu-pop {
+  from {
+    transform: translate(0, -6px) scale(0.97);
+  }
+}
+@keyframes ms-menu-out {
+  to {
+    opacity: 0;
+    transform: translate(0, -3px) scale(0.985);
+  }
+}
+
+.ms-body {
+  overflow: hidden;
+}
+.ms-list {
+  position: relative;
+  max-height: 352px;
+  padding: 6px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.ms-highlight {
+  position: absolute;
+  top: 0;
+  left: 6px;
+  right: 6px;
+  border-radius: 12px;
+  background: var(--ms-fill);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 100ms ease-out;
+}
+.ms-highlight[data-on] {
+  opacity: 1;
+}
+
+.ms-item,
+.ms-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px;
+  border-radius: 12px;
+  color: var(--ms-ink);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+.ms-item {
+  min-height: 54px;
+}
+.ms-item.is-effort {
+  min-height: 50px;
+  padding-left: 12px;
+}
+.ms-row {
+  min-height: 40px;
+}
+.ms-row.is-compact {
+  min-height: 38px;
+  gap: 10px;
+}
+.ms-item-mark {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+.ms-item-text {
+  display: grid;
+  min-width: 0;
+  flex: 1 1 0%;
+  gap: 1px;
+}
+.ms-item-name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+.ms-item-default {
+  color: var(--ms-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.ms-item-blurb {
+  overflow: hidden;
+  color: var(--ms-ink-2);
+  font-size: 12px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ms-check {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--ms-ink);
+}
+.ms-check svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+.ms-row-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--ms-ink-2);
+  stroke-width: 1.75;
+}
+.ms-row-label {
+  flex: 1 1 0%;
+}
+.ms-row.is-back .ms-row-label {
+  font-weight: 500;
+}
+.ms-row-value {
+  max-width: 132px;
+  overflow: hidden;
+  color: var(--ms-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ms-row-chevron {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  margin-right: -2px;
+  color: var(--ms-muted);
+  stroke-width: 1.75;
+}
+.ms-compact-mark {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+}
+.ms-compact-name {
+  min-width: 0;
+  flex: 1 1 0%;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ms-tag {
+  flex: 0 0 auto;
+  color: var(--ms-muted);
+  font-size: 12px;
+}
+.ms-separator {
+  height: 1px;
+  margin: 6px;
+  background: var(--ms-line-subtle);
+}
+.ms-group {
+  padding: 10px 10px 4px;
+  color: var(--ms-muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+/* ---------- summary ---------- */
+.ms-summary {
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.ms-desc-slot {
+  display: grid;
+  width: 100%;
+  max-width: 380px;
+  min-height: 45px;
+  align-items: start;
+}
+.ms-desc {
+  grid-area: 1 / 1;
+  margin: 0;
+  color: var(--ms-ink-2);
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: balance;
+}
+.ms-facts {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 4px 0 0;
+  border: 1px solid var(--ms-line-subtle);
+  border-radius: 12px;
+}
+.ms-fact {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  padding: 11px 8px 12px;
+}
+.ms-fact + .ms-fact {
+  border-left: 1px solid var(--ms-line-subtle);
+}
+.ms-fact dt {
+  color: var(--ms-muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+.ms-fact dd {
+  margin: 0;
+  overflow: hidden;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.ms-note {
+  margin: 0;
+  color: var(--ms-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.ms-change-slot {
+  display: grid;
+  min-height: 20px;
+  place-items: center;
+}
+.ms-change {
+  display: inline-flex;
+  grid-area: 1 / 1;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--ms-ink-2);
+  font-size: 12px;
+}
+.ms-change svg {
+  width: 14px;
+  height: 14px;
+  color: var(--ms-ok);
+  stroke-width: 2;
+}
+
+/* ---------- swaps (spec rows 15–20) ---------- */
+.ms-swap {
+  display: inline-grid;
+  max-width: 100%;
+}
+.ms-swap > *,
+.ms-trigger-mark > *,
+.ms-trigger-text > .ms-inner {
+  grid-area: 1 / 1;
+}
+.ms-out {
+  animation: ms-out 100ms var(--ms-ease) both;
+}
+.ms-in {
+  animation:
+    ms-fade-in 150ms var(--ms-ease) both,
+    ms-lift 150ms var(--ms-ease) both;
+}
+.ms-in-pop {
+  animation:
+    ms-fade-in 150ms var(--ms-ease) both,
+    ms-pop 150ms var(--ms-ease) both;
+}
+@keyframes ms-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes ms-lift {
+  from {
+    transform: translateY(var(--ms-lift, 3px));
+  }
+}
+@keyframes ms-pop {
+  from {
+    transform: scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-trigger,
+  .ms-chevron {
+    transition: none;
+  }
+  .ms-menu,
+  .ms-menu[data-state="closed"],
+  .ms-in,
+  .ms-in-pop {
+    animation: ms-fade-in 100ms linear both;
+  }
+  .ms-menu[data-state="closed"] {
+    animation: ms-out 100ms linear both;
+  }
+}
