@@ -1,0 +1,531 @@
+/* Approval queue clone: clone-local styles (plain CSS, so the shared dev server never waits on a Tailwind rescan).
+   Palette, fonts, icons and copy are our own; layout proportions and motion follow .reanimate/approval/spec.md. */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+.ap-root {
+  --ap-stage: #f5f4f1;
+  --ap-card: #fffefc;
+  --ap-border: #e6e2db;
+  --ap-hair: #f0ede7;
+  --ap-ink: #1d1c1a;
+  --ap-ink-2: #58534b;
+  --ap-muted: #8f897f;
+  --ap-panel: #f7f5f1;
+  --ap-panel-hover: #f0ede7;
+  --ap-primary: #1f4a40;
+  --ap-primary-ink: #fbfaf7;
+  --ap-ok: #2f7d4f;
+  --ap-high: #b4412f;
+  --ap-medium: #a5741b;
+  --ap-low: #2f7d4f;
+  --ap-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ap-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  position: absolute;
+  inset: 0;
+  background: var(--ap-stage);
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ap-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.ap-root *,
+.ap-root *::before,
+.ap-root *::after {
+  box-sizing: border-box;
+}
+
+.ap-mono {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* 640 wide with a 1px border, 16px in from the stage edge, as in the reference crop. */
+.ap-card {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  width: 640px;
+  border: 1px solid var(--ap-border);
+  border-radius: 24px;
+  background: var(--ap-card);
+  overflow: hidden;
+  outline: none;
+}
+
+/* ------------------------------------------------------------ header */
+
+.ap-header {
+  height: 60px;
+  padding: 12px 12px 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ap-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.ap-title {
+  margin: 0;
+  font-size: 15px;
+  line-height: 18px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.ap-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--ap-muted);
+}
+.ap-rules {
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ap-ink-2);
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: background-color 150ms var(--ap-quint);
+}
+.ap-rules:hover {
+  background: var(--ap-panel);
+}
+.ap-dot {
+  color: var(--ap-muted);
+}
+
+/* Rolling digits: every glyph of 0-9 sits 13px from its neighbour and fades with its distance from the value. */
+.ap-digits {
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+}
+.ap-digit {
+  position: relative;
+  display: inline-block;
+  height: 22px;
+  margin: -2px 0;
+  padding: 2px 0;
+  overflow: hidden;
+  vertical-align: top;
+}
+.ap-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.ap-digit-sizer {
+  visibility: hidden;
+  display: block;
+}
+.ap-glyph {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  display: block;
+  will-change: transform, opacity;
+}
+
+/* ------------------------------------------------------------ focused request */
+
+.ap-focus-area {
+  display: flow-root; /* keeps the wrapper's -4px margin from collapsing through */
+  padding: 0 20px 18px;
+}
+/* Auto-height wrappers sit 4px outside their content so focus rings and the rise of a new slide are not clipped. */
+.ap-auto {
+  position: relative;
+  overflow: hidden;
+  margin: -4px;
+}
+.ap-auto-inner {
+  position: relative;
+  padding: 4px;
+}
+.ap-slide {
+  position: relative;
+  display: flow-root;
+}
+.ap-slide.is-leaving {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  pointer-events: none;
+}
+
+.ap-meta {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ap-agent {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ap-muted);
+  min-width: 0;
+  white-space: nowrap;
+}
+.ap-agent-name {
+  color: var(--ap-ink);
+}
+.ap-mark {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  color: #fff;
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 600;
+}
+.ap-risk {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ap-ink-2);
+  white-space: nowrap;
+}
+.ap-risk[data-risk="high"] svg {
+  color: var(--ap-high);
+}
+.ap-risk[data-risk="medium"] svg {
+  color: var(--ap-medium);
+}
+.ap-risk[data-risk="low"] svg {
+  color: var(--ap-low);
+}
+
+.ap-focus-title {
+  margin: 14px 0 0;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.ap-focus-title svg {
+  flex: none;
+}
+.ap-focus-title .ap-mono {
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.ap-reason {
+  margin: 6px 0 0;
+  color: var(--ap-ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ap-args {
+  margin: 16px 0 0;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--ap-panel);
+}
+.ap-arg {
+  display: grid;
+  grid-template-columns: 92px 458px;
+  column-gap: 4px;
+}
+.ap-arg dt {
+  padding: 6px 0 6px 8px;
+  line-height: 20px;
+  color: var(--ap-muted);
+}
+.ap-arg dd {
+  margin: 0;
+  padding: 6px 9px;
+  line-height: 20px;
+  color: var(--ap-ink);
+  border-radius: 8px;
+}
+.ap-arg dd.ap-mono {
+  font-size: 12.5px;
+}
+
+/* ------------------------------------------------------------ decision row */
+
+.ap-decision-slot {
+  position: relative;
+  overflow: hidden;
+  margin: 14px -4px -4px;
+}
+.ap-decision-inner {
+  position: relative;
+  padding: 4px;
+}
+.ap-decision.is-leaving {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  pointer-events: none;
+}
+.ap-actions {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ap-actions-end {
+  display: inline-flex;
+  gap: 6px;
+}
+.ap-btn {
+  height: 32px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color 150ms var(--ap-quint),
+    opacity 150ms var(--ap-quint),
+    box-shadow 150ms var(--ap-quint);
+}
+.ap-btn-ghost {
+  padding: 0 13px;
+  background: transparent;
+  color: var(--ap-ink-2);
+}
+.ap-btn-ghost:hover {
+  background: var(--ap-panel);
+}
+.ap-btn-allow {
+  padding: 0 11px 0 13px;
+  background: transparent;
+  color: var(--ap-ink-2);
+  font-weight: 400;
+}
+.ap-btn-allow:hover {
+  background: var(--ap-panel);
+}
+.ap-btn-allow svg {
+  color: var(--ap-muted);
+}
+.ap-btn-primary {
+  padding: 0 7px 0 13px;
+  background: var(--ap-primary);
+  color: var(--ap-primary-ink);
+}
+.ap-btn-primary:hover {
+  opacity: 0.91;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+}
+.ap-kbd {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 5px;
+  display: inline-grid;
+  place-items: center;
+  font: 500 11px/1 "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+.ap-btn-primary .ap-kbd {
+  background: rgb(255 255 255 / 0.14);
+  color: var(--ap-primary-ink);
+}
+.ap-status {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ap-muted);
+  white-space: nowrap;
+}
+.ap-status strong {
+  font-weight: 400;
+  color: var(--ap-ink);
+}
+.ap-status svg.is-ok {
+  color: var(--ap-ok);
+}
+.ap-status svg.is-no {
+  color: var(--ap-high);
+}
+
+/* ------------------------------------------------------------ queue */
+
+.ap-queue {
+  margin: 0;
+  padding: 0 8px 8px;
+  list-style: none;
+}
+.ap-queue-item {
+  position: relative;
+  overflow: hidden;
+}
+/* The separator is inside the row, so it collapses with it (a border would keep 1px after the height reaches 0). */
+.ap-queue-item::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--ap-hair);
+}
+.ap-row {
+  width: 100%;
+  height: 47px;
+  margin-top: 1px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: background-color 150ms var(--ap-quint);
+}
+.ap-row:hover {
+  background: var(--ap-panel);
+}
+.ap-row-marks {
+  display: inline-flex;
+  gap: 6px;
+  flex: none;
+}
+.ap-row-marks svg {
+  color: var(--ap-ink-2);
+}
+.ap-row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.ap-row-agent {
+  color: var(--ap-muted);
+}
+
+/* ------------------------------------------------------------ footer */
+
+.ap-footer {
+  height: 52px;
+  border-top: 1px solid var(--ap-hair);
+  padding: 0 16px 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ap-ink-2);
+}
+.ap-resolved {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ap-resolved svg {
+  color: var(--ap-muted);
+}
+.ap-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ap-muted);
+}
+.ap-keys > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ap-keys .ap-kbd {
+  border: 1px solid var(--ap-border);
+  background: var(--ap-card);
+  color: var(--ap-ink-2);
+  padding: 0 4px;
+}
+
+/* ------------------------------------------------------------ empty state (addition) */
+
+.ap-empty {
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--ap-muted);
+}
+.ap-empty strong {
+  font-weight: 500;
+  color: var(--ap-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ap-empty svg {
+  color: var(--ap-ok);
+}
+
+/* ------------------------------------------------------------ cross-fades
+   The reference fades with WAAPI; CSS keyframes run the same curves on the real clock and on reanimate's
+   frame-stepped virtual clock. */
+
+@keyframes ap-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ap-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+.ap-in-150 {
+  animation: ap-fade-in 150ms var(--ap-expo) both;
+}
+.ap-in-200 {
+  animation: ap-fade-in 200ms var(--ap-expo) both;
+}
+.ap-out-100 {
+  animation: ap-fade-out 100ms var(--ap-quint) both;
+}
+.ap-out-150 {
+  animation: ap-fade-out 150ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-in-150,
+  .ap-in-200,
+  .ap-out-100,
+  .ap-out-150 {
+    animation-duration: 1ms;
+  }
+}
