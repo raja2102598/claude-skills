@@ -1,0 +1,78 @@
+/*
+ * Typing dots, motion-faithful to Wensity "AI Typing Indicator" (Typing cell). See .reanimate/typing-indicator/spec.md.
+ * Three dots rise 0.28em and brighten 0.32 → 1 in turn: a 1320 ms loop whose first 56 % is the lift and settle
+ * (two in-out segments of 369.6 ms each), dots 160 ms apart, then a short pause with all three at rest.
+ * Plain CSS keyframes, so the loop is identical on the real clock and under frame-stepped capture.
+ */
+
+.td-stage {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.td-root {
+  --td-bubble: #1b2130;
+  --td-edge: rgba(190, 205, 235, 0.07);
+  --td-ink: #a9b4c8;
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px;
+  color: var(--td-ink);
+}
+
+/* Chat bubble with a tucked bottom-left corner, pointing at the speaker. */
+.td-bubble {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.9em 1.05em;
+  border-radius: 1.375em 1.375em 1.375em 0.4em;
+  background: var(--td-bubble);
+  box-shadow: inset 0 0 0 1px var(--td-edge);
+}
+
+.td-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32em;
+  height: 1em;
+}
+
+.td-dot {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.32;
+  animation: td-dot-rise 1320ms cubic-bezier(0.45, 0, 0.55, 1) infinite backwards;
+}
+.td-dot:nth-child(2) {
+  animation-delay: 160ms;
+}
+.td-dot:nth-child(3) {
+  animation-delay: 320ms;
+}
+
+@keyframes td-dot-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0.32;
+  }
+  28% {
+    transform: translateY(-0.28em);
+    opacity: 1;
+  }
+  56%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.32;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .td-dot {
+    animation: none;
+    opacity: 0.55;
+  }
+}
