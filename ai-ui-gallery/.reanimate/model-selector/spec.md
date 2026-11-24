@@ -7,13 +7,13 @@
 Viewport 1440x900 · fps 25 · `--clock virtual` (main) · crop 745x620.
 
 Reference captures:
-- `ref/` — `capture-ref.sh ref --clock virtual`: `--trigger click --target 'button[class*="model-picker_trigger"]' --pre-js prejs-ref.js --wait-before 5500 --duration 2800 --fps 25 --network-wait 300`.
+- `ref/` — `capture-ref.sh ref --clock virtual` (`--clip 340,110,745,620`): `--trigger click --target 'button[class*="model-picker_trigger"]' --pre-js prejs-ref.js --wait-before 5500 --duration 2800 --fps 25 --network-wait 300`.
 - `ref-real/` — same on the real clock (visual check of the WAAPI rows; it runs ~110–130 ms late because the real click and the timers drift).
 - `ref-real-probe1.json` — `probes/arcprobe.ts`: real-mouse rAF probe (open → hover row 2 → select row 2) of menu, highlight, pill layers, summary layers.
 - `probes/arcanims.ts` — `document.getAnimations()` dumped at each step: exact duration/easing/keyframes of every CSS transition and every WAAPI animation `motion` starts.
 - `probes/arcpage2.ts` — the menu's in-place page mode (narrow layout): Effort page swap and height spring.
 
-Trigger: real click on the pill (Radix opens on pointerdown). `prejs-ref.js` schedules the rest from that pointerdown with synthetic pointer events (virtual-clock timers, so exact): hover row 2 at 700 ms, hover row 3 at 1100 ms, select row 3 at 1500 ms (pointerdown, pointerup, click). The real pointer stays on the pill, so the pill keeps its :hover style throughout. t = 0 is the click.
+Trigger: real click on the pill (Radix opens on pointerdown). `prejs-ref.js` schedules the rest from that pointerdown with synthetic pointer events (virtual-clock timers, so exact): hover row 2 at 700 ms, hover row 3 at 1100 ms, select row 3 at 1500 ms (pointerdown, pointerup, click). The timers are set 0.5 ms early (699.5, 1099.5, 1499.5) so the events land in the same virtual frame on both sides; at exactly 1500 the pointerdown's sub-ms jitter put the clone's pick one frame after the reference's. The real pointer stays on the pill, so the pill keeps its :hover style throughout. t = 0 is the click.
 
 ## Structure (static, crop coordinates)
 
@@ -63,3 +63,5 @@ Additions and secondary paths (not in the verified sequence):
 - **Effort** and **More models** rows open in-menu pages (back row + list), the reference's own narrow-layout mode (`arcpage2.ts`): the page content swaps at once and the menu height springs (≈360 ms). The 745 px stage clips side submenus, so the clone always uses pages.
 - Keyboard: arrows move the highlight, Enter selects, Escape closes or goes back, ArrowLeft goes back. Outside click closes.
 - Gallery autoplay: on mount the clone plays the same scripted sequence once (open, row 2, row 3, select), then stays interactive. `?autoplay=0` turns it off for captures, which use the click trigger above.
+
+Clone captures: `capture-clone.sh clone-N --clock virtual` (same flags; `--selector '[data-stage]'`, `?autoplay=0`, `prejs-clone.js`); `track-mapped.json` renames the clone selectors to the reference's so `easing.ts` and `probes/rowcmp.py` compare like with like. Real-clock check of the WAAPI rows: `probes/cloneprobe.ts` (same real-mouse sequence as `probes/arcprobe.ts`) and `probes/realcmp.py`.
