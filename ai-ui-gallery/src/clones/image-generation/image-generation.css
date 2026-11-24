@@ -245,23 +245,27 @@
   }
 }
 
-/* two labels in one grid cell: the slot keeps its width while they cross-fade (out 100 ms, in 150 ms after 40 ms) */
+/* the status pill shows only its current label: the swap is instant and the pill resizes */
+.ig-stable-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+/* the Generate button keeps two labels in one grid cell that cross-fade (out 100 ms, in 150 ms after 40 ms) */
 .ig-stable {
   display: inline-grid;
   justify-items: start;
 }
 
-.ig-stable-item {
-  display: inline-flex;
+.ig-stable > .ig-stable-item {
   grid-area: 1 / 1;
-  align-items: center;
-  gap: 7px;
-  white-space: nowrap;
   opacity: 0;
   transition: opacity 0.1s var(--ease);
 }
 
-.ig-stable-item[data-on] {
+.ig-stable > .ig-stable-item[data-on] {
   opacity: 1;
   transition: opacity 0.15s var(--ease) 0.04s;
 }

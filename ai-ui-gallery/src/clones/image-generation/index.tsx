@@ -452,18 +452,19 @@ export default function ImageGeneration() {
             {status && status !== "stopped" && (
               <div className="ig-status" data-ig-status role="status" aria-live="polite">
                 <span className="ig-pill">
-                  <span className="ig-stable">
-                    <span className="ig-stable-item" data-on={status === "running" ? "" : undefined} aria-hidden={status !== "running"}>
+                  {status === "running" ? (
+                    <span className="ig-stable-item">
                       <Spinner />
                       Generating
                       <span ref={percentRef} className="ig-percent">
                         1%
                       </span>
                     </span>
-                    <span className="ig-stable-item ig-mono" data-on={status === "done" ? "" : undefined} aria-hidden={status !== "done"}>
+                  ) : (
+                    <span className="ig-stable-item ig-mono">
                       seed {active?.seed} · {active?.elapsed.toFixed(1)}s
                     </span>
-                  </span>
+                  )}
                 </span>
               </div>
             )}

@@ -266,6 +266,13 @@
     mf-pop-out 100ms var(--mf-quint) 16ms both;
 }
 
+/* The check's stroke draws on from the short arm while it pops in (reference: ~50 ms to ~270 ms). */
+.mf-layer[data-state="in"] .mf-copy-check path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: mf-draw 220ms var(--mf-quint) 66ms both;
+}
+
 @keyframes mf-pop-in {
   from {
     transform: scale(0.7);

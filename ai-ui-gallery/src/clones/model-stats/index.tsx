@@ -11,7 +11,7 @@ import "./model-stats.css";
  */
 
 const ICON: Record<string, LucideIcon> = { Text: Type, Image: ImageIcon, PDF: FileText, Audio: Mic, Video, Tools: Wrench, Reasoning: Brain };
-const LOOKUP_MS = 80;
+const LOOKUP_MS = 40;
 const RELOAD_MS = 1300;
 const BENCHES: Bench[] = ["swe", "gpqa", "term"];
 

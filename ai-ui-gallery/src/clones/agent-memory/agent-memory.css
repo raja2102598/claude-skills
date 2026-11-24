@@ -57,8 +57,8 @@
 .am-pill:not([data-state="update"]) [data-l="update"] { opacity: 0; }
 .am-pill[data-state="added"] svg { color: var(--ok); }
 .am-pill [data-l="saved"] svg { color: var(--ok); }
-.am-list { overflow: auto; max-height: 380px; flex: none; padding: 0 10px 8px; scrollbar-width: none; }
-.am-gh { display: flex; gap: 6px; align-items: baseline; padding: 14px 10px 4px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.am-list { margin-top: 11px; overflow: auto; max-height: 380px; flex: none; padding: 0 10px 8px; scrollbar-width: none; }
+.am-gh { display: flex; gap: 6px; align-items: baseline; padding: 19px 10px 4px; font-size: 12px; font-weight: 500; color: var(--muted); }
 .am-gh span { color: var(--faint); font-variant-numeric: tabular-nums; }
 .am-row { position: relative; min-height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10px; border-radius: 12px; }
 .am-row::before { content: ""; position: absolute; inset: 0; border-radius: 12px; background: var(--wash); opacity: 0; }
@@ -94,3 +94,5 @@
 .am-add button:hover { color: var(--ink); }
 .am-add input { flex: 1; border: 0; outline: 0; background: none; font: inherit; font-size: 13.5px; color: var(--ink); }
 .am-fade-b { position: relative; }
+
+.am-list > .am-c:first-child .am-gh { padding-top: 3px; }

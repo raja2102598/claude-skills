@@ -7,7 +7,7 @@ import { bezier, smoothstep, type FieldFrame } from "./field";
 export const RUN_AT = 533; // the auto-submit fires this long after mount
 export const RESOLVE_AT = 3910;
 export const RESOLVE_MS = 1290;
-export const DONE_AT = 5270;
+export const DONE_AT = 5260;
 export const COLOUR_STAGGER = 250;
 export const RESOLVE_STAGGER = 400;
 const PERCENT_MS = 4650;
