@@ -20,7 +20,7 @@ import "./ai-search.css";
 const PERIOD = 18000;
 const TYPE_START = 1070;
 const TYPE_MS = 25;
-const TOKEN_MS = 13.5;
+const TOKEN_MS = 13;
 const DONE_LAG = 100;
 const START_OFFSET = 0;
 
@@ -117,7 +117,7 @@ function citeRevealed(script: Script, n: Cite, now: number, thinkEnd: number) {
 export default function AiSearch() {
   const t = useClock();
   const tt = t % PERIOD;
-  const fade = Math.max(0, Math.min(1, (t - 100) / 380)); // the card fades in over ~0.4 s
+  const fade = Math.max(0, Math.min(1, t / 380)); // the card fades in over ~0.4 s
 
   const run = tt < RUNS[0].reset ? RUNS[0] : RUNS[1];
   const base = run === RUNS[0] ? 0 : RUNS[0].reset;

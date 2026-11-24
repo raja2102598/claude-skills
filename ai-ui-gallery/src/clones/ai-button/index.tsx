@@ -23,6 +23,19 @@ const NEXT: Partial<Record<Phase, [Phase, number]>> = {
 // Delay from the label swap to the width change: the reference waits for the old label's exit (about 330 ms on the real
 // clock, 313-471 ms measured under load). `?gap=0` removes it, matching the reference when its WAAPI exit is collapsed
 // by the virtual clock (used for the compare capture only).
+// rAF-based timer (setTimeout does not advance under the capture's virtual clock; rAF and performance.now do).
+type Handle = { cancelled: boolean };
+function after(ms: number, fn: () => void): Handle {
+  const h: Handle = { cancelled: false };
+  const t0 = performance.now();
+  const tick = () => {
+    if (h.cancelled) return;
+    if (performance.now() - t0 >= ms) fn();
+    else requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+  return h;
+}
 const GAP = (() => { try { const g = new URLSearchParams(location.search).get("gap"); return g === null ? 330 : Number(g); } catch { return 330; } })();
 
 function Icon({ phase }: { phase: Phase }) {
@@ -47,9 +60,9 @@ export default function AiButton() {
   const [widths, setWidths] = useState<Record<Phase, number>>({ idle: 121, reading: 155, writing: 81, done: 67 });
   const [width, setWidth] = useState(121);
   const refs = useRef<Record<Phase, HTMLSpanElement | null>>({ idle: null, reading: null, writing: null, done: null });
-  const timers = useRef<number[]>([]);
+  const timers = useRef<Handle[]>([]);
   const cur = useRef<Phase>("idle");
-  const clear = () => { timers.current.forEach(clearTimeout); timers.current = []; };
+  const clear = () => { timers.current.forEach((h) => { h.cancelled = true; }); timers.current = []; };
 
   useLayoutEffect(() => {
     const measure = () => {
@@ -68,10 +81,10 @@ export default function AiButton() {
     cur.current = p;
     setPhase(p);
     setKey((k) => k + 1);
-    timers.current.push(window.setTimeout(() => setWidth(refs.current[p]?.getBoundingClientRect().width ?? 0), WIDTH_DELAY));
-    timers.current.push(window.setTimeout(() => setPrev(null), 330));
+    timers.current.push(after(GAP, () => setWidth(refs.current[p]?.getBoundingClientRect().width ?? 0)));
+    timers.current.push(after(330, () => setPrev(null)));
     const n = NEXT[p];
-    if (n) timers.current.push(window.setTimeout(() => go(n[0]), n[1]));
+    if (n) timers.current.push(after(n[1], () => go(n[0])));
   }, []);
   useEffect(() => clear, []);
 

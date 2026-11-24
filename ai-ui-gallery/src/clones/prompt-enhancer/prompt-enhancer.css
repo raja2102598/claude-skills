@@ -27,7 +27,7 @@
   border-radius: 21px;
   padding: 1.5px;
   pointer-events: none;
-  background: conic-gradient(from var(--pe-a), transparent 0deg, transparent 250deg, rgb(122 99 240 / 0.15) 300deg, #7a63f0 345deg, #6aa4ff 358deg, transparent 360deg);
+  background: conic-gradient(from calc(var(--pe-a) + 160deg), transparent 0deg, transparent 250deg, rgb(122 99 240 / 0.15) 300deg, #7a63f0 345deg, #6aa4ff 358deg, transparent 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

@@ -10,6 +10,7 @@ import "./prompt-enhancer.css";
  */
 
 const CYCLE = 11000;
+const LOOP = 12100;
 const ORIGINAL = "Write a product description for our wool throw";
 const PARTS: [string, boolean][] = [
   ["Write a ", false],
@@ -44,15 +45,20 @@ function Stream({ n }: { n: number }) {
 }
 
 export default function PromptEnhancer() {
-  const [t, setT] = useState(0);
+  const [raw, setT] = useState(0);
+  // First run: 0.9 s of placeholder. Every later run starts with 2.0 s of placeholder, and a one-frame
+  // false start ("Write a p") 0.7 s after the reset, as in the reference.
+  const u = raw < CYCLE ? -1 : (raw - CYCLE) % LOOP;
+  const t = raw < CYCLE ? raw : u - 1100;
+  const falseStart = u >= 700 && u < 900;
   useEffect(() => {
     const t0 = performance.now();
-    const id = setInterval(() => setT((performance.now() - t0) % CYCLE), 16);
+    const id = setInterval(() => setT(performance.now() - t0), 16);
     return () => clearInterval(id);
   }, []);
 
-  const chars = Math.max(0, Math.min(ORIGINAL.length, Math.floor((t - T.typeStart) / T.typePerChar) + 1));
-  const typed = t >= T.typeStart;
+  const chars = falseStart ? 9 : Math.max(0, Math.min(ORIGINAL.length, Math.floor((t - T.typeStart) / T.typePerChar) + 1));
+  const typed = t >= T.typeStart || falseStart;
   const improving = t >= T.improve && t < T.stream;
   const nWords = Math.max(0, Math.min(WORDS.length, Math.floor((t - T.stream) / T.perWord) + 1));
   const review = t >= T.stream && t < T.use + 150;
@@ -62,7 +68,7 @@ export default function PromptEnhancer() {
   const blank = t >= T.blank && t < T.old;
   const glow = t >= T.improve + 100 && t < T.chips;
 
-  const text = finished ? IMPROVED : blank ? "" : typed ? ORIGINAL.slice(0, chars) : "";
+  const text = falseStart ? "Write a p" : finished ? IMPROVED : blank ? "" : typed ? ORIGINAL.slice(0, chars) : "";
   const hasText = typed && text !== "" || finished || t >= T.old;
 
   return (
@@ -78,7 +84,7 @@ export default function PromptEnhancer() {
           <span className="pe-pill"><Sparkles size={14} color="var(--pe-violet)" />Improve</span>
         </div>
       ) : (
-        <div className="mt-[14px] flex items-center justify-between">
+        <div className="mt-[12px] flex items-center justify-between">
           <span className="text-[13px]" style={{ color: "#4b4b52" }}>{hasText ? "Add a bit more detail" : "A few words is enough"}</span>
           <span className="pe-pill" data-off={!hasText || review}>
             {improving ? <span className="pe-dots">{Array.from({ length: 9 }).map((_, i) => <i key={i} style={{ animationDelay: `${(i % 3) * 120 + Math.floor(i / 3) * 90}ms` }} />)}</span> : <Sparkles size={14} color="var(--pe-violet)" />}
