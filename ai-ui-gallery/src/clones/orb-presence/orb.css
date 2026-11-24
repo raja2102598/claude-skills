@@ -1,0 +1,71 @@
+/* Clone-local styles. Plain CSS so the clone renders even when the shared dev server's Tailwind
+   has not rescanned new files. System font only. */
+
+.orbp-root {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.orbp-button {
+  position: relative;
+  display: block;
+  width: 260px;
+  height: 260px;
+  padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.orbp-button:focus-visible {
+  outline: 2px solid #8ee6d8;
+  outline-offset: 5px;
+}
+
+.orbp-canvas,
+.orbp-fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.orbp-fallback {
+  background: linear-gradient(170deg, #098c85 0%, #9fd3c9 42%, #fbf7ed 70%);
+}
+
+.orbp-status {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.orbp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.05);
+  color: #cfeee8;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.orbp-chip svg {
+  width: 14px;
+  height: 14px;
+}

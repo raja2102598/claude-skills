@@ -70,6 +70,11 @@ src/clones/<slug>/*              any other files the clone needs (clone-local CS
 - The shared dev server is `http://127.0.0.1:5173`, and a clone renders alone at
   `http://127.0.0.1:5173/c/<slug>`. If it does not answer, start your own with
   `npx vite --port <5200 + a random number> --strictPort` from `ai-ui-gallery/` and stop it at the end.
+- **Warm the page before every clone capture.** The dev server's Tailwind only learns a file's classes
+  once Vite has transformed that file, so the first load of a new or edited clone renders unstyled and
+  the CSS arrives mid-capture. Run
+  `for f in src/clones/<slug>/*.ts*; do curl -s "http://127.0.0.1:5173/$f" >/dev/null; done; sleep 1`
+  from `ai-ui-gallery/` first, then capture. Clone-local CSS files are not affected.
 - reanimate is installed at `~/.claude/skills/reanimate`, and its setup is already done; run scripts as
   `bun ~/.claude/skills/reanimate/scripts/<name>.ts`. Use the same viewport, trigger, duration, fps
   and crop size for the reference and the clone. Crop the clone with `--selector "[data-stage]"`.
@@ -77,7 +82,7 @@ src/clones/<slug>/*              any other files the clone needs (clone-local CS
 - The machine has 4 CPUs shared with other agents. Keep captures short (the motion plus about 1 s),
   use `--fps 25` or lower unless the motion needs more, and do not run captures in parallel yourself.
 - Keep raw captures under `.reanimate/`. The `.gitignore` keeps `spec.md`, `report.md`,
-  `selection.md` and `compare-*/sheets/*` and drops frames, video and JSON.
+  `selection.md` and the final round's `compare-*/sheets/compare-01.webp` (the coordinator converts it) and drops frames, video, JSON and PNG sheets.
 
 ## Done means
 
@@ -86,5 +91,7 @@ src/clones/<slug>/*              any other files the clone needs (clone-local CS
 - `report.md` has the last compare round: timing error, mean mismatch, easing match per element, and
   pass or fail per spec row, plus each residual deviation with a number and a reason.
 - `selection.md` lists every candidate with one line each and the reason for the winner.
+- Subagents cannot write `report.md` (the harness refuses report files), so put its full text at the end
+  of the final message and the coordinator saves it.
 - The final message to the coordinator is short: the slug or slugs, fidelity, pass/fail summary, the
   winner and the runner-up, any candidate that failed to load, and any package the clone still needs.
