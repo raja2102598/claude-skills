@@ -453,14 +453,14 @@ export default function ImageGeneration() {
               <div className="ig-status" data-ig-status role="status" aria-live="polite">
                 <span className="ig-pill">
                   <span className="ig-stable">
-                    <span className="ig-stable-item" data-on={status === "running" ? "" : undefined}>
+                    <span className="ig-stable-item" data-on={status === "running" ? "" : undefined} aria-hidden={status !== "running"}>
                       <Spinner />
                       Generating
                       <span ref={percentRef} className="ig-percent">
                         1%
                       </span>
                     </span>
-                    <span className="ig-stable-item ig-mono" data-on={status === "done" ? "" : undefined}>
+                    <span className="ig-stable-item ig-mono" data-on={status === "done" ? "" : undefined} aria-hidden={status !== "done"}>
                       seed {active?.seed} · {active?.elapsed.toFixed(1)}s
                     </span>
                   </span>
@@ -601,8 +601,10 @@ export default function ImageGeneration() {
                     <span className="ig-chip-mark">
                       <Icon size={15} strokeWidth={1.9} aria-hidden />
                     </span>
-                    <span className="ig-chip-name">
-                      <span className="ig-chip-name-text">{name}</span>
+                    <span className="ig-chip-name" aria-hidden>
+                      <span className="ig-chip-name-clip">
+                        <span className="ig-chip-name-text">{name}</span>
+                      </span>
                     </span>
                   </button>
                 );
@@ -620,11 +622,11 @@ export default function ImageGeneration() {
             </div>
             <button type="submit" className="ig-generate" data-variant={running ? "secondary" : "primary"} disabled={!running && !canGenerate}>
               <span className="ig-stable">
-                <span className="ig-stable-item" data-on={running ? undefined : ""}>
+                <span className="ig-stable-item" data-on={running ? undefined : ""} aria-hidden={running}>
                   <Sparkles size={15} aria-hidden />
                   Generate
                 </span>
-                <span className="ig-stable-item" data-on={running ? "" : undefined}>
+                <span className="ig-stable-item" data-on={running ? "" : undefined} aria-hidden={!running}>
                   <Square size={12} strokeWidth={2.2} aria-hidden />
                   Stop
                   <span className="ig-count">

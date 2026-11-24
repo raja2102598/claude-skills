@@ -633,8 +633,13 @@
   grid-template-columns: 1fr;
 }
 
-.ig-chip-name-text {
+.ig-chip-name-clip {
   min-width: 0;
+  overflow: hidden;
+}
+
+.ig-chip-name-text {
+  display: block;
   padding-left: 6px;
   padding-right: 3px;
   white-space: nowrap;
