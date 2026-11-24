@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { flushSync } from "react-dom";
-import { ChevronRight, CircleCheck, LoaderCircle } from "lucide-react";
+import { ChevronRight, LoaderCircle } from "lucide-react";
 import "./agent-handoff.css";
 
 /*
@@ -50,6 +50,27 @@ const autoplayEnabled = () => {
 };
 
 // ---------- trace pieces ----------
+
+/** lucide circle-check as the reference ships it (its check is "m9 12 2 2 4-4"; lucide 1.x redrew it larger). */
+function CircleCheck() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  );
+}
 
 function Spinner() {
   return <LoaderCircle className="ah-spin" aria-hidden="true" />;

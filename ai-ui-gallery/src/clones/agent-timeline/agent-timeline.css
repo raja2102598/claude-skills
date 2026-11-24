@@ -132,18 +132,20 @@
   white-space: nowrap;
 }
 
-/* Shimmering "Running": a lighter band sweeps across the word in about 1 s, then rests; a 2.4 s cycle (the
-   reference's period, measured from its frames). */
+/* Shimmering "Running": muted text with an ink band that sweeps left to right across the word in 1.2 s, then
+   1.2 s of rest; a 2.4 s cycle (the reference's period and sweep, measured from its frames). The gradient is 3x the
+   word wide with the band in its middle third, so background-position 100% -> 0% carries the band across. */
 .at-shimmer {
   background-image: linear-gradient(
-    100deg,
-    var(--at-ink) 0%,
-    var(--at-ink) 38%,
-    color-mix(in oklab, var(--at-ink) 35%, white) 50%,
-    var(--at-ink) 62%,
-    var(--at-ink) 100%
+    90deg,
+    var(--at-muted) 0%,
+    var(--at-muted) 33.3%,
+    var(--at-ink) 50%,
+    var(--at-muted) 66.7%,
+    var(--at-muted) 100%
   );
   background-size: 300% 100%;
+  background-position: 0% 0;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
@@ -153,7 +155,7 @@
   0% {
     background-position: 100% 0;
   }
-  40%,
+  50%,
   100% {
     background-position: 0% 0;
   }

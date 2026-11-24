@@ -105,6 +105,7 @@
   inset: 0;
   border-radius: 12px;
   box-shadow: 0 0 0 1px var(--vc-subtle);
+  opacity: 0.5; /* the second ring rests at .5 through its 700 ms delay, like the reference */
   animation: vc-ring 1400ms cubic-bezier(0, 0, 0.58, 1) infinite;
 }
 .vc-ring + .vc-ring {
