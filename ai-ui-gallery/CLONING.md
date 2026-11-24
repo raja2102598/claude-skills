@@ -79,6 +79,12 @@ src/clones/<slug>/*              any other files the clone needs (clone-local CS
   `bun ~/.claude/skills/reanimate/scripts/<name>.ts`. Use the same viewport, trigger, duration, fps
   and crop size for the reference and the clone. Crop the clone with `--selector "[data-stage]"`.
 - Prefer `--clock virtual` on both sides for JS-driven motion. It makes captures exact and repeatable.
+  **Trap:** the virtual clock does not drive WAAPI animations, and `motion` runs opacity and transform
+  through WAAPI. Under it, a reference's motion animations collapse into 1–2 frames, and a clone's
+  motion animations can stay frozen at their start value. Measure such rows on the reference with
+  real-clock rAF probes (`--track` without `--clock virtual`). In the clone, use CSS keyframes for
+  short opacity/transform transitions (sample a spring into a `linear()` easing). Those behave the same
+  on both clocks. Keep `motion` for JS-driven values such as height and layout.
 - The machine has 4 CPUs shared with other agents. Keep captures short (the motion plus about 1 s),
   use `--fps 25` or lower unless the motion needs more, and do not run captures in parallel yourself.
 - Keep raw captures under `.reanimate/`. The `.gitignore` keeps `spec.md`, `report.md`,

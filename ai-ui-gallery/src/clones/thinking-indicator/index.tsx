@@ -6,7 +6,7 @@ import "./thinking-indicator.css";
 /*
  * Thinking status line, motion-faithful to UIStacks "Thinking state".
  * A phase label shimmers while a seconds counter runs. Every 1.6 s the label steps to the next phase. At 4.8 s it
- * settles into "Thought for 5s": the dot mark fades out (300 ms) while a check springs in (0.4 → 1, overshoot ≈ 21 %).
+ * settles into "Thought for 5s": the dot mark fades out (320 ms) while a check springs in (0.4 → 1, overshoot ≈ 21 %).
  * Reasoning steps tick to done with the phases, and the header collapses or expands the reasoning panel.
  * All sizes are the reference's at its 0.92 preview scale (13.8 px text, 14.72 px icons).
  */
@@ -196,7 +196,7 @@ function ThinkingState() {
                     <span className="min-w-0 truncate">
                       {step.label}
                       {step.meta && (
-                        <span style={{ marginLeft: px(8), fontSize: px(13), color: "var(--ti-muted)" }}>{step.meta}</span>
+                        <span style={{ marginLeft: px(8), fontSize: px(13), lineHeight: 1, color: "var(--ti-muted)" }}>{step.meta}</span>
                       )}
                     </span>
                   </li>

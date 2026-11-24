@@ -37,7 +37,7 @@ captures.
 | 1b | label | color | ink (shimmer) → muted | 4800 | instant | – | – | rAF probe: color transparent (bg-clip) → rgb(83,83,88) in one frame |
 | 2 | label | shimmer: background-position-x | 100 % → 0 % (band at −0.25W → 1.25W, bg-size 250 %) | 0, restarts each phase | 1600 | linear | per phase, stops at done | rAF probe: −1.06 %/frame, 99 % at 92 ms, 0 % at 1675 |
 | 3 | timer | text | "1s" → "2s" … "5s", hidden at done | 0, 1000, 2000, 3000, 4000 / hide 4800 | instant | – | +1000 | ref virtual: timer changes at +1.00, 2.00, 3.00, 4.00 s |
-| 4 | mark: dot grid | opacity | 1 → 0 (exit) | 4800 | 300 | ease (cubic-bezier .25,.1,.25,1); fit 317 ms, rmse 0.009 | – | rAF probe 4896→5195 |
+| 4 | mark: dot grid | opacity | 1 → 0 (exit) | 4800 | ≈320 (0 at +300) | ease (cubic-bezier .25,.1,.25,1); easing.ts fit 317 ms, rmse 0.009; 320 ms is the best fit from the switch frame | – | rAF probe 4896→5195 |
 | 4b | mark: dot grid | position on exit | ref popped 1.9 px left / 9.8 px up (popLayout + the preview's `zoom: 0.92`) → clone exits in place | 4800 | – | – | – | rAF probe rect; reference artifact, see report |
 | 5 | mark: check | scale | 0.4 → 1, peak 1.128 at ~160 ms, trough 0.972 at ~310 ms, settles ~700 ms | 4800 (concurrent with #4) | ~700 | spring stiffness 500, damping 20, mass 1 (fit rmse 0.0035) | – | rAF probe 4896→5657 |
 | 5b | mark: check | opacity | 1 (no fade) | – | – | – | – | rAF probe |
