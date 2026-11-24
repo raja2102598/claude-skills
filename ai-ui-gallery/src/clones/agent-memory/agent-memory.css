@@ -43,7 +43,7 @@
 .am-search[data-open="true"] input { opacity: 1; }
 .am-searchClose { width: 30px; height: 30px; display: grid; place-items: center; color: var(--muted); flex: none; opacity: 0; pointer-events: none; transition: opacity 160ms var(--q); }
 .am-search[data-open="true"] .am-searchClose { opacity: 1; pointer-events: auto; }
-.am-c { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows 520ms var(--q), opacity 80ms linear; }
+.am-c { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows 390ms cubic-bezier(0.22, 0.36, 0.24, 0.99) 25ms, opacity 80ms linear; }
 .am-c[data-open="false"] { grid-template-rows: 0fr; opacity: 0; pointer-events: none; }
 .am-c > .am-ci { min-height: 0; overflow: hidden; }
 .am-pillRow { padding: 10px 16px 0; height: 44px; box-sizing: border-box; }

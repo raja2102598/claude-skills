@@ -15,13 +15,13 @@ export const INSIGHTS: Record<string, Insight> = {
     chunks: [
       { t: "Wholesale reorders fell ", m: 0 },
       { t: "from 38 to 21 " },
-      { t: "on Tuesday." },
+      { t: "on Tuesday, when two large accounts paused." },
       { t: " " },
       { t: "Delayed courier pickups ", m: 1 },
       { t: "cost another $9.4k " },
       { t: "on Thursday, while " },
       { t: "Seasonal bundles ", m: 2 },
-      { t: "added back $2.9k on Sunday." },
+      { t: "added back $2.9k on Sunday, the one clear gain." },
     ],
     drivers: [
       { label: "Wholesale reorders", delta: "−$21.7k", value: 21.7, tone: "bad", point: 2 },
@@ -44,7 +44,7 @@ export const INSIGHTS: Record<string, Insight> = {
       { t: "Only " },
       { t: "late courier pickups ", m: 2 },
       { t: "on Thursday fell below " },
-      { t: "the Q3 pace." },
+      { t: "the Q3 pace, and only by a little." },
     ],
     drivers: [
       { label: "New wholesale accounts", delta: "+$8.2k", value: 8.2, tone: "good", point: 0 },
@@ -58,14 +58,14 @@ export const INSIGHTS: Record<string, Insight> = {
     chunks: [
       { t: "Retail carried the dip, ", m: 0 },
       { t: "down $18.3k as reorders lapsed " },
-      { t: "on Tuesday." },
+      { t: "on Tuesday, when two large accounts paused." },
       { t: " " },
       { t: "Online ", m: 1 },
       { t: "slipped $7.9k, mostly from late " },
       { t: "pickups on Thursday." },
       { t: " " },
       { t: "Trade desk grew $2.9k on ", m: 2 },
-      { t: "bundle orders billed Sunday." },
+      { t: "bundle orders billed Sunday, the one clear gain." },
     ],
     drivers: [
       { label: "Retail", delta: "−$18.3k", value: 18.3, tone: "bad", point: 2 },

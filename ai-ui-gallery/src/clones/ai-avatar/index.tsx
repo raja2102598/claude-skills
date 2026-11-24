@@ -32,7 +32,8 @@ const TOUR: { s: State; ms: number }[] = [
   { s: "listening", ms: 2200 },
 ];
 const TOUR_MS = TOUR.reduce((a, b) => a + b.ms, 0);
-const START_OFFSET = 600; // the tour is already 0.6 s into its first "thinking" at the first captured frame
+const BLINKS = [2.9, 7.78, 10.15, 14.45, 17.43];
+const START_OFFSET = 650; // the tour is already 0.6 s into its first "thinking" at the first captured frame
 
 function locate(t: number) {
   let x = ((t % TOUR_MS) + TOUR_MS) % TOUR_MS;
@@ -100,27 +101,30 @@ function Pip({ size, state, mini = false }: { size: number; state: State; mini?:
       const P = pose.current;
       const k = (tau: number) => 1 - Math.exp(-dt / tau);
       const sec = t / 1000;
+      const sref = sec - 0.9; /* seconds on the reference clock (its frame 0 = 0 s) */
 
-      let tgt = { lean: 0, dx: 0, dy: 0, eyeS: 1, lookX: Math.sin(sec * 0.9) * 2.2, lookY: Math.sin(sec * 0.55 + 1) * 0.8, happy: 0, worry: 0, cx: 95 + Math.sin(sec * 1.7) * 1.2, cy: 40 + Math.sin(sec * 2.1) * 2.2, cr: 5, cop: 1, line: 0 };
+      let tgt = { lean: 0, dx: 0, dy: 0, eyeS: 1, lookX: Math.sin(sec * 0.9) * 2.2, lookY: Math.sin(sec * 0.55 + 1) * 0.8, happy: 0, worry: 0, cx: 95.3 + Math.sin(sec * 1.7) * 0.4, cy: 27.2 + Math.sin(sec * 2.1) * 0.6, cr: 5, cop: 1, line: 0 };
       let orbitFront = false;
       if (s === "listening") {
-        tgt = { ...tgt, lean: -5, dx: 4, dy: 1, eyeS: 1.18, lookX: 3, lookY: 0, cx: 100, cy: 46 + Math.sin(sec * 7) * 1.5, cr: 5.6 };
+        tgt = { ...tgt, lean: -5, dx: 4, dy: 1, eyeS: 1.18, lookX: 3, lookY: 0, cx: 91.3, cy: 20.9, cr: 5 * (1.05 + 0.11 * Math.cos(((tin - 0.4) / 0.95) * Math.PI * 2)) };
       } else if (s === "thinking") {
-        const a = ((tin * 1000) / 2400) * Math.PI * 2 - 0.55;
+        /* measured on the reference: period 2.3 s, rightmost point 0.28 s after entry, centre (59.6, 26.4), rx 47.4, ry 9.4 */
+        const a = Math.max(0, ((tin + 0.05 - 0.28) / 2.3) * Math.PI * 2);
         const z = Math.sin(a);
-        tgt = { ...tgt, lean: 3, lookX: -3.2, lookY: -3, cx: 60 + 44 * Math.cos(a), cy: 46 + 11 * z, cr: 5 + 1.4 * z };
+        tgt = { ...tgt, lean: 3, lookX: -3.2, lookY: -3, cx: 59.6 + 47.4 * Math.cos(a), cy: 26.4 + 9.4 * z, cr: 5 * (0.85 + 0.25 * z) };
         orbitFront = z > 0;
       } else if (s === "writing") {
-        const ph = ((tin * 1000 + 250) % 1800) / 1800;
-        const run = ease(ph / 0.52);
-        const vis = ph < 0.6 ? 1 : Math.max(0, 1 - (ph - 0.6) / 0.12);
-        tgt = { ...tgt, lookX: -3.5 + 7 * run, lookY: 3.6, lean: 0, dy: 1, cx: 36 + 48 * run, cy: 114, cr: 4.4, line: vis };
-        if (ph > 0.6 && ph < 0.72) tgt.cx = 84;
-        if (ph >= 0.72) { tgt.cx = 36; tgt.line = 0; }
+        /* measured: sweep starts 0.15 s after entry, 1.2 s across (x 34.9 to 84.3), 0.4 s arced return, period 1.7 s */
+        const u = tin - 0.15 + 0.05;
+        const ph = u < 0 ? 0.97 : (u % 1.7) / 1.7;
+        let cx = 34.9, cy = 119, line = 0, frac = 0;
+        if (ph < 0.706) { frac = ease(ph / 0.706); cx = 34.9 + 49.4 * frac; line = 1; }
+        else if (ph < 0.94) { const r = (ph - 0.706) / 0.234; frac = 1 - r; cx = 84.3 - 49.4 * r; cy = 119 - 6.3 * Math.sin(Math.PI * r); }
+        tgt = { ...tgt, lookX: -3.5 + 7 * frac, lookY: 3.6, lean: 0, dy: 1, cx, cy, cr: 4.4, line };
       } else if (s === "done") {
-        tgt = { ...tgt, happy: 1, eyeS: 1, lookX: 0, lookY: 0, dy: -Math.max(0, Math.sin(Math.min(1, tin / 0.45) * Math.PI)) * 7, cx: 98, cy: 34, cr: 4.5 };
+        tgt = { ...tgt, happy: 1, eyeS: 1, lookX: 0, lookY: 0, dy: -2, cx: 95.3, cy: 24, cr: 4.5, cop: 0 };
       } else if (s === "error") {
-        const sh = Math.exp(-tin * 6) * Math.sin(tin * 48) * 4.2;
+        const sh = Math.exp(-tin * 5) * Math.sin(tin * 42) * 2.8;
         tgt = { ...tgt, worry: 1, dx: sh, lookX: 0, lookY: 1, eyeS: 0.92, cx: 96, cy: 46, cr: 4, cop: 0.55, lean: 0 };
       }
       if (reduce) { P.lean = tgt.lean; }
@@ -142,10 +146,14 @@ function Pip({ size, state, mini = false }: { size: number; state: State; mini?:
 
       /* breathing and the blink (every 4.2 s, 140 ms) */
       const breath = Math.sin(sec * 1.6);
-      const bob = Math.sin(sec * 1.6 + 0.6) * 1.6;
-      const bx = (sec * 1000) % 4200;
-      let blink = bx < 150 ? Math.sin((bx / 150) * Math.PI) : 0;
-      if ((s === "idle" || s === "listening") && tin < 0.16) blink = Math.max(blink, Math.sin((tin / 0.16) * Math.PI));
+      const bob = 1.9 * Math.cos(1.96 * (sref - 14.95)); /* measured: period 3.2 s, +-2.4 px */
+      /* blink times measured on the reference (s, loop 20.715): unevenly spaced, ~4.8 s mean, 150 ms each */
+      const lp = ((sref % 20.715) + 20.715) % 20.715;
+      let blink = 0;
+      for (const bt of BLINKS) {
+        const d = lp - (bt - 0.075);
+        if (d >= 0 && d < 0.15) blink = Math.max(blink, Math.sin((d / 0.15) * Math.PI));
+      }
       const sy = 1 + breath * 0.012;
       el.body.setAttribute(
         "transform",
@@ -184,9 +192,9 @@ function Pip({ size, state, mini = false }: { size: number; state: State; mini?:
       tgtEl.setAttribute("opacity", P.cop.toFixed(3));
       other.setAttribute("opacity", "0");
       void cArr;
-      const ringPhase = s === "listening" ? (tin % 1.1) / 1.1 : 1;
+      const ringPhase = 1;
       el.ring.setAttribute("transform", `translate(${P.cx.toFixed(2)} ${P.cy.toFixed(2)}) scale(${(1 + ringPhase * 2.2).toFixed(3)})`);
-      el.ring.setAttribute("opacity", s === "listening" ? ((1 - ringPhase) * 0.5).toFixed(3) : "0");
+      el.ring.setAttribute("opacity", "0");
       /* writing line: dashes revealed up to the spark */
       const lx = P.cx;
       el.line.setAttribute("x2", String(Math.max(36, lx - 4).toFixed(2)));
@@ -194,8 +202,8 @@ function Pip({ size, state, mini = false }: { size: number; state: State; mini?:
       /* done sparkles: a pop then a slow twinkle */
       const pop = s === "done" ? ease(tin / 0.3) : 0;
       const tw = 0.9 + 0.1 * Math.sin(sec * 5);
-      el.spark1.setAttribute("transform", `translate(98 30) rotate(${(pop * 20).toFixed(1)}) scale(${(pop * 1.4 * tw).toFixed(3)})`);
-      el.spark2.setAttribute("transform", `translate(106 46) rotate(${(-pop * 20).toFixed(1)}) scale(${(pop * 0.8).toFixed(3)})`);
+      el.spark1.setAttribute("transform", `translate(95.3 24) rotate(${(pop * 20).toFixed(1)}) scale(${(pop * 0.85 * tw).toFixed(3)})`);
+      el.spark2.setAttribute("transform", `translate(107 39.7) rotate(${(-pop * 20).toFixed(1)}) scale(${(pop * 0.35).toFixed(3)})`);
       el.spark1.setAttribute("opacity", pop > 0.01 ? "1" : "0");
       el.spark2.setAttribute("opacity", pop > 0.01 ? "1" : "0");
       raf = requestAnimationFrame(frame);

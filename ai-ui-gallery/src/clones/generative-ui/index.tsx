@@ -143,7 +143,7 @@ export default function GenerativeUI() {
   const words = REPLY.split(/(?<= )/);
 
   return (
-    <div className="gu-root" data-gu-root data-card={card ? "" : undefined}>
+    <div className="gu-root" data-gu-root data-started={started ? "" : undefined}>
       <header className="gu-head">
         <div className="gu-who">
           <span className="gu-orb" style={{ width: 28, height: 28 }} />

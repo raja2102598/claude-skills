@@ -5,7 +5,7 @@ import "./ai-hero.css";
 /* Copy, brand and palette are our own. Structure and motion follow .reanimate/ai-hero/spec.md. */
 const LINES = [
   ["Let", "Wren", "clear", "the"],
-  ["path", "for", "your", "day."],
+  ["space", "for", "focus."],
 ];
 const PROMPTS = [
   "Draft a launch checklist for Friday",
@@ -15,7 +15,7 @@ const PROMPTS = [
 const CHIPS = ["Plan next sprint", "Summarize my inbox", "Prep tomorrow's standup"];
 const BAR_H = [231, 287, 340, 386, 419, 386, 340, 287, 231]; // px at the 1293 px reference width
 const WORD_BASE = 183; // ms, first word starts moving
-const WORD_STEP = 142; // ms per word; line 2 starts two steps after line 1
+const WORD_STEP = 73; // ms per word, one global index across both lines (line 2 simply continues the sequence)
 const CHIP_DELAY = [378, 417, 462];
 const PROMPT_DELAY = [0.317, 3.117, 5.917]; // s, 2.8 s apart
 
@@ -98,7 +98,7 @@ export default function AiHero() {
             <span className="ah-line" key={li}>
               {line.map((w, wi) => (
                 <span key={wi}>
-                  <span className="ah-w ah-in" style={{ ["--d" as string]: `${WORD_BASE + WORD_STEP * (li * 2 + wi)}ms` }}>
+                  <span className="ah-w ah-in" style={{ ["--d" as string]: `${WORD_BASE + WORD_STEP * (li * LINES[0].length + wi)}ms` }}>
                     {w}
                   </span>
                   {wi < line.length - 1 && <span className="ah-sp" />}

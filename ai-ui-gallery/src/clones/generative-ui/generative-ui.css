@@ -163,9 +163,9 @@
 .gu-actions .no { transition: width 260ms var(--ease), opacity 200ms, margin 260ms var(--ease), background 150ms; }
 .gu-actions .no.gone { width: 0; opacity: 0; margin-right: -8px; overflow: hidden; }
 
-/* the reference composer sits below the visible stage; fade ours out once the card is on screen so it never shows through or beside the card */
+/* the reference composer sits below the visible stage; fade ours out when the turn starts */
 .gu-composer { transition: opacity 200ms; }
-.gu-root[data-card] .gu-composer { opacity: 0; }
+.gu-root[data-started] .gu-composer { opacity: 0; }
 .gu-collapse.snap { animation: gu-fade 200ms ease both; }
 .gu-foot span { opacity: 0; transition: opacity 250ms; }
 .gu-foot span.show { opacity: 1; }
