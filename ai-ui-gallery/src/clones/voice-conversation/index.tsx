@@ -356,8 +356,9 @@ function Call({ startAt }: { startAt: number }) {
   useEffect(() => {
     let raf = 0;
     let lastKey = "";
-    const tick = (now: number) => {
-      const elapsed = Math.max(0, now - startAt);
+    const tick = () => {
+      // performance.now(), not the rAF frame stamp: the stamp is the frame's start, which can trail the click time.
+      const elapsed = Math.max(0, performance.now() - startAt);
       const cycle = Math.floor(elapsed / T.cycle);
       const frame = frameAt(elapsed - cycle * T.cycle);
       const key = `${cycle}/${frameKey(frame)}`;
