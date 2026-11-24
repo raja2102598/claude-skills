@@ -325,6 +325,6 @@ export const entries: ShowcaseEntry[] = [
     slug: "ai-hero",
     load: () => import("../src/clones/ai-hero/index.tsx"),
     meta: () => import("../src/clones/ai-hero/meta.ts"),
-    reference: "beUI Pro · AI Workspace", candidates: 8, rounds: 3, timing: "every element within 17 ms", runnerUp: "Arc UI AI feature launch",
+    reference: "beUI Pro · AI Workspace", candidates: 8, rounds: 4, timing: "0 s window error, rows within 80 ms", runnerUp: "Arc UI AI feature launch",
   },
 ];
