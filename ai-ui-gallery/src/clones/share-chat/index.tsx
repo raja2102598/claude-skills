@@ -68,7 +68,7 @@ export default function ShareChat() {
       at(base + 10600, () => setVis("any"));
       at(base + 12000, () => { setExpiry("7 days"); cycle(base + 12000); });
     };
-    cycle(lag - 150);
+    cycle(lag + 50);
     return () => ids.forEach(window.clearTimeout);
   }, [flashCopied]);
   const stop = () => { demoOn.current = false; };
