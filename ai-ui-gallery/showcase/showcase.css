@@ -1,0 +1,17 @@
+/* Tailwind for the clones (scans ../src); the page chrome is styled in the published HTML. */
+@import "tailwindcss" source("../src");
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Give every stage the dev server's defaults so the host page's theme and font never leak in. */
+.sc-stage {
+  position: relative;
+  overflow: hidden;
+  color-scheme: light;
+  color: #000;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-align: left;
+}

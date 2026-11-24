@@ -8,6 +8,11 @@ How each clone in this gallery was made. It also briefs the agent that clones on
 into concepts. A concept is one idea (an agent plan, a model picker, a thinking line) offered by
 several catalogs. For each concept:
 
+**Speed mode (from 24 Nov 2026):** up to 8 agents share 4 CPUs. Keep the candidate review to one
+screenshot plus one short capture per candidate, cap reanimate at 3 rounds, and report any row that
+still fails with its numbers instead of running a 4th round. Real-clock probes are noisier under this
+load; prefer the virtual clock and the `getAnimations()` durations and easings.
+
 1. **Look at every candidate.** Open each candidate URL with reanimate's `capture.ts` and find the
    live preview on the page. Use a short capture, about 3 s at 10 fps, cropped to the preview with
    `--selector`, then read the frames or the filmstrip sheet. Note anything that fails to load:
@@ -22,7 +27,7 @@ several catalogs. For each concept:
    Pick **one** winner. Pick a second only when the concept holds two genuinely different
    components rather than variants of one, and say why.
 3. **Clone the winner with the `reanimate` skill.** Invoke the skill and follow its workflow: scope,
-   capture, spec, build, verify, and repeat for up to 5 rounds.
+   capture, spec, build, verify, and repeat for up to 3 rounds (speed mode: the user asked for the remaining concepts as soon as possible).
 4. **Record the selection** (see Output).
 
 ## Fidelity and licenses (non-negotiable)

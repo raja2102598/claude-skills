@@ -10,3 +10,4 @@ dist
 !.reanimate/*/compare-*/
 !.reanimate/*/compare-*/sheets/
 !.reanimate/*/compare-*/sheets/*.webp
+dist-showcase

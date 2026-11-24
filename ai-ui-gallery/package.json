@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:showcase": "vite build --config vite.showcase.config.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
