@@ -14,7 +14,7 @@ import "./generative-ui.css";
 // Times are read from real-clock rAF probes of the reference (steps are paced 512 ms apart, each row appears as the previous one resolves).
 const T = { user: 212, think: 226, s1: 518, s1done: 1032, s2: 1032, s2done: 1544, s3: 1544, s3done: 2080, text: 2080, card: 2597 };
 // ms after Approve: button label swaps, Decline leaves, stepper opens with Sign done, then Submitted + Confirmed land together
-const SIGN = { label: 258, decline: 724, sign: 1470, confirmed: 3105 };
+const SIGN = { label: 258, decline: 480, sign: 1455, confirmed: 3105 };
 const WORD_GAP = 21;
 
 const STEPS = [

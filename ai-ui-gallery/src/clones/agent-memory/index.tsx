@@ -24,9 +24,9 @@ const autoplayEnabled = () => {
   }
 };
 
-function Collapse({ open, children }: { open: boolean; children: ReactNode }) {
+function Collapse({ open, children, slow }: { open: boolean; children: ReactNode; slow?: boolean }) {
   return (
-    <div className="am-c" data-open={open}>
+    <div className="am-c" data-open={open} data-slow={slow}>
       <div className="am-ci">{children}</div>
     </div>
   );
@@ -75,6 +75,7 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
   const [addText, setAddText] = useState("");
   const [pct, setPct] = useState(62);
   const [pill, setPill] = useState<"update" | "added" | "saved">("update");
+  const [pillGone, setPillGone] = useState(false);
   const [saved, setSaved] = useState(true);
   const [history, setHistory] = useState(true);
   const timers = useRef<Record<string, number>>({});
@@ -106,16 +107,13 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
   const addFresh = useCallback(() => {
     setMems((m) => (m.some((x) => x.id === FRESH.id) ? m : [FRESH, ...m]));
     setEntered((e) => ({ ...e, [FRESH.id]: false }));
-    setPill("added");
     setPct((p) => p + 4);
     setFresh(FRESH.id);
-    timers.current.enter = window.setTimeout(() => setEntered((e) => ({ ...e, [FRESH.id]: true })), 80);
-    timers.current.saved = window.setTimeout(() => setPill("saved"), 450);
-    timers.current.fresh = window.setTimeout(() => setFresh(null), 1500);
-    timers.current.scroll = window.setTimeout(
-      () => document.querySelector('[data-memory-id="fresh"]')?.scrollIntoView({ block: "nearest", behavior: "smooth" }),
-      1000,
-    );
+    timers.current.enter = window.setTimeout(() => setEntered((e) => ({ ...e, [FRESH.id]: true })), 20);
+    timers.current.saved = window.setTimeout(() => setPill("saved"), 30);
+    timers.current.fresh = window.setTimeout(() => setFresh(null), 1650);
+    /* measured on the reference: the chip leaves at +1.77 s and the list glides up by the chip's height */
+    timers.current.gone = window.setTimeout(() => setPillGone(true), 1770);
   }, []);
   const commitAdd = () => {
     const text = addText.trim();
@@ -242,7 +240,7 @@ function AgentMemory({ onUser }: { onUser: () => void }) {
             </button>
           </div>
         </div>
-        <Collapse open>
+        <Collapse open={!pillGone} slow>
           <div className="am-pillRow">
             <button type="button" className="am-pill" data-state={pill} data-t="pill" onClick={() => pill === "update" && addFresh()}>
               <span data-l="update">
