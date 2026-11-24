@@ -24,12 +24,12 @@ type Model = {
 };
 
 const MODELS: Model[] = [
-  { name: "Nova 2", role: "Primary", Icon: Asterisk, tint: "#e2603c", outcome: "timeout", cost: "+8.0 s", tryMs: 2100, doneNote: "No reply in 8 s" },
-  { name: "Atlas Mini", role: "Fallback 1", Icon: Hexagon, tint: "#44403c", outcome: "limited", cost: "+1.4 s", tryMs: 2500, doneNote: "Rate limited, retry in 40 s" },
-  { name: "Lumen", role: "Fallback 2", Icon: Star, tint: "#2f6bf0", outcome: "answered", cost: "2.3 s", tryMs: 1900, doneNote: "Sent the reply" },
+  { name: "Nova 2", role: "Primary", Icon: Asterisk, tint: "#e2603c", outcome: "timeout", cost: "+8.0 s", tryMs: 2200, doneNote: "No reply in 8 s" },
+  { name: "Atlas Mini", role: "Fallback 1", Icon: Hexagon, tint: "#44403c", outcome: "limited", cost: "+1.4 s", tryMs: 1800, doneNote: "Rate limited, retry in 40 s" },
+  { name: "Lumen", role: "Fallback 2", Icon: Star, tint: "#2f6bf0", outcome: "answered", cost: "2.3 s", tryMs: 2000, doneNote: "Sent the reply" },
   { name: "Quill", role: "Fallback 3", Icon: Orbit, tint: "#0e9aa7", outcome: "answered", cost: "", tryMs: 0, doneNote: "" },
 ];
-const HOLD_MS = 5100;
+const HOLD_MS = 6000;
 // Totals after each attempt finishes: [added latency, fallbacks, total].
 const TOTALS: [string, string, string][] = [
   ["+0.0 s", "0", "0.0 s"],
