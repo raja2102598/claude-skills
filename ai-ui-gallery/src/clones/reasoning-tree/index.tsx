@@ -10,14 +10,16 @@ import "./reasoning-tree.css";
  * question, then for three depths proposes thoughts (nodes and edges draw in), scores them (bars fill and numbers
  * count up), and keeps the best `beam` of the level (the rest fade). At depth 3 the winner turns green, the others
  * fade, and the path back to the question lights up. Controls: play/pause, step, reset, beam width 1/2/3.
- * Event times below were read off the reference's frames (ms from mount). The clock is advanced by rAF so it can
+ * Event times below were measured on the reference (virtual clock, ms from the card appearing). The clock is advanced by rAF so it can
  * be paused and stepped; every visual change is a CSS transition keyed off the step number.
  */
 
-// step: 0 ready, 1 reading, then per depth k: propose, score, fill, keep (depth 3: answer)
-const T = [0, 1000, 2600, 3200, 3900, 4300, 5200, 5900, 6900, 7300, 8650, 9400, 9900, 11400];
-const P = (k: number) => 2 + 4 * (k - 1);
-const END = T.length - 1;
+// step: 0 ready (play icon, card taller), 1 collapse (the stage shrinks, controls slide in), 2 reading, then per
+// depth k: propose, score, keep (depth 3: answer, whose path highlight keeps moving for 1.26 s)
+const T = [0, 1400, 1570, 2170, 2840, 3730, 4520, 5170, 6050, 6810, 7430];
+const P = (k: number) => 3 + 3 * (k - 1);
+const END = 10;
+const TAIL = 1260;
 
 const COL_X = [20, 167, 337, 506];
 const COL_W = [119, 140, 140, 140];
@@ -34,6 +36,7 @@ interface N {
   best: boolean;
   onPath: boolean;
   idx: number;
+  ci: number;
 }
 
 function layout(beam: number) {
@@ -46,7 +49,7 @@ function layout(beam: number) {
     for (const p of parents) {
       p.kids.forEach((t, i) => {
         want.push(p.y + (i - (p.kids.length - 1) / 2) * 62);
-        nodes.push({ t, depth: d, parent: p.id, y: 0, kept: false, best: false, onPath: false, idx: nodes.length });
+        nodes.push({ t, depth: d, parent: p.id, y: 0, kept: false, best: false, onPath: false, idx: nodes.length, ci: i });
       });
     }
     const pitch = Math.min(62, 340 / nodes.length);
@@ -69,12 +72,11 @@ function layout(beam: number) {
   return { levels, all };
 }
 
-const reduced = () => typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-
 export default function ReasoningTree() {
   const [beam, setBeam] = useState(2);
   const [step, setStep] = useState(0);
   const [running, setRunning] = useState(false);
+  const [prev, setPrev] = useState<string | null>(null);
   const clock = useRef({ t: 0, step: 0, running: false });
 
   const { levels, all } = useMemo(() => layout(beam), [beam]);
@@ -99,7 +101,7 @@ export default function ReasoningTree() {
     setRunning(true);
   }, []);
 
-  // autoplay on mount, like the reference (and again after a reset or beam change)
+  // autoplay shortly after mount (the Ready state lasts T[1]), and again after a reset or beam change
   useEffect(() => {
     if (step === 0 && !running && !clock.current.running) {
       clock.current.running = true;
@@ -135,164 +137,195 @@ export default function ReasoningTree() {
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const level = (n: N) => n.depth;
-  const proposed = (n: N) => step >= P(level(n));
-  const scoring = (n: N) => step >= P(level(n)) + 1;
-  const filled = (n: N) => step >= P(level(n)) + 2;
-  // the scorer first reports a rough value (about 45 % of the final), then settles on the real one
-  const shown = (n: N) => (filled(n) ? n.t.score : scoring(n) ? n.t.score * 0.45 : 0);
-  const decided = (n: N) => step >= P(level(n)) + 3;
+  const proposing = (n: N) => step === P(n.depth);
+  const proposed = (n: N) => step >= P(n.depth);
+  const scoring = (n: N) => step >= P(n.depth) + 1;
+  const decided = (n: N) => step >= P(n.depth) + 2;
   const answer = step === END;
   const winner = all.find((n) => n.best)!;
   const nodeById = new Map(all.map((n) => [n.t.id, n]));
 
   const count = (d: number) => levels[d - 1].length;
   let status = "Ready";
-  let live = false;
-  if (step === 1) status = "Reading the question";
-  else if (answer) status = "Answer found";
-  else if (step > 1) {
-    const d = Math.min(3, Math.floor((step - 2) / 4) + 1);
-    const ph = (step - 2) % 4;
-    status = ph === 0 ? `Proposing ${count(d)} thoughts` : ph < 3 ? `Scoring ${count(d)} thoughts` : `Keeping the best ${beam}`;
+  if (answer) status = "Answer found";
+  else if (step >= 2) {
+    const d = Math.min(3, Math.floor((step - 3) / 3) + 1);
+    const ph = step < 3 ? -1 : (step - 3) % 3;
+    status = ph < 0 ? "Reading the question" : ph === 0 ? `Proposing ${count(d)} thoughts` : ph === 1 ? `Scoring ${count(d)} thoughts` : `Keeping the best ${beam}`;
   }
-  live = step >= 1 && !answer;
-  const activeDepth = step < 2 ? 0 : Math.min(3, Math.floor((step - 2) / 4) + 1);
-  const paused = !running && step > 0 && !answer;
+  const live = step >= 2 && !answer;
+  const activeDepth = step < 3 || answer ? 0 : Math.min(3, Math.floor((step - 3) / 3) + 1);
+  const paused = !running && step > 1 && !answer;
+
+  // the status crossfades: the old line fades out in 100 ms, the new one fades in over 150 ms after it
+  const lastStatus = useRef(status);
+  useEffect(() => {
+    if (lastStatus.current !== status) {
+      setPrev(lastStatus.current);
+      lastStatus.current = status;
+      const id = window.setTimeout(() => setPrev(null), 260);
+      return () => window.clearTimeout(id);
+    }
+  }, [status]);
 
   const qBottom = CY;
-  const edge = (n: N) => {
+  const edgePts = (n: N) => {
     const p = n.parent ? nodeById.get(n.parent)! : null;
     const x1 = p ? COL_X[p.depth] + COL_W[p.depth] : COL_X[0] + COL_W[0];
     const y1 = p ? p.y : qBottom;
     const x2 = COL_X[n.depth];
     const mx = (x1 + x2) / 2;
-    return `M${x1} ${y1} C${mx} ${y1} ${mx} ${n.y} ${x2} ${n.y}`;
+    return { x1, y1, x2, y2: n.y, mx };
   };
+  const edge = (n: N) => {
+    const { x1, y1, x2, y2, mx } = edgePts(n);
+    return `M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`;
+  };
+  // one path from the question through the winning chain (drawn at the end, with a travelling sheen)
+  const winPath = (() => {
+    const chain: N[] = [];
+    for (let c: N | undefined = winner; c; c = c.parent ? nodeById.get(c.parent) : undefined) chain.unshift(c);
+    let d = "";
+    chain.forEach((n, i) => {
+      const { x1, y1, x2, y2, mx } = edgePts(n);
+      d += `${i === 0 ? `M${x1} ${y1} ` : ""}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2} L${x2 + COL_W[n.depth]} ${y2} `;
+    });
+    return d;
+  })();
+
+  const dim = (n: N) => (decided(n) && !n.kept) || (answer && n.depth === 3 && !n.best);
 
   return (
-    <div className="rt" data-rt>
-      <div className="rt-head">
-        <Sparkle size={16} fill="currentColor" style={{ color: "var(--mark)" }} />
-        <span className="rt-model">{MODEL}</span>
-        <span className="rt-sub">Tree of thoughts</span>
-        <span key={status} className={clsx("rt-status rt-swap", live && !paused && "live", answer && "done")} data-rt-status>
-          {answer && <Check size={14} />}
-          {status}
-        </span>
-      </div>
-
-      <div className="rt-cols">
-        <span className={clsx("rt-col", step < 2 && "on")} style={{ left: COL_X[0] }}>Question</span>
-        {[1, 2, 3].map((d) => (
-          <span key={d} className={clsx("rt-col", activeDepth === d && "on")} style={{ left: COL_X[d] }}>
-            Depth {d}
-          </span>
-        ))}
-        {[1, 2].map((d) =>
-          step >= P(d) + 3 ? (
-            <span key={d} className="rt-kept" style={{ right: 667 - COL_X[d] - COL_W[d] }}>
-              {beam} of {count(d)} kept
+    <div className="rt" data-rt data-start={step >= 1 ? "1" : "0"}>
+      <div className="rt-card">
+        <div className="rt-head">
+          <Sparkle size={16} fill="currentColor" style={{ color: "var(--mark)" }} />
+          <span className="rt-model">{MODEL}</span>
+          <span className="rt-sub">Tree of thoughts</span>
+          <span className="rt-statuswrap" data-rt-status>
+            {prev !== null && <span key={"o" + prev} className="rt-status rt-out">{prev}</span>}
+            <span key={status} className={clsx("rt-status", prev !== null && "rt-in", live && !paused && "live", answer && "done")}>
+              {status}
             </span>
-          ) : null,
-        )}
-        {answer && (
-          <span className="rt-kept" style={{ right: 667 - COL_X[3] - COL_W[3] }}>
-            Best of {count(3)}
           </span>
-        )}
-      </div>
+        </div>
 
-      <svg className="rt-edges" width="667" height="539" viewBox="0 0 667 539">
+        <div className="rt-cols">
+          <span className={clsx("rt-col", step < 3 && "on")} style={{ left: COL_X[0] }}>Question</span>
+          {[1, 2, 3].map((d) => (
+            <span key={d} className={clsx("rt-col", activeDepth === d && "on")} style={{ left: COL_X[d] }}>
+              Depth {d}
+            </span>
+          ))}
+          {[1, 2].map((d) =>
+            step >= P(d) + 2 ? (
+              <span key={d} className="rt-kept" style={{ right: 667 - COL_X[d] - COL_W[d] }}>
+                {beam} of {count(d)} kept
+              </span>
+            ) : null,
+          )}
+          {answer && (
+            <span className="rt-kept" style={{ right: 667 - COL_X[3] - COL_W[3] }}>
+              Best of {count(3)}
+            </span>
+          )}
+        </div>
+
+        <svg className="rt-edges" width="667" height="539" viewBox="0 0 667 539">
+          {all.map((n) => {
+            const pruned = (decided(n) && !n.kept && n.depth < 3) || (answer && n.depth === 3 && !n.best);
+            return (
+              <path
+                key={n.t.id}
+                d={edge(n)}
+                pathLength={1}
+                className={clsx("rt-edge", proposed(n) && "in", pruned && "out")}
+                style={{ transitionDelay: proposing(n) ? `${n.ci * 20}ms` : "0ms" }}
+              />
+            );
+          })}
+          {answer && <path key="win" d={winPath} pathLength={1} className="rt-win" />}
+          {answer && <path key="sheen" d={winPath} pathLength={1} className="rt-sheen" />}
+        </svg>
+
+        <div className={clsx("rt-node q", answer && "path")} style={{ left: COL_X[0], top: CY - Q_H / 2, width: COL_W[0], height: Q_H }}>
+          {QUESTION}
+        </div>
+
         {all.map((n) => {
-          const pruned = decided(n) && !n.kept;
+          const kept = decided(n) && n.kept;
+          const pathDelay = answer && n.onPath ? 160 + (n.depth - 1) * (760 / 3) : 0;
           return (
-            <path
+            <div
               key={n.t.id}
-              d={edge(n)}
-              pathLength={1}
-              className={clsx("rt-edge", proposed(n) && "in", pruned && "out", answer && n.onPath && "win")}
-              style={{ transitionDelay: answer && n.onPath ? `${(n.depth - 1) * 220}ms` : proposed(n) ? `${(n.idx % 6) * 60}ms` : "0ms", transitionDuration: answer && n.onPath ? "420ms, 700ms, 400ms" : undefined }}
-            />
+              className={clsx("rt-node leaf", proposed(n) && "in", dim(n) && "pruned", kept && "kept", answer && n.onPath && "path", answer && n.best && "best")}
+              style={{
+                left: COL_X[n.depth], top: n.y - NODE_H / 2, width: COL_W[n.depth], height: NODE_H,
+                transitionDelay: proposing(n) ? `${100 + n.ci * 20}ms, 0ms, 0ms` : `0ms, ${pathDelay}ms, ${n.best ? 920 : 0}ms`,
+              }}
+              data-depth={n.depth}
+            >
+              <div className="rt-title">{n.t.label}</div>
+              {answer && n.best && <Check size={14} className="rt-check" />}
+              <div className="rt-row">
+                <span className="rt-bar">
+                  <i
+                    className="rt-fill"
+                    style={{ transform: `scaleX(${scoring(n) ? n.t.score : 0})`, transitionDelay: step === P(n.depth) + 1 ? `${n.ci * 20}ms, 0ms` : "0ms" }}
+                  />
+                </span>
+                <span
+                  className={clsx("rt-num", scoring(n) && "show", decided(n) && n.kept && "kept")}
+                  style={{ "--rt-n": scoring(n) ? Math.round(n.t.score * 100) : 0, transitionDelay: step === P(n.depth) + 1 ? `${n.ci * 20}ms, ${n.ci * 20}ms, 0ms` : "0ms" } as CSSProperties}
+                />
+              </div>
+            </div>
           );
         })}
-      </svg>
 
-      <div className="rt-node q" style={{ left: COL_X[0], top: CY - Q_H / 2, width: COL_W[0], height: Q_H }}>
-        {QUESTION}
-      </div>
-
-      {all.map((n) => {
-        const pruned = (decided(n) && !n.kept) || (answer && n.depth === 3 && !n.best);
-        const kept = decided(n) && n.kept;
-        return (
-          <div
-            key={n.t.id}
-            className={clsx("rt-node leaf", proposed(n) && "in", pruned && "pruned", kept && "kept", answer && n.best && "best")}
-            style={{
-              left: COL_X[n.depth], top: n.y - NODE_H / 2, width: COL_W[n.depth], height: NODE_H,
-              transitionDelay: proposed(n) ? `${(n.idx % 6) * 60}ms` : "0ms",
+        <div className="rt-foot">
+          <button
+            className="rt-btn" data-rt-play aria-label={running ? "Pause" : "Play"}
+            onClick={() => {
+              if (answer) {
+                apply(0, false);
+                clock.current.running = true;
+                setRunning(true);
+              } else {
+                clock.current.running = !running;
+                setRunning(!running);
+              }
             }}
-            data-depth={n.depth}
           >
-            <div className="rt-title">{n.t.label}</div>
-            <div className="rt-row">
-              <span className="rt-bar">
-                <i
-                  className="rt-fill"
-                  style={{ transform: `scaleX(${shown(n)})`, transitionDelay: `${(n.idx % 4) * 20}ms` }}
-                />
-              </span>
-              <span
-                className={clsx("rt-num", scoring(n) && "show")}
-                style={{ "--rt-n": Math.round(shown(n) * 100), transitionDelay: `${(n.idx % 4) * 20}ms` } as CSSProperties}
-              />
+            <Pause size={16} className={clsx("rt-ic", running && "on")} />
+            <Play size={16} className={clsx("rt-ic", !running && "on")} />
+          </button>
+          <button
+            className={clsx("rt-btn", answer && "off")} aria-label="Step" disabled={step >= END}
+            onClick={() => apply(Math.min(END, Math.max(2, step + 1)), false)}
+          >
+            <SkipForward size={16} />
+          </button>
+          <button className="rt-btn" aria-label="Reset" onClick={restart}>
+            <RotateCcw size={16} />
+          </button>
+          <div className="rt-beam">
+            <span>Beam width</span>
+            <div className="rt-seg" role="group" aria-label="Beam width">
+              <span className="rt-pill" style={{ transform: `translateX(${(beam - 1) * 34}px)` }} />
+              {[1, 2, 3].map((b) => (
+                <button
+                  key={b} data-rt-beam={b} aria-pressed={beam === b}
+                  onClick={() => {
+                    if (b === beam) return;
+                    setBeam(b);
+                    restart();
+                  }}
+                >
+                  {b}
+                </button>
+              ))}
             </div>
-          </div>
-        );
-      })}
-
-      <div className="rt-foot">
-        <button
-          className="rt-btn" data-rt-play aria-label={running ? "Pause" : "Play"}
-          onClick={() => {
-            if (answer) {
-              apply(0, false);
-              clock.current.running = true;
-              setRunning(true);
-            } else {
-              clock.current.running = !running;
-              setRunning(!running);
-            }
-          }}
-        >
-          {running ? <Pause size={16} /> : <Play size={16} />}
-        </button>
-        <button
-          className="rt-btn" aria-label="Step" disabled={step >= END}
-          onClick={() => apply(Math.min(END, step + 1), false)}
-        >
-          <SkipForward size={16} />
-        </button>
-        <button className="rt-btn" aria-label="Reset" onClick={restart}>
-          <RotateCcw size={16} />
-        </button>
-        <div className="rt-beam">
-          <span>Beam width</span>
-          <div className="rt-seg" role="group" aria-label="Beam width">
-            <span className="rt-pill" style={{ transform: `translateX(${(beam - 1) * 34}px)` }} />
-            {[1, 2, 3].map((b) => (
-              <button
-                key={b} data-rt-beam={b} aria-pressed={beam === b}
-                onClick={() => {
-                  if (b === beam) return;
-                  setBeam(b);
-                  restart();
-                }}
-              >
-                {b}
-              </button>
-            ))}
           </div>
         </div>
       </div>
