@@ -16,10 +16,11 @@ const DEMO = {
   expand: 2484,
   ring: [
     [2878, 0.35],
-    [3280, 0.65],
+    [3265, 0.65],
     [3765, 1],
   ] as const,
   image: 2910,
+  ready: 3775, // send lights up a frame after the ring closes
   settle: 4005,
   press: 4385,
   record: 4640,
@@ -33,11 +34,19 @@ const DEMO = {
 };
 const COLS = 36;
 const LEVELS = [16, 17, 15, 11, 11, 15, 20, 23, 20, 14, 10, 8]; // px, the twelve bars of the reference note
-const TRANSCRIPT = "Find a quiet trail near this lake for a sunrise hike";
+const TRANSCRIPT = "Find a quiet trail near this lake for a sunrise hike and a swim";
 const EFFORTS = ["Medium", "High", "Low"];
 
 type Mode = "pill" | "compose" | "record";
-type Attachment = { id: number; progress: number; loaded: boolean; settled: boolean };
+type Fx = "cut" | "record" | "transcript" | "done";
+// Cross-fade durations (ms) per change, measured per element on the 60 fps reference (spec rows 11-13, 18-20, 25).
+const FADES: Record<Fx, { text: number; voice: number; icon: number }> = {
+  cut: { text: 0, voice: 0, icon: 0 },
+  record: { text: 170, voice: 170, icon: 140 },
+  transcript: { text: 70, voice: 150, icon: 140 },
+  done: { text: 0, voice: 0, icon: 110 },
+};
+type Attachment = { id: number; progress: number; loaded: boolean; done: boolean; settled: boolean };
 type State = {
   mode: Mode;
   running: boolean;
@@ -48,7 +57,7 @@ type State = {
   bars: number[];
   barCount: number;
   secs: number;
-  fade: number; // ms for the cross-fades this change starts (0 = cut)
+  fx: Fx; // which kind of change this is: decides the cross-fade durations (cut = none)
   effort: number;
 };
 
@@ -62,7 +71,7 @@ const initial = (): State => ({
   bars: Array(COLS).fill(0),
   barCount: 0,
   secs: 0,
-  fade: 0,
+  fx: "cut",
   effort: 0,
 });
 
@@ -176,26 +185,27 @@ export default function PromptMini() {
     if (!demo.current.on) return;
     const steps: { at: number; run: () => void }[] = [
       { at: 0, run: () => setS(initial()) },
-      { at: DEMO.expand, run: () => patch({ mode: "compose", fade: 0, attach: { id: 1, progress: 0.08, loaded: false, settled: false } }) },
+      { at: DEMO.expand, run: () => patch({ mode: "compose", fx: "cut", attach: { id: 1, progress: 0.08, loaded: false, done: false, settled: false } }) },
       ...DEMO.ring.map(([at, progress]) => ({
         at,
         run: () => patch((c) => ({ attach: c.attach && { ...c.attach, progress } })),
       })),
       { at: DEMO.image, run: () => patch((c) => ({ attach: c.attach && { ...c.attach, loaded: true } })) },
+      { at: DEMO.ready, run: () => patch((c) => ({ attach: c.attach && { ...c.attach, done: true } })) },
       { at: DEMO.settle, run: () => patch((c) => ({ attach: c.attach && { ...c.attach, settled: true } })) },
       { at: DEMO.press, run: () => patch({ pressed: true }) },
-      { at: DEMO.record, run: () => patch({ mode: "record", fade: 200, secs: 0, bars: Array(COLS).fill(0), barCount: 0 }) },
+      { at: DEMO.record, run: () => patch({ mode: "record", fx: "record", secs: 0, bars: Array(COLS).fill(0), barCount: 0 }) },
       ...LEVELS.map((lv, k) => ({
         at: DEMO.bar0 + k * DEMO.barStep,
         run: () => patch((c) => ({ bars: [...c.bars.slice(1), lv], barCount: c.barCount + 1 })),
       })),
       ...DEMO.ticks.map((at, k) => ({ at, run: () => patch({ secs: k + 1 }) })),
-      { at: DEMO.transcript, run: () => patch({ mode: "compose", fade: 200, pressed: false, text: TRANSCRIPT }) },
+      { at: DEMO.transcript, run: () => patch({ mode: "compose", fx: "transcript", pressed: false, text: TRANSCRIPT }) },
       {
         at: DEMO.send,
-        run: () => patch((c) => ({ mode: "pill", fade: 0, running: true, leaving: c.attach, attach: null, text: "" })),
+        run: () => patch((c) => ({ mode: "pill", fx: "cut", running: true, leaving: c.attach, attach: null, text: "" })),
       },
-      { at: DEMO.done, run: () => patch({ running: false, fade: 150 }) },
+      { at: DEMO.done, run: () => patch({ running: false, fx: "done" }) },
     ].sort((a, b) => a.at - b.at);
     let t0 = performance.now();
     let i = 0;
@@ -234,7 +244,7 @@ export default function PromptMini() {
       const set = (p: Partial<Attachment>) => patch((c) => (c.attach?.id === id ? { attach: { ...c.attach, ...p } } : {}));
       later(400, () => set({ progress: 0.35, loaded: true }));
       later(800, () => set({ progress: 0.65 }));
-      later(1250, () => set({ progress: 1 }));
+      later(1250, () => set({ progress: 1, done: true }));
       later(1500, () => set({ settled: true }));
     },
     [later, patch],
@@ -248,46 +258,46 @@ export default function PromptMini() {
       // Finish whatever the script left half-way.
       if (s.attach && !s.attach.settled) upload(s.attach.id);
       if (s.mode === "record") startVoice();
-      if (s.running) later(1500, () => patch({ running: false, fade: 150 }));
+      if (s.running) later(1500, () => patch({ running: false, fx: "done" }));
     },
     [s, upload, startVoice, later, patch],
   );
 
   const expand = () => {
     if (s.mode !== "pill") return;
-    patch({ mode: "compose", fade: 0 });
+    patch({ mode: "compose", fx: "cut" });
     requestAnimationFrame(() => textRef.current?.focus());
   };
   const addPhoto = () => {
     if (s.attach) return expand();
     const id = Date.now();
-    patch({ mode: s.mode === "record" ? "record" : "compose", fade: 0, attach: { id, progress: 0.08, loaded: false, settled: false } });
+    patch({ mode: s.mode === "record" ? "record" : "compose", fx: "cut", attach: { id, progress: 0.08, loaded: false, done: false, settled: false } });
     upload(id);
   };
   const record = () => {
-    patch({ mode: "record", fade: 200, pressed: true, secs: 0, bars: Array(COLS).fill(0), barCount: 0 });
+    patch({ mode: "record", fx: "record", pressed: true, secs: 0, bars: Array(COLS).fill(0), barCount: 0 });
     startVoice();
   };
   const endRecord = (keep: boolean) => {
     stopVoice();
     patch((c) => ({
       mode: "compose",
-      fade: 200,
+      fx: "transcript",
       pressed: false,
       text: keep ? (c.text ? `${c.text} ${TRANSCRIPT}` : TRANSCRIPT) : c.text,
     }));
   };
-  const ready = s.text.trim().length > 0 || (s.attach !== null && s.attach.progress >= 1);
+  const ready = s.text.trim().length > 0 || (s.attach !== null && s.attach.done);
   const send = () => {
     if (!ready) return;
     textRef.current?.blur();
-    patch((c) => ({ mode: "pill", fade: 0, running: true, leaving: c.attach, attach: null, text: "" }));
-    later(2200, () => patch((c) => (c.running ? { running: false, fade: 150 } : {})));
+    patch((c) => ({ mode: "pill", fx: "cut", running: true, leaving: c.attach, attach: null, text: "" }));
+    later(2200, () => patch((c) => (c.running ? { running: false, fx: "done" } : {})));
   };
   const onPrimary = () => {
     if (s.mode === "record") return endRecord(true);
     if (s.mode === "compose") return send();
-    if (s.running) return patch({ running: false, fade: 150 });
+    if (s.running) return patch({ running: false, fx: "done" });
     record();
   };
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -297,16 +307,16 @@ export default function PromptMini() {
     }
   };
   const collapseIfEmpty = (e: { target: EventTarget; currentTarget: EventTarget }) => {
-    if (e.target === e.currentTarget && s.mode === "compose" && !s.text.trim() && !s.attach) patch({ mode: "pill", fade: 0 });
+    if (e.target === e.currentTarget && s.mode === "compose" && !s.text.trim() && !s.attach) patch({ mode: "pill", fx: "cut" });
   };
 
   const icon = s.mode === "record" ? "check" : s.mode === "compose" ? "arrow" : s.running ? "stop" : "voice";
-  const fadeStyle = { transitionDuration: `${reduce ? 0 : s.fade}ms` };
-  const show = (on: boolean) => ({ ...fadeStyle, opacity: on ? 1 : 0 });
+  const fades = FADES[reduce ? "cut" : s.fx];
+  const show = (on: boolean, ms: number) => ({ transitionDuration: `${ms}ms`, opacity: on ? 1 : 0 });
   const micScale = s.pressed || s.mode === "record";
   const micStyle = {
     transform: micScale ? "scale(0.9)" : "none",
-    transition: reduce ? "none" : micScale ? "transform 150ms ease" : "transform 200ms ease-out",
+    transition: reduce ? "none" : micScale ? "transform 150ms ease" : "transform 100ms ease-out",
   };
   const primaryLabel = { check: "Use voice note", arrow: "Send", stop: "Stop reply", voice: "Talk" }[icon];
 
@@ -330,7 +340,7 @@ export default function PromptMini() {
                 </div>
               )}
               <div className="pm-zone">
-                <div className="pm-layer pm-text" style={show(s.mode === "compose")}>
+                <div className="pm-layer pm-text" style={show(s.mode === "compose", fades.text)}>
                   <div className="pm-mirror" aria-hidden>
                     {s.text || " "}
                     {"​"}
@@ -346,7 +356,7 @@ export default function PromptMini() {
                     disabled={s.mode === "record"}
                   />
                 </div>
-                <div className="pm-layer pm-voice" style={show(s.mode === "record")} aria-hidden={s.mode !== "record"}>
+                <div className="pm-layer pm-voice" style={show(s.mode === "record", fades.voice)} aria-hidden={s.mode !== "record"}>
                   <span className="pm-dot" key={`dot-${s.mode}`} />
                   <span className="pm-time">0:{String(s.secs).padStart(2, "0")}</span>
                   <span className="pm-wave">
@@ -410,16 +420,16 @@ export default function PromptMini() {
               aria-label={primaryLabel}
               onClick={onPrimary}
             >
-              <span style={show(icon === "voice")}>
+              <span style={show(icon === "voice", fades.icon)}>
                 <AudioLines />
               </span>
-              <span style={show(icon === "stop")}>
+              <span style={show(icon === "stop", fades.icon)}>
                 <i className="pm-stop" />
               </span>
-              <span style={show(icon === "arrow")}>
+              <span style={show(icon === "arrow", fades.icon)}>
                 <ArrowUp />
               </span>
-              <span style={show(icon === "check")}>
+              <span style={show(icon === "check", fades.icon)}>
                 <Check />
               </span>
             </button>

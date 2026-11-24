@@ -6,7 +6,7 @@ export const meta: CloneMeta = {
   source: "UIStacks",
   sourceUrl: "https://uistacks.dev/components/agent-map",
   license:
-    "Not verifiable as open source (UIStacks component catalog, no license file or page found for the component). Rebuilt from captures and rAF probes only, no source used.",
+    "Paid (UIStacks Pro: the page offers Get Pro · $159 and installs from @uistacks-pro with a license key). Rebuilt from captures and rAF probes only, no source used.",
   fidelity: "motion-faithful",
   stage: { width: 870, height: 533, background: "#f4f4f5" },
   pickedBecause:

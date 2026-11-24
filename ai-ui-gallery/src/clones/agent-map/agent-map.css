@@ -37,8 +37,9 @@
 }
 .am-zoom {
   position: absolute;
-  left: 12px;
-  top: 12px;
+  /* 12 px on screen; zoom scales the offsets too */
+  left: 13.0435px;
+  top: 13.0435px;
   width: 920px;
   zoom: 0.92;
 }

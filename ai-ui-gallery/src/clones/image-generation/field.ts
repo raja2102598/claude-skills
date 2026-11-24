@@ -43,12 +43,13 @@ export function toFieldImage(grid: Float32Array, n: number): FieldImage {
     const g = grid[i * 3 + 1];
     const b = grid[i * 3 + 2];
     const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
-    // darken toward ink so light areas still print as visible dots
-    col[i * 3] = r * 0.52;
-    col[i * 3 + 1] = g * 0.52;
-    col[i * 3 + 2] = b * 0.52;
-    alpha[i] = 0.82 + 0.07 * (1 - lum);
-    radius[i] = 3.34 - 1.6 * lum * 0.52;
+    // printed a little darker than the picture (x 0.78, fitted on the reference's dot log), so light areas read as
+    // pale dots and dark areas as full ones; dots shrink slightly as the picture gets lighter
+    col[i * 3] = r * 0.78;
+    col[i * 3 + 1] = g * 0.78;
+    col[i * 3 + 2] = b * 0.78;
+    alpha[i] = 0.83 + 0.04 * (1 - lum);
+    radius[i] = 2.95 - 0.35 * lum;
   }
   return { n, col, alpha, radius };
 }

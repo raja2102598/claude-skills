@@ -318,7 +318,11 @@ export default function PromptMention() {
   /* ---------- gallery autoplay: the reference's loop, any real input ends it ---------- */
   useEffect(() => {
     if (!demo.current.on) return;
-    const t0 = performance.now();
+    // Like the reference, whose demo starts with the page, the loop runs on page time from navigation: a capture then
+    // lines up however long the lazily loaded module took to mount. Mounted later than one loop after the page
+    // loaded (a client-side navigation), it starts from the top at mount instead.
+    const mountedAt = performance.now();
+    const t0 = mountedAt < LOOP ? 0 : mountedAt;
     let last = "";
     const tick = (now: number) => {
       if (!demo.current.on) return;

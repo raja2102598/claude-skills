@@ -24,29 +24,29 @@ send → reply running → reply done → idle again, then repeat (period 12.28 
 |---|---|---|---|---|---|---|---|
 | 1 | card | height | 2483 | ≈215 ms (99 % at 150 ms) | 57 → 174 px | ease-out-expo, remaining = 2^(−10 t/215) | fit to 11 frames, no overshoot; bottom edge fixed, grows up; content bottom-anchored and clipped |
 | 2 | card content | swap pill → compose | 2483 | cut | pill row → thumbnail / "Ask…" / [+][model chip] … [mic][send dim] | — | new row is complete on the first changed frame |
-| 3 | thumbnail tile | opacity, scale | 2500 | ≈150 ms | 0 / 0.85 → 1 / 1 | ease-out | tile clipped by the growing card top |
-| 4 | progress ring | arc | 2483 / 2883 / 3283 / 3767 | ≈120 ms steps | 8 % → 35 % → 65 % → 100 % | ease-out | determinate upload ring over a dimmed tile |
+| 3 | thumbnail tile | opacity, scale | 2514 (30 ms after #1) | ≈120 ms | 0 / 0.8 → 1 / 1 | ease-out (p = .42/.55/.79/.89/.98 at 2.95–3.02 s) | tile also clipped by the growing card top |
+| 4 | progress ring | arc | 2484 / 2878 / 3265 / 3765 | ≈120 ms steps | 8 % → 35 % → 65 % → 100 % | ease-out | determinate upload ring over a dimmed tile |
 | 5 | thumbnail image | appears | 2917 | cut | dark tile → photo (dimmed ≈45 %) | — | |
-| 6 | send | enabled | 3783 | cut | dim accent → accent | — | |
+| 6 | send | enabled | 3775 | cut | dim accent → accent | — | |
 | 7 | ring + dim overlay | opacity | 4005 | ≈215 ms | 1 → 0 | ease-out-expo (p = .32/.62/.78/.88 at frames 1–4) | |
 | 8 | mic | press scale | 4385 | 150 ms | 1 → 0.9 | `ease` (0.25,0.1,0.25,1) (p = .21/.42/.58/.75/.82/.90/.94) | hold-to-talk press |
-| 9 | +, model chip | remove | 4650 | cut | | — | record mode starts |
-| 10 | mic | tint | 4650 | cut | grey → accent-tint bg, accent icon | — | stays scaled 0.9 |
-| 11 | placeholder → record row | crossfade | 4650 | 200 ms | | ease-out (0,0,0.58,1) (p = .18/.45/.72/.94 at frames 1/3/6/9) | |
-| 12 | × button | opacity | 4650 | 200 ms | 0 → 1 | ease-out | |
-| 13 | send icon | arrow → check | 4650 | 200 ms | crossfade | ease-out | |
-| 14 | waveform | bars | 4750 + k·83.3, k = 0…11 | each bar grows in ≈50 ms | dot (2 px) → bar | ease-out | 36 columns, 7.7 px pitch; the row shifts left one column per bar; frozen after bar 12; heights 16,17,15,11,11,15,20,23,20,14,10,8 px |
-| 15 | timer | text | 4650 / 5667 / 6683 | cut | 0:00 → 0:01 → 0:02 | — | ticks every ≈1017 ms |
-| 16 | record dot | opacity | 4650 | ≈1.07 s period | 1 ↔ 0.4 | ease-in-out | peaks at ≈4.8, 5.8, 6.9 s |
+| 9 | +, model chip | remove | 4640 | cut | | — | record mode starts |
+| 10 | mic | tint | 4640 | cut | grey → accent-tint bg, accent icon | — | stays scaled 0.9 |
+| 11 | placeholder → record row | crossfade | 4640 | ≈170–200 ms | | ease-out (0,0,0.58,1) (p = .18/.36/.45/.56/.62/.72/.82/.88/.94 per 60 fps frame) | |
+| 12 | × button | opacity | 4640 | 200 ms | 0 → 1 | ease-out | |
+| 13 | send icon | arrow → check | 4640 | ≈140 ms | crossfade | ease-out (p = .25/.53/.65/.78/.83/.88/.93) | |
+| 14 | waveform | bars | 4742 + k·83.3, k = 0…11 | each bar grows in ≈50 ms | dot (2 px) → bar | ease-out | 36 columns, 7.7 px pitch; the row shifts left one column per bar; frozen after bar 12; heights 16,17,15,11,11,15,20,23,20,14,10,8 px |
+| 15 | timer | text | 4640 / 5660 / 6675 | cut | 0:00 → 0:01 → 0:02 | — | ticks every ≈1017 ms |
+| 16 | record dot | opacity | 4640 | ≈1.1 s period | 1 ↔ 0.4 | ease-in-out | peaks at T ≈ 4.8, 5.85, 6.95 s |
 | 17 | card | height | 6925 | ≈215 ms | 174 → 194 px | ease-out-expo | 2-line transcript |
-| 18 | record row → transcript | crossfade | 6925 | 200 ms | | ease-out | + / chip back on a cut |
-| 19 | send icon | check → arrow | 6925 | 200 ms | crossfade | ease-out | |
-| 20 | mic | back | 6925 | 200 ms | tint → grey (cut), scale 0.9 → 1 | ease-out | |
+| 18 | record row → transcript | crossfade | 6925 | text in ≈70 ms, voice row out ≈150 ms | | ease-out (text p = .36/.69/.94) | + / chip back on a cut |
+| 19 | send icon | check → arrow | 6925 | ≈140 ms | crossfade | ease-out (p = .10/.37/.53/.68/.74/.81/.86/.93) | |
+| 20 | mic | back | 6925 | ≈100 ms | tint → grey (cut), scale 0.9 → 1 | ease-out | |
 | 21 | card | height | 8454 | ≈215 ms | 194 → 57 px | ease-out-expo (start 0.26 frame after v = 8.850) | send |
 | 22 | card content | swap compose → pill | 8467 | cut | [+] "…hold to talk" [stop] | — | mic hidden while the reply runs |
 | 23 | thumbnail tile | scale, opacity | 8467 | ≈100 ms | 1 → 0 | ease-out | 1 → .6 → .3 → .14 per frame, centre fixed |
-| 24 | mic | return | 10683 | cut | hidden → shown | — | reply done |
-| 25 | primary icon | stop → voice | 10683 | 150 ms | crossfade | ease-out | p = .28/.52/.74/.85/.93 |
+| 24 | mic | return | 10675 | cut | hidden → shown | — | reply done |
+| 25 | primary icon | stop → voice | 10675 | ≈110 ms | crossfade | ease-out | p = .28/.52/.74/.85/.93 |
 
 Ignored: v = 8.333 s (one frame of text re-rasterisation, no motion) and v = 12.50 s (loop seam).
 

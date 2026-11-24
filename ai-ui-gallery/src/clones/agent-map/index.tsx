@@ -99,6 +99,8 @@ function easeInOut(x: number) {
   return by((lo + hi) / 2);
 }
 
+const DRAW_LAG = 1 / 60;
+
 const reducedMotion = () => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // ---------- small pieces ----------
@@ -438,7 +440,8 @@ function MapCard({ onLoop }: { onLoop: () => void }) {
 
       const svg = svgRef.current;
       if (svg) {
-        const since = (now - selAt.current) / 1000;
+        // The reference starts a draw one frame after the render that lit the edge.
+        const since = (now - selAt.current) / 1000 - DRAW_LAG;
         svg.querySelectorAll<SVGPathElement>("path[data-hl]").forEach((p) => {
           const v = reduce ? 1 : drawAt(since - Number(p.dataset.delay));
           p.style.visibility = v > 0 ? "visible" : "hidden";

@@ -10,7 +10,7 @@ export const RESOLVE_MS = 1290;
 export const DONE_AT = 5270;
 export const COLOUR_STAGGER = 250;
 export const RESOLVE_STAGGER = 400;
-const PERCENT_MS = 4700;
+const PERCENT_MS = 4650;
 
 /** Wave and colour state of the dot field for an n x n field `px` wide (the stage is 440). */
 export function fieldAt(t: number, slot: number, px: number): FieldFrame {
@@ -37,5 +37,5 @@ export const doneAt = (slot: number) => DONE_AT + RESOLVE_STAGGER * slot;
 /** The "Generating n%" read-out: an ease-out power curve that lands on 100 as the image resolves. */
 export function percentAt(t: number, slot: number) {
   const u = Math.min(1, Math.max(0, (t - RUN_AT) / (PERCENT_MS + RESOLVE_STAGGER * slot)));
-  return Math.max(1, Math.round(100 * (1 - (1 - u) ** 1.3)));
+  return Math.max(1, Math.round(100 * (1 - (1 - u) ** 1.27)));
 }
