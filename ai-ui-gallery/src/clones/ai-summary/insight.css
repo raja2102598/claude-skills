@@ -67,7 +67,7 @@
 .aic-axis { display: flex; justify-content: space-between; gap: 12px; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 16px; }
 
 /* panel: grid-rows 0fr -> 1fr gives the height spring, opacity runs 150 ms */
-.aic-clip { display: grid; grid-template-rows: 0fr; margin-inline: -4px; opacity: 0; transition: grid-template-rows 380ms var(--ease), opacity 150ms var(--ease); }
+.aic-clip { display: grid; grid-template-rows: 0fr; margin-inline: -4px; opacity: 0; transition: grid-template-rows 240ms var(--ease), opacity 150ms var(--ease); }
 .aic-clip[data-open="true"] { grid-template-rows: 1fr; opacity: 1; }
 .aic-clip-in { overflow: hidden; min-height: 0; padding-inline: 4px; }
 .aic-panel { margin-top: 16px; padding-top: 16px; padding-bottom: 2px; border-top: 1px solid var(--line2); }
