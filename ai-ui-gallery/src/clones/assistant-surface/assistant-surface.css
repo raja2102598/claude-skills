@@ -29,8 +29,8 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 1px solid var(--as-line);
-  background: var(--as-soft);
+  border: 1px solid oklch(0.145 0.004 106 / 0.07);
+  background: oklch(0.972 0.003 106);
   color: var(--as-fg);
   display: grid;
   place-items: center;
@@ -89,7 +89,7 @@
 .as-foot {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  padding: 0 26px 24px;
+  padding: 0 26px 25px;
   background: var(--as-bg);
 }
 .as-dialog[data-state="open"] .as-foot { animation: as-foot-in 300ms var(--as-ease) 100ms both; }
@@ -128,3 +128,36 @@
 @media (prefers-reduced-motion: reduce) {
   .as-dialog, .as-dialog .as-foot, .as-launcher svg { animation: none !important; transition: none !important; }
 }
+
+.as-tip {
+  position: absolute;
+  right: 68px;
+  bottom: 26px;
+  height: 24px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  background: oklch(0.145 0.004 106);
+  color: oklch(0.985 0 0);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.as-tip::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 2px;
+  z-index: -1;
+}
+.as-launcher:hover ~ .as-tip, .as-launcher:focus-visible ~ .as-tip { opacity: 1; transform: none; }

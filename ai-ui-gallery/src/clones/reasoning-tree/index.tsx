@@ -15,7 +15,7 @@ import "./reasoning-tree.css";
  */
 
 // step: 0 ready, 1 reading, then per depth k: propose, score, fill, keep (depth 3: answer)
-const T = [0, 1000, 2600, 3200, 3800, 4200, 5200, 5700, 6200, 7000, 8000, 8700, 9400, 10800];
+const T = [0, 1000, 2600, 3200, 3900, 4300, 5200, 5900, 6900, 7300, 8650, 9400, 9900, 11400];
 const P = (k: number) => 2 + 4 * (k - 1);
 const END = T.length - 1;
 
@@ -139,6 +139,8 @@ export default function ReasoningTree() {
   const proposed = (n: N) => step >= P(level(n));
   const scoring = (n: N) => step >= P(level(n)) + 1;
   const filled = (n: N) => step >= P(level(n)) + 2;
+  // the scorer first reports a rough value (about 45 % of the final), then settles on the real one
+  const shown = (n: N) => (filled(n) ? n.t.score : scoring(n) ? n.t.score * 0.45 : 0);
   const decided = (n: N) => step >= P(level(n)) + 3;
   const answer = step === END;
   const winner = all.find((n) => n.best)!;
@@ -238,12 +240,12 @@ export default function ReasoningTree() {
               <span className="rt-bar">
                 <i
                   className="rt-fill"
-                  style={{ transform: `scaleX(${filled(n) ? n.t.score : 0})`, transitionDelay: `${(n.idx % 4) * 20}ms` }}
+                  style={{ transform: `scaleX(${shown(n)})`, transitionDelay: `${(n.idx % 4) * 20}ms` }}
                 />
               </span>
               <span
                 className={clsx("rt-num", scoring(n) && "show")}
-                style={{ "--rt-n": filled(n) ? Math.round(n.t.score * 100) : 0, transitionDelay: `${(n.idx % 4) * 20}ms` } as CSSProperties}
+                style={{ "--rt-n": Math.round(shown(n) * 100), transitionDelay: `${(n.idx % 4) * 20}ms` } as CSSProperties}
               />
             </div>
           </div>

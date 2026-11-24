@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap");
+
+.tl-root {
+  --tl-bg: #f6f4f0; --tl-panel: #efebe4; --tl-surface: #fffefb; --tl-muted: #e6e1d8;
+  --tl-fg: #26231f; --tl-fg2: #7a7368; --tl-fg3: #a39c90; --tl-ring: #c2623d;
+  font-family: "Geist", system-ui, sans-serif; color: var(--tl-fg);
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--tl-bg);
+}
+.tl-nav { position: relative; width: 300px; height: 422px; background: var(--tl-panel); border-radius: 20px; padding: 8px; display: flex; flex-direction: column; }
+.tl-head { display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 10px; }
+.tl-head h3 { flex: 1; margin: 0; font-size: 15px; font-weight: 500; line-height: 20px; }
+.tl-new { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px 0 10px; border: 0; border-radius: 999px; background: var(--tl-surface); color: var(--tl-fg); font: 500 13px "Geist", sans-serif; box-shadow: 0 0 0 1px rgb(0 0 0 / .05), 0 1px 2px rgb(0 0 0 / .06); cursor: pointer; transition: transform 120ms cubic-bezier(.22,1,.36,1); }
+.tl-new:active { transform: scale(.97); }
+.tl-search-wrap { padding: 8px 0 4px; }
+.tl-search { height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 999px; background: var(--tl-surface); box-shadow: 0 0 0 1px rgb(0 0 0 / .05); color: var(--tl-fg2); }
+.tl-search:focus-within { box-shadow: 0 0 0 2px var(--tl-ring); }
+.tl-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; font: 400 13px "Geist", sans-serif; color: var(--tl-fg); }
+.tl-search input::placeholder { color: var(--tl-fg3); }
+.tl-search input::-webkit-search-cancel-button { display: none; }
+.tl-clear { border: 0; background: transparent; color: var(--tl-fg2); display: grid; place-items: center; padding: 0; cursor: pointer; }
+.tl-list { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -4px; padding: 0 4px 4px; scrollbar-width: none; }
+.tl-list::-webkit-scrollbar { display: none; }
+.tl-group h4 { margin: 0; padding: 12px 10px 4px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tl-fg2); }
+.tl-group ul { list-style: none; margin: 0; padding: 0; }
+.tl-item { height: 36px; margin-bottom: 2px; overflow: hidden; }
+.tl-item.tl-in { animation: tl-grow 230ms cubic-bezier(.22,1,.36,1) both; }
+.tl-item.tl-out { animation: tl-fade 170ms ease-out forwards, tl-collapse 200ms cubic-bezier(.22,1,.36,1) 150ms forwards; }
+@keyframes tl-grow { from { height: 0; opacity: 0; margin-bottom: 0; } to { height: 36px; opacity: 1; margin-bottom: 2px; } }
+@keyframes tl-fade { to { opacity: 0; } }
+@keyframes tl-collapse { to { height: 0; margin-bottom: 0; } }
+.tl-row { position: relative; height: 36px; display: flex; align-items: center; border-radius: 12px; }
+.tl-row::before { content: ""; position: absolute; inset: 0; border-radius: 12px; background: transparent; transition: background-color 120ms cubic-bezier(.22,1,.36,1); }
+.tl-row:hover::before, .tl-row.tl-hot::before { background: rgb(230 225 216 / .75); }
+.tl-row.tl-sel::before { background: var(--tl-surface); }
+.tl-row.tl-sel:hover::before { background: var(--tl-surface); }
+.tl-main { position: relative; flex: 1; min-width: 0; height: 100%; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 10px; border: 0; border-radius: 12px; background: transparent; text-align: left; font: 400 14px/20px "Geist", sans-serif; color: var(--tl-fg); cursor: pointer; outline: none; }
+.tl-main:focus-visible, .tl-act:focus-visible, .tl-undo:focus-visible, .tl-new:focus-visible { box-shadow: 0 0 0 2px var(--tl-ring); }
+.tl-mark { width: 20px; height: 20px; flex: none; display: grid; place-items: center; }
+.tl-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-acts { position: relative; display: flex; align-items: center; padding-right: 4px; width: 0; overflow: hidden; opacity: 0; transition: opacity 120ms ease-out; }
+.tl-row:hover .tl-acts, .tl-row:focus-within .tl-acts, .tl-row.tl-hot .tl-acts { width: auto; opacity: 1; }
+.tl-act { width: 28px; height: 28px; flex: none; border: 0; border-radius: 999px; background: transparent; color: var(--tl-fg2); display: grid; place-items: center; cursor: pointer; outline: none; transition: background-color 120ms, color 120ms; }
+.tl-act:hover { background: var(--tl-muted); color: var(--tl-fg); }
+.tl-rename { position: relative; flex: 1; min-width: 0; margin: 0 4px 0 36px; height: 28px; padding: 0 8px; border: 0; border-radius: 8px; background: var(--tl-surface); font: 400 14px "Geist", sans-serif; color: var(--tl-fg); outline: 2px solid var(--tl-ring); }
+.tl-rowmark-r { position: absolute; left: 10px; }
+.tl-empty { padding: 56px 0; text-align: center; font-size: 13px; color: var(--tl-fg2); }
+.tl-toast { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 12px; border-radius: 12px; background: var(--tl-surface); box-shadow: 0 0 0 1px rgb(0 0 0 / .05), 0 6px 18px rgb(60 40 20 / .14); font-size: 13px; animation: tl-toast-in 220ms cubic-bezier(.22,1,.36,1) both; }
+.tl-toast.tl-toast-out { animation: tl-toast-out 140ms ease-in forwards; }
+.tl-toast span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-toast b { font-weight: 400; color: var(--tl-fg2); }
+.tl-undo { border: 0; background: transparent; padding: 6px 10px; border-radius: 8px; font: 500 13px "Geist", sans-serif; color: var(--tl-ring); cursor: pointer; outline: none; }
+.tl-undo:hover { background: #f4e4dc; }
+@keyframes tl-toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes tl-toast-out { to { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .tl-item.tl-in, .tl-toast { animation-duration: 1ms; } }
