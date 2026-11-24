@@ -347,16 +347,17 @@ function Control({
   );
 }
 
-/** Runs the script on requestAnimationFrame and loops it; each cycle remounts the card so it resets instantly. */
-function Call() {
+/**
+ * Runs the script on requestAnimationFrame from `startAt` (the click or mount time) and loops it; each cycle remounts
+ * the card so it resets instantly, like the reference.
+ */
+function Call({ startAt }: { startAt: number }) {
   const [state, setState] = useState(() => ({ cycle: 0, frame: frameAt(0) }));
   useEffect(() => {
     let raf = 0;
-    let start: number | null = null;
     let lastKey = "";
     const tick = (now: number) => {
-      if (start === null) start = now;
-      const elapsed = now - start;
+      const elapsed = Math.max(0, now - startAt);
       const cycle = Math.floor(elapsed / T.cycle);
       const frame = frameAt(elapsed - cycle * T.cycle);
       const key = `${cycle}/${frameKey(frame)}`;
@@ -368,7 +369,7 @@ function Call() {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [startAt]);
   return <CallCard key={state.cycle} frame={state.frame} />;
 }
 
@@ -381,7 +382,7 @@ const autoplayEnabled = () => {
 };
 
 export default function VoiceConversation() {
-  const [run, setRun] = useState(() => (autoplayEnabled() ? 1 : 0));
+  const [startAt, setStartAt] = useState<number | null>(() => (autoplayEnabled() ? performance.now() : null));
   const vars = {
     "--vc-enter": EASE.enter,
     "--vc-enter-slide": EASE.enterSlide,
@@ -390,13 +391,13 @@ export default function VoiceConversation() {
   } as CSSProperties;
   return (
     <div className="vc-root absolute inset-0 grid place-items-center" style={vars}>
-      {run > 0 ? (
+      {startAt !== null ? (
         <div className="vc-zoom">
-          <Call key={run} />
+          <Call startAt={startAt} />
         </div>
       ) : (
         // Capture mode (?autoplay=0): the call starts when this invisible corner button is clicked.
-        <button type="button" data-vc-start aria-label="Start the call" className="absolute left-0 top-0 h-6 w-6 cursor-pointer opacity-0" onClick={() => setRun(1)} />
+        <button type="button" data-vc-start aria-label="Start the call" className="absolute left-0 top-0 h-6 w-6 cursor-pointer opacity-0" onClick={() => setStartAt(performance.now())} />
       )}
     </div>
   );

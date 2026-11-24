@@ -18,28 +18,29 @@ export const GOAL = "Vet visit Thu 9:15";
 export const OUTCOME = { title: "Visit booked for Biscuit", detail: "Thu 9:15 AM · Dr. Kim" };
 
 export const LINES: Line[] = [
-  { speaker: "callee", at: 1750, text: "Juniper Vet Clinic, Priya speaking." },
-  { speaker: "agent", at: 2665, text: "Hi Priya, I'm an AI assistant for Sam Ortiz. Can Biscuit see a vet this Thursday at 9:15, please?" },
-  { speaker: "callee", at: 4716, text: "We have 9:15 with Dr. Kim, or 11:00 otherwise." },
-  { speaker: "agent", at: 5946, text: "9:15 with Dr. Kim works, thanks." },
-  { speaker: "callee", at: 6946, text: "You're all set, Thursday at 9:15. See you!" },
+  { speaker: "callee", at: 1700, text: "Juniper Vet Clinic, Priya speaking." },
+  { speaker: "agent", at: 2583, text: "Hi Priya, I'm an AI assistant for Sam Ortiz. Can Biscuit see a vet this Thursday at 9:15, please?" },
+  { speaker: "callee", at: 4650, text: "We have 9:15 with Dr. Kim, or 11:00 otherwise." },
+  { speaker: "agent", at: 5867, text: "9:15 with Dr. Kim works, thanks." },
+  { speaker: "callee", at: 6833, text: "You're all set, Thursday at 9:15. See you!" },
 ];
 
 export const T = {
-  ringing: 830,
-  pickup: 1750,
-  /** The call timer runs fast, like the reference: one "second" every 250 ms from TIMER_START. */
-  timerStart: 1762,
+  ringing: 810,
+  pickup: 1700,
+  /** The call timer runs fast, like the reference: one "second" every 250 ms, the first tick 300 ms after pickup. */
+  timerStart: 1750,
   timerStep: 250,
-  confirmed: 7873,
-  ended: 8484,
-  /** The outcome card and the dimmed tile start one frame after the controls leave. */
-  outcome: 8498,
-  cycle: 12030,
+  confirmed: 7800,
+  ended: 8410,
+  cycle: 11950,
 } as const;
 
 export const FIRST_WORD_MS = 100;
-export const WORD_MS = 84;
+export const WORD_MS = 1000 / 12; // 83.3 ms: five 60 Hz frames per word
+
+/** Frame times are floats; a word due at 1883.33 ms must land on the frame stamped 1883.33. */
+const EPS = 0.5;
 
 export const WORDS = LINES.map((l) => l.text.split(" "));
 
@@ -55,7 +56,6 @@ export interface Snapshot {
   words: number[];
   speaking: Speaker | null;
   goal: GoalState;
-  outcome: boolean;
 }
 
 export function snapshotAt(t: number): Snapshot {
@@ -66,13 +66,13 @@ export function snapshotAt(t: number): Snapshot {
   LINES.forEach((line, i) => {
     if (t < line.at) return;
     const n = WORDS[i].length;
-    const shown = Math.max(0, Math.min(n, Math.floor((t - line.at - FIRST_WORD_MS) / WORD_MS) + 1));
+    const shown = Math.max(0, Math.min(n, Math.floor((t - line.at - FIRST_WORD_MS + EPS) / WORD_MS) + 1));
     words.push(shown);
     if (shown < n) speaking = line.speaker;
   });
   const goal: GoalState = t < T.pickup ? "pending" : t < T.confirmed ? "asking" : "confirmed";
-  return { phase, seconds, rows: words.length, words, speaking, goal, outcome: t >= T.outcome };
+  return { phase, seconds, rows: words.length, words, speaking, goal };
 }
 
 export const snapshotKey = (s: Snapshot) =>
-  `${s.phase}|${s.seconds}|${s.words.join(",")}|${s.speaking}|${s.goal}|${s.outcome}`;
+  `${s.phase}|${s.seconds}|${s.words.join(",")}|${s.speaking}|${s.goal}`;

@@ -6,7 +6,7 @@
 
 ## Capture
 
-`capture.ts --viewport 1440x900 --trigger click --wait-before 5000 --pre-roll 200 --duration 5600 --fps 60 --clock virtual --network-wait 300`
+`capture.ts --viewport 1440x901 --trigger click --wait-before 5000 --pre-roll 200 --duration 5600 --fps 60 --clock virtual --network-wait 300`
 
 - reference: `--url https://ui.shadcn.com/docs/ai-elements/base/subagent --target 'button:has-text("Replay")' --pre-js hide-code.js --clip 401,267,638,517`
 - clone: `--url http://127.0.0.1:<port>/c/agent-handoff?autoplay=0 --target '[data-ah=replay]' --selector '[data-stage]'`

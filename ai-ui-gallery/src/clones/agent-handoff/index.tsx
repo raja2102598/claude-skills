@@ -13,7 +13,7 @@ import "./agent-handoff.css";
  */
 
 // ms from the start of a run (measured on the reference, see .reanimate/agent-handoff/spec.md)
-const T = { step: [600, 1600, 2600], done: 3600, answer: 4025, word: 20 };
+const T = { step: [600, 1600, 2600], done: 3600, answer: 4018, word: 20 };
 
 const QUESTION = "Why does image optimization rerun on every deploy?";
 const AGENT = "the research subagent";
