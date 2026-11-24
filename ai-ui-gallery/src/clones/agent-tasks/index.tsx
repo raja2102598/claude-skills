@@ -625,7 +625,8 @@ function AgentTasks({ startedAt }: { startedAt: number }) {
           </p>
         </div>
       </header>
-      <ul className="divide-y divide-[var(--at-line)] overflow-clip rounded-2xl border border-[var(--at-line)] bg-[var(--at-list)]">
+      {/* Taller than the demo's list only after tasks are added or rows opened: it scrolls, the composer stays put. */}
+      <ul className="max-h-[428px] divide-y divide-[var(--at-line)] overflow-y-auto overscroll-contain rounded-2xl border border-[var(--at-line)] bg-[var(--at-list)] [scrollbar-width:thin]">
         {state.agents.map((a) => (
           <AgentRow key={a.id} agent={a} open={state.open === a.id} clock={clock} actions={actionsRef.current} />
         ))}

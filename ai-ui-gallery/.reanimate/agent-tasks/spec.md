@@ -28,7 +28,8 @@ easing. The y and scale tweens run on motion's JS frameloop and are measured on 
 
 ## Static facts (reference, CSS px)
 
-- Card 448 x 542, top-left at (24,24) of the crop, 1 px border, radius 24, padding 6. Height never changes during the
+- Card 448 x 542, top-left at (24,20) of the reference crop (the page shifts up 4 px after load; the clone's
+  frames are compared with the clip moved 4 px down, `clone-3/frames-y409`), 1 px border, radius 24, padding 6. Height never changes during the
   auto-run (rows keep a fixed 16 px subtitle line).
 - Header 56: 28 px round icon chip, title 14/20 medium, summary 12/16 muted ("2 running · 1 needs you · 1 done").
 - List: radius 16, 1 px border, dividers; rows 57 (py 10, 20 px marker, gap 12, title 14/20 + subtitle 12/16 in a
