@@ -25,9 +25,9 @@ const autoplayEnabled = () => {
 };
 
 export default function ShareChat() {
-  const [vis, setVis] = useState<Vis>("team");
+  const [vis, setVis] = useState<Vis>("any");
   const [files, setFiles] = useState(true);
-  const [expiry, setExpiry] = useState("Never");
+  const [expiry, setExpiry] = useState("7 days");
   const [menu, setMenu] = useState(false);
   const [copied, setCopied] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -39,26 +39,35 @@ export default function ShareChat() {
   const flashCopied = useCallback(() => {
     setCopied(true); setFailed(false);
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setCopied(false), 1800);
+    timer.current = window.setTimeout(() => setCopied(false), 1600);
   }, []);
 
   const doCopy = async () => {
+    stop();
     if (off) return;
     try { await navigator.clipboard.writeText("https://" + URL); flashCopied(); }
     catch { setFailed(true); window.clearTimeout(timer.current); timer.current = window.setTimeout(() => setFailed(false), 2400); }
   };
 
+  // Demo loop (12 s): files off, Copied, Only me, Workspace, Copied, Anyone, expiry 7 days. Any interaction stops it.
+  const demoOn = useRef(autoplayEnabled());
   useEffect(() => {
-    if (!autoplayEnabled()) return;
-    const T = [
-      window.setTimeout(() => setVis("me"), 500),
-      window.setTimeout(() => setVis("any"), 1700),
-      ...(param("copy") === "0" ? [] : [window.setTimeout(flashCopied, 2900)]),
-      window.setTimeout(() => setMenu(true), 4900),
-      window.setTimeout(() => { setExpiry("7 days"); setMenu(false); }, 5900),
-    ];
-    return () => T.forEach(window.clearTimeout);
+    if (!demoOn.current) return;
+    const ids: number[] = [];
+    const at = (ms: number, fn: () => void) => ids.push(window.setTimeout(() => demoOn.current && fn(), ms));
+    const cycle = () => {
+      at(1200, () => setFiles(false));
+      at(2400, flashCopied);
+      at(4600, () => setVis("me"));
+      at(6800, () => { setVis("team"); setExpiry("Never"); setFiles(true); });
+      at(8400, flashCopied);
+      at(10600, () => setVis("any"));
+      at(12000, () => { setExpiry("7 days"); cycle(); });
+    };
+    cycle();
+    return () => ids.forEach(window.clearTimeout);
   }, [flashCopied]);
+  const stop = () => { demoOn.current = false; };
 
   useEffect(() => { if (off) setMenu(false); }, [off]);
   const idx = VIS.indexOf(vis);
@@ -81,7 +90,7 @@ export default function ShareChat() {
             {VIS.map((v) => {
               const I = ICON[v];
               return (
-                <button key={v} role="radio" aria-checked={vis === v} onClick={() => setVis(v)}>
+                <button key={v} role="radio" aria-checked={vis === v} onClick={() => { stop(); setVis(v); }}>
                   <I size={14} /> <span>{LABEL[v]}</span>
                 </button>
               );
@@ -118,8 +127,8 @@ export default function ShareChat() {
             <div className="sc-row">
               <span className="l" style={{ opacity: off ? 0.5 : 1 }}><Clock size={16} />Link expires</span>
               <div className="sc-sel">
-                <button aria-expanded={menu} disabled={off} onClick={() => setMenu((m) => !m)}>
-                  {expiry}<ChevronDown size={14} />
+                <button aria-expanded={menu} disabled={off} onClick={() => { stop(); setMenu((m) => !m); }}>
+                  <span className="sc-xf">{EXPIRY.map((e) => <span key={e} data-on={e === expiry}>{e}</span>)}</span><ChevronDown size={14} />
                 </button>
                 <div className={clsx("sc-menu", menu && "open")} role="menu">
                   {EXPIRY.map((e) => (
@@ -132,7 +141,7 @@ export default function ShareChat() {
             </div>
             <div className="sc-row">
               <span className="l"><Paperclip size={16} />Include 2 files</span>
-              <button className="sc-sw" role="switch" aria-checked={files && !off} disabled={off} onClick={() => setFiles((f) => !f)} aria-label="Include files"><i /></button>
+              <button className="sc-sw" role="switch" aria-checked={files && !off} disabled={off} onClick={() => { stop(); setFiles((f) => !f); }} aria-label="Include files"><i /></button>
             </div>
           </div>
 

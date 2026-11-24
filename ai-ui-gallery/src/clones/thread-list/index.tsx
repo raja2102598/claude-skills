@@ -52,36 +52,40 @@ export default function ThreadList() {
     [chats, q],
   );
 
+  const chatsRef = useRef(chats);
+  chatsRef.current = chats;
+
   const dismissToast = useCallback(() => {
     window.clearTimeout(toastTimer.current);
     setToast((t) => (t ? { ...t, out: true } : t));
-    toastTimer.current = window.setTimeout(() => setToast(null), 140);
+    toastTimer.current = window.setTimeout(() => setToast(null), 230);
   }, []);
 
+  /* the toast appears with the fade, the collapse starts 85 ms in and the row leaves the list at 310 ms */
   const del = useCallback((id: string) => {
+    const index = chatsRef.current.findIndex((c) => c.id === id);
+    if (index < 0) return;
+    const chat = chatsRef.current[index];
     setRemoving(id);
+    setToast({ chat, index });
+    window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(dismissToast, 5000);
     window.setTimeout(() => {
-      setChats((cs) => {
-        const index = cs.findIndex((c) => c.id === id);
-        if (index < 0) return cs;
-        const chat = cs[index];
-        setToast({ chat, index });
-        window.clearTimeout(toastTimer.current);
-        toastTimer.current = window.setTimeout(dismissToast, 5000);
-        return cs.filter((c) => c.id !== id);
-      });
+      setChats((cs) => cs.filter((c) => c.id !== id));
       setRemoving(null);
-    }, 390);
+    }, 310);
   }, [dismissToast]);
 
   const undo = useCallback(() => {
-    if (!toast) return;
+    if (!toast || toast.out) return;
     const { chat, index } = toast;
-    setChats((cs) => { const n = cs.slice(); n.splice(Math.min(index, n.length), 0, chat); return n; });
+    setChats((cs) => {
+      if (cs.some((c) => c.id === chat.id)) return cs;
+      const n = cs.slice(); n.splice(Math.min(index, n.length), 0, chat); return n;
+    });
     setFresh(chat.id);
-    window.clearTimeout(toastTimer.current);
-    setToast(null);
-  }, [toast]);
+    dismissToast();
+  }, [toast, dismissToast]);
 
   const newChat = useCallback(() => {
     const id = `n${idN.current++}`;

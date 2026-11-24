@@ -23,8 +23,8 @@
 .tl-group h4 { margin: 0; padding: 12px 10px 4px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--tl-fg2); }
 .tl-group ul { list-style: none; margin: 0; padding: 0; }
 .tl-item { height: 36px; margin-bottom: 2px; overflow: hidden; }
-.tl-item.tl-in { animation: tl-grow 230ms ease-out both; }
-.tl-item.tl-out { animation: tl-fade 190ms ease-out forwards, tl-collapse 230ms ease-out 160ms forwards; }
+.tl-item.tl-in { animation: tl-grow 230ms cubic-bezier(.4,0,.2,1) both; }
+.tl-item.tl-out { animation: tl-fade 165ms linear forwards, tl-collapse 215ms ease-out 85ms forwards; }
 @keyframes tl-grow { from { height: 0; opacity: 0; margin-bottom: 0; } to { height: 36px; opacity: 1; margin-bottom: 2px; } }
 @keyframes tl-fade { to { opacity: 0; } }
 @keyframes tl-collapse { to { height: 0; margin-bottom: 0; } }
@@ -44,12 +44,14 @@
 .tl-rename { position: relative; flex: 1; min-width: 0; margin: 0 4px 0 36px; height: 28px; padding: 0 8px; border: 0; border-radius: 8px; background: var(--tl-surface); font: 400 14px "Geist", sans-serif; color: var(--tl-fg); outline: 2px solid var(--tl-ring); }
 .tl-rowmark-r { position: absolute; left: 10px; }
 .tl-empty { padding: 56px 0; text-align: center; font-size: 13px; color: var(--tl-fg2); }
-.tl-toast { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 12px; border-radius: 12px; background: var(--tl-surface); box-shadow: 0 0 0 1px rgb(0 0 0 / .05), 0 6px 18px rgb(60 40 20 / .14); font-size: 13px; animation: tl-toast-in 220ms cubic-bezier(.22,1,.36,1) both; }
-.tl-toast.tl-toast-out { animation: tl-toast-out 140ms ease-in forwards; }
+.tl-toast { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 12px; border-radius: 12px; background: var(--tl-surface); box-shadow: 0 0 0 1px rgb(0 0 0 / .05), 0 6px 18px rgb(60 40 20 / .14); font-size: 13px; animation: tl-toast-fade-in 210ms ease-out both, tl-toast-up 120ms cubic-bezier(.22,1,.36,1) both; }
+.tl-toast.tl-toast-out { animation: tl-toast-fade-out 230ms ease-out forwards, tl-toast-down 230ms cubic-bezier(.4,0,.3,1) forwards; }
 .tl-toast span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tl-toast b { font-weight: 400; color: var(--tl-fg2); }
 .tl-undo { border: 0; background: transparent; padding: 6px 10px; border-radius: 8px; font: 500 13px "Geist", sans-serif; color: var(--tl-ring); cursor: pointer; outline: none; }
 .tl-undo:hover { background: #f4e4dc; }
-@keyframes tl-toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@keyframes tl-toast-out { to { opacity: 0; transform: translateY(4px); } }
+@keyframes tl-toast-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tl-toast-up { from { transform: translateY(44px); } to { transform: none; } }
+@keyframes tl-toast-fade-out { to { opacity: 0; } }
+@keyframes tl-toast-down { to { transform: translateY(44px); } }
 @media (prefers-reduced-motion: reduce) { .tl-item.tl-in, .tl-toast { animation-duration: 1ms; } }

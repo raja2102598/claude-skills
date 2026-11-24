@@ -80,3 +80,7 @@
 .sc-cap { min-height: 20px; text-align: center; font-size: 13px; line-height: 20px; color: var(--fg2); position: relative; }
 .sc-cap .sc-stack { height: 20px; }
 .sc-cap .sc-stack > * { width: 100%; text-align: center; }
+
+.sc-xf { display: inline-grid; justify-items: end; }
+.sc-xf > span { grid-area: 1 / 1; opacity: 0; transition: opacity 450ms ease-out; }
+.sc-xf > span[data-on="true"] { opacity: 1; }
