@@ -1,0 +1,72 @@
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&display=swap");
+
+@property --pe-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+.pe-root {
+  --pe-ink: #1b1b1f;
+  --pe-sub: #6b6b73;
+  --pe-faint: #a3a3ab;
+  --pe-chip: #ececee;
+  --pe-violet: #7a63f0;
+  font-family: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  color: var(--pe-ink);
+  position: absolute;
+  left: 41px;
+  top: 13px;
+  width: 478px;
+  background: #fff;
+  border-radius: 20px;
+  padding: 16px 15px 14px;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.02), 0 6px 22px rgb(0 0 0 / 0.04);
+}
+
+/* Light that travels round the card's edge while the rewrite runs. */
+.pe-glow {
+  position: absolute;
+  inset: -1px;
+  border-radius: 21px;
+  padding: 1.5px;
+  pointer-events: none;
+  background: conic-gradient(from calc(var(--pe-a) + 160deg), transparent 0deg, transparent 250deg, rgb(122 99 240 / 0.15) 300deg, #7a63f0 345deg, #6aa4ff 358deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: pe-spin 2.4s linear infinite;
+}
+@keyframes pe-spin { to { --pe-a: 360deg; } }
+
+@keyframes pe-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pe-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pe-dot {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 1; }
+}
+.pe-in { animation: pe-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.pe-fade { animation: pe-fade 200ms ease-out both; }
+
+.pe-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 32px; padding: 0 12px; border-radius: 999px;
+  background: #f1f1f3; font-size: 14.5px; font-weight: 500; color: var(--pe-ink);
+  transition: opacity 200ms, background 200ms;
+}
+.pe-pill[data-off="true"] { opacity: 0.55; }
+.pe-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 34px; padding: 0 16px; border-radius: 999px; font-size: 14.5px; font-weight: 500;
+  background: #f1f1f3; color: var(--pe-ink);
+  transition: background 220ms, color 220ms;
+}
+.pe-btn.use { background: #1e1e22; color: #fff; }
+.pe-btn.use[data-off="true"] { background: #a0a0a6; }
+.pe-mark { background: linear-gradient(transparent 58%, #cddcfb 58%); }
+.pe-caret { display: inline-block; width: 1.5px; height: 1.05em; margin-left: 2px; vertical-align: -2px; background: var(--pe-ink); }
+.pe-chip {
+  display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px;
+  background: var(--pe-chip); font-size: 13px; color: #3c3c42;
+}
+.pe-dots { display: grid; grid-template-columns: repeat(3, 3px); gap: 2px; }
+.pe-dots i { width: 3px; height: 3px; border-radius: 1px; background: var(--pe-violet); animation: pe-dot 900ms ease-in-out infinite; }

@@ -1,0 +1,90 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap");
+
+.ps-root { --bg:#f6f4f0; --card:#fffefb; --sub:#f1ede6; --line:#e6e1d8; --fg:#26231f; --fg2:#7a7368; --fg3:#a39c90; --accent:#c2623d; --ok:#2f7f58;
+  font-family:"Geist",system-ui,sans-serif; color:var(--fg); width:100%; height:100%; background:var(--bg); display:flex; justify-content:center; align-items:flex-start; padding-top:64px; box-sizing:border-box; font-size:14px; line-height:20px; }
+.ps-card { position:relative; width:491px; background:var(--card); border-radius:24px; box-shadow:0 0 0 1px rgb(38 35 31 / .09), 0 1px 3px rgb(38 35 31 / .05); overflow:visible; }
+.ps-head { display:flex; align-items:center; gap:12px; padding:14px 12px 14px 24px; border-bottom:1px solid var(--line); height:61px; box-sizing:border-box; }
+.ps-title { margin:0; font-size:15px; font-weight:500; line-height:20px; }
+.ps-chips { display:flex; flex:1; justify-content:space-between; align-items:center; position:relative; }
+.ps-chip { height:32px; display:inline-flex; align-items:center; gap:8px; padding:0 12px; border:0; border-radius:999px; background:var(--card); box-shadow:0 0 0 1px rgb(38 35 31 / .12); font:400 13px "Geist",sans-serif; color:var(--fg); cursor:pointer; transition:box-shadow 120ms ease-out, transform 120ms ease-out; }
+.ps-chip:hover { box-shadow:0 0 0 1px rgb(38 35 31 / .22); }
+.ps-chip:active { transform:scale(.97); }
+.ps-chip b { font-weight:500; }
+.ps-dot { width:6px; height:6px; border-radius:50%; background:var(--ok); display:inline-block; }
+.ps-dot.draft { background:var(--fg3); }
+.ps-muted { color:var(--fg2); }
+.ps-caret { color:var(--fg3); transition:transform 160ms ease-out; }
+.ps-chip[aria-expanded=true] .ps-caret { transform:rotate(180deg); }
+.ps-pop { position:absolute; top:40px; z-index:5; min-width:220px; background:var(--card); border-radius:16px; padding:6px; box-shadow:0 0 0 1px rgb(38 35 31 / .1), 0 12px 32px rgb(38 35 31 / .16); transform-origin:top left; animation:ps-pop-in 160ms cubic-bezier(.22,1,.36,1) both; }
+.ps-pop.right { right:0; transform-origin:top right; }
+.ps-pop.out { animation:ps-pop-out 110ms ease-in both; }
+@keyframes ps-pop-in { from { opacity:0; transform:scale(.96) translateY(-4px); } to { opacity:1; transform:none; } }
+@keyframes ps-pop-out { to { opacity:0; transform:scale(.97) translateY(-2px); } }
+.ps-opt { display:flex; align-items:center; gap:10px; width:100%; border:0; background:transparent; padding:8px 10px; border-radius:10px; font:400 13px "Geist",sans-serif; color:var(--fg); text-align:left; cursor:pointer; }
+.ps-opt:hover { background:var(--sub); }
+.ps-opt .ps-spacer { flex:1; }
+.ps-opt small { color:var(--fg3); font-size:12px; }
+.ps-sep { height:1px; background:var(--line); margin:4px 2px; }
+.ps-effort { display:flex; gap:4px; padding:4px 4px 2px; }
+.ps-effort button { flex:1; height:28px; border:0; border-radius:8px; background:var(--sub); font:400 12px "Geist",sans-serif; color:var(--fg2); cursor:pointer; }
+.ps-effort button[aria-pressed=true] { background:var(--fg); color:#fff; }
+
+.ps-bar { display:flex; align-items:center; justify-content:space-between; padding:13px 12px 3px; height:46px; box-sizing:border-box; }
+.ps-seg { position:relative; display:inline-flex; padding:0; }
+.ps-seg.boxed { padding:3px; border-radius:999px; background:var(--card); box-shadow:0 0 0 1px rgb(38 35 31 / .1); }
+.ps-hl { position:absolute; top:0; bottom:0; left:0; border-radius:999px; background:var(--sub); transition:transform 220ms cubic-bezier(.22,1,.36,1), width 220ms cubic-bezier(.22,1,.36,1); z-index:0; }
+.ps-seg.boxed .ps-hl { top:3px; bottom:3px; left:3px; }
+.ps-segbtn { position:relative; z-index:1; height:30px; padding:0 12px; border:0; background:transparent; border-radius:999px; font:400 13px "Geist",sans-serif; color:var(--fg2); cursor:pointer; transition:color 160ms ease-out; }
+.ps-segbtn[aria-selected=true], .ps-segbtn[aria-checked=true] { color:var(--fg); font-weight:500; }
+.ps-tokens { display:inline-flex; align-items:baseline; gap:4px; color:var(--fg2); font-size:13px; padding-right:12px; }
+.ps-odo { display:inline-flex; height:17px; overflow:hidden; line-height:17px; font-variant-numeric:tabular-nums; }
+.ps-odo-col { display:block; width:8px; height:17px; overflow:hidden; }
+.ps-odo-col > span { display:block; transition:transform 420ms cubic-bezier(.22,1,.36,1); }
+.ps-odo-col i { display:block; height:17px; font-style:normal; text-align:center; }
+.ps-editor-wrap { padding:6px 12px 0 12px; transition:height 220ms cubic-bezier(.22,1,.36,1); overflow:hidden; }
+.ps-pane { padding:0 12px; white-space:pre-wrap; font-size:14px; line-height:23px; height:230px; overflow:hidden; box-sizing:border-box; animation:ps-pane-in 200ms ease-out both; }
+@keyframes ps-pane-in { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:none; } }
+.ps-var { display:inline-block; padding:0 8px; border-radius:7px; font-size:13px; line-height:18px; height:18px; vertical-align:1px; }
+.ps-hint { height:36px; box-sizing:border-box; padding:0 24px 13px; color:var(--fg3); font-size:13px; display:flex; align-items:center; gap:6px; }
+.ps-hint kbd { font:400 12px "Geist Mono",monospace; border-radius:5px; padding:0 5px; background:var(--card); box-shadow:0 0 0 1px rgb(38 35 31 / .14); color:var(--fg2); }
+
+.ps-vars { border-top:1px solid var(--line); padding:14px 12px 12px; }
+.ps-fields { display:grid; grid-template-columns:1fr 1fr; gap:12px 10px; margin-bottom:14px; }
+.ps-field { display:flex; flex-direction:column; gap:6px; }
+.ps-field.wide { grid-column:1 / -1; }
+.ps-flabel { line-height:16px; display:flex; align-items:center; gap:6px; font-size:13px; padding-left:12px; }
+.ps-flabel i { width:6px; height:6px; border-radius:50%; background:currentColor; }
+.ps-input { height:36px; border:0; border-radius:999px; background:var(--card); box-shadow:0 0 0 1px rgb(38 35 31 / .12); padding:0 14px; font:400 14px "Geist",sans-serif; color:var(--fg); outline:0; transition:box-shadow 140ms ease-out; }
+.ps-input:focus { box-shadow:0 0 0 2px var(--accent); }
+.ps-runrow { display:flex; justify-content:space-between; align-items:center; }
+.ps-run { height:36px; width:121px; border:0; border-radius:999px; background:var(--fg); color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:8px; font:500 14px "Geist",sans-serif; cursor:pointer; transition:transform 120ms ease-out; }
+.ps-run:active { transform:scale(.97); }
+.ps-run kbd { font:400 12px "Geist",sans-serif; color:rgb(255 255 255 / .6); }
+.ps-runlabel { position:relative; display:inline-block; width:28px; height:20px; overflow:hidden; text-align:left; }
+.ps-runlabel span { position:absolute; left:0; top:0; transition:transform 200ms cubic-bezier(.22,1,.36,1), opacity 160ms ease-out; }
+.ps-runlabel .a { transform:translateY(0); } .ps-runlabel .b { transform:translateY(100%); opacity:0; }
+.ps-run[data-busy=true] .a { transform:translateY(-100%); opacity:0; } .ps-run[data-busy=true] .b { transform:none; opacity:1; }
+
+.ps-outframe { overflow:hidden; border-radius:0 0 24px 24px; transition:height 340ms ease-out; }
+.ps-out { border-top:1px solid var(--line); background:var(--sub); padding:10px 12px 12px; min-height:52px; box-sizing:border-box; }
+.ps-outhead { display:flex; align-items:center; justify-content:space-between; height:32px; padding-left:12px; font-size:13px; color:var(--fg2); }
+.ps-status { display:inline-flex; align-items:center; gap:8px; }
+.ps-status b { font-weight:500; color:var(--fg); }
+.ps-status .ok { color:var(--ok); animation:ps-pop-tick 260ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes ps-pop-tick { from { opacity:0; transform:scale(.5); } to { opacity:1; transform:none; } }
+.ps-spin { width:12px; height:12px; border-radius:50%; border:2px solid var(--line); border-top-color:var(--fg2); animation:ps-spin 700ms linear infinite; }
+@keyframes ps-spin { to { transform:rotate(360deg); } }
+.ps-copy { width:32px; height:32px; border:0; border-radius:50%; background:transparent; color:var(--fg2); display:grid; place-items:center; cursor:pointer; animation:ps-fade 200ms ease-out both; }
+.ps-copy:hover { background:rgb(38 35 31 / .06); }
+@keyframes ps-fade { from { opacity:0; } to { opacity:1; } }
+.ps-body { padding:4px 12px 0; font-size:14px; line-height:23px; }
+.ps-body p { margin:0 0 7px; } .ps-body p:last-child { margin:0; }
+.ps-w { display:inline; opacity:0; animation:ps-word 260ms ease-out forwards; }
+@keyframes ps-word { from { opacity:0; } to { opacity:1; } }
+.ps-measure { position:absolute; left:0; right:0; top:0; visibility:hidden; pointer-events:none; border:0; }
+.ps-foot { padding:0 12px; font-size:12px; line-height:29px; color:var(--fg3); animation:ps-fade 240ms ease-out both; }
+.ps-empty { padding:0 12px; font-size:13px; color:var(--fg2); line-height:29px; }
+
+.ps-gray { color:var(--fg2) !important; font-weight:400 !important; }
+.ps-shimmer { background:linear-gradient(90deg, var(--fg2) 0%, var(--fg2) 40%, var(--fg) 50%, var(--fg2) 60%, var(--fg2) 100%) 100% 0 / 250% 100% no-repeat; -webkit-background-clip:text; background-clip:text; color:transparent !important; animation:ps-shimmer 1000ms linear infinite; }
+@keyframes ps-shimmer { to { background-position:0 0; } }

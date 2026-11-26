@@ -225,10 +225,11 @@ function SubagentDemo({ autoplay }: { autoplay: boolean }) {
   const [state, setState] = useState<RunState>(autoplay ? START : FINISHED);
   const timers = useRef<number[]>([]);
 
-  const play = useCallback(() => {
+  // From the Replay click the reset commits synchronously (same frame as the click); on mount the state already is START.
+  const play = useCallback((fromClick: boolean) => {
     timers.current.forEach((id) => window.clearTimeout(id));
     timers.current = [];
-    flushSync(() => setState(START));
+    if (fromClick) flushSync(() => setState(START));
     const t0 = performance.now();
     const at = (ms: number, next: (s: RunState) => RunState) => {
       timers.current.push(
@@ -244,7 +245,7 @@ function SubagentDemo({ autoplay }: { autoplay: boolean }) {
   }, []);
 
   useEffect(() => {
-    if (autoplay) play();
+    if (autoplay) play(false);
     const list = timers.current;
     return () => list.forEach((id) => window.clearTimeout(id));
   }, [autoplay, play]);
@@ -271,7 +272,7 @@ function SubagentDemo({ autoplay }: { autoplay: boolean }) {
         </div>
       </div>
       {state.ready && (
-        <button type="button" data-slot="button" data-ah="replay" className="ah-replay" onClick={play}>
+        <button type="button" data-slot="button" data-ah="replay" className="ah-replay" onClick={() => play(true)}>
           Replay
         </button>
       )}

@@ -1,0 +1,105 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap");
+
+.aie {
+  --ink: #17181b;
+  --mute: #8a8d94;
+  --line: #e6e7ea;
+  --sel: #e8e9ec;
+  --ins: #d9efe2;
+  --ins-ink: #14261d;
+  --del: #c4514b;
+  --pill: #ffffff;
+  position: relative;
+  width: 745px;
+  height: 680px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  font-family: "Inter", system-ui, sans-serif;
+  color: var(--ink);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.aie header {
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--line);
+}
+.aie .doc-meta { display: flex; align-items: center; gap: 10px; }
+.aie .avatar { width: 28px; height: 28px; border-radius: 50%; background: conic-gradient(from 40deg, #f2a65a, #e0607e, #6a7bd6, #3fb8a0, #f2a65a); }
+.aie .doc-title { font-size: 13px; font-weight: 500; line-height: 16px; }
+.aie .doc-sub { font-size: 12px; color: var(--mute); line-height: 16px; display: flex; gap: 6px; align-items: center; }
+.aie .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--mute); }
+.aie .hbtn { color: #c9cbd0; display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; }
+.aie .hbtn svg { width: 16px; height: 16px; }
+.aie .page { padding: 43px 50px 0; }
+.aie h1 { margin: 0 0 20px; font-size: 28px; line-height: 34px; font-weight: 400; letter-spacing: -0.01em; }
+.aie p { margin: 0 0 16px; font-size: 16px; line-height: 26px; width: 640px; }
+.aie p.target { position: relative; }
+.aie .tok-dim { color: rgba(23, 24, 27, 0.4); transition: color 500ms ease; }
+.aie .sel { background: var(--sel); transition: background-color 200ms ease; }
+.aie .ins { background: var(--ins); color: var(--ins-ink); border-radius: 3px; animation: aie-in 260ms ease-out both; }
+.aie .del { color: var(--del); text-decoration: line-through; text-decoration-thickness: 1px; opacity: 0.85; }
+.aie .cur { background: var(--sel); border-radius: 3px; }
+@keyframes aie-in { from { background-color: transparent; } to { background-color: var(--ins); } }
+
+.aie footer {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 40px;
+  border-top: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 19px; font-size: 12px; color: var(--mute);
+}
+.aie kbd {
+  font-family: inherit; font-size: 11px; line-height: 14px;
+  border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin: 0 2px; color: var(--mute); background: #fff;
+}
+.aie .num { font-variant-numeric: tabular-nums; }
+
+/* floating layer: chip -> menu -> status pill -> review bar */
+.aie .layer {
+  position: absolute; left: 49px; background: var(--pill);
+  border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(20, 22, 30, 0.12), 0 2px 6px rgba(20, 22, 30, 0.06);
+  overflow: hidden; z-index: 3;
+  transition: width 640ms cubic-bezier(0.3, 1, 0.2, 1) 20ms, height 640ms cubic-bezier(0.3, 1, 0.2, 1) 20ms, border-radius 640ms cubic-bezier(0.3, 1, 0.2, 1) 20ms;
+}
+.aie .layer.hidden { opacity: 0; pointer-events: none; transform: translateY(-4px); }
+.aie .layer.show { animation: aie-pop 420ms cubic-bezier(0.25, 0.5, 0.3, 1) both; }
+@keyframes aie-pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.aie .layer.m-menu { width: 322px; height: 286px; border-radius: 18px; }
+.aie .layer.m-run { width: 213px; height: 44px; border-radius: 12px; }
+.aie .layer.m-review { width: 320px; height: 44px; border-radius: 12px; transition-duration: 580ms; transition-delay: 10ms; transition-timing-function: cubic-bezier(0.2, 1, 0.3, 1); }
+.aie .layer.m-none { width: 322px; height: 286px; border-radius: 18px; opacity: 0; pointer-events: none; }
+.aie .lbody { position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 140ms ease; white-space: nowrap; }
+.aie .lbody.on { opacity: 1; transition-delay: 120ms; }
+.aie .menu { width: 322px; padding: 0; }
+.aie .prompt-row { height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 14px 0 14px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--mute); }
+.aie .prompt-row svg { width: 16px; height: 16px; color: #3b3d44; }
+.aie .prompt-row span { flex: 1; }
+.aie ul { list-style: none; margin: 0; padding: 6px; }
+.aie li { position: relative; height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border-radius: 8px; font-size: 13px; color: #34363c; }
+.aie li svg { width: 15px; height: 15px; color: #5b5e66; }
+.aie li.active { background: #efeff1; }
+.aie li .enter { margin-left: auto; opacity: 0; }
+.aie li.active .enter { opacity: 1; }
+.aie .menu-foot { padding: 10px 14px 12px; font-size: 12px; color: var(--mute); line-height: 20px; white-space: normal; border-top: 1px solid var(--line); }
+.aie .runrow { width: 213px; height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 14px; font-size: 13px; color: #34363c; }
+.aie .spin { width: 14px; height: 14px; border: 1.6px solid #d3d5da; border-top-color: #5b5e66; border-radius: 50%; animation: aie-spin 800ms linear infinite; }
+@keyframes aie-spin { to { transform: rotate(360deg); } }
+.aie .stop { display: inline-flex; align-items: center; gap: 6px; margin-left: 6px; }
+.aie .stop i { width: 8px; height: 8px; background: #5b5e66; border-radius: 1.5px; display: inline-block; }
+.aie .reviewrow { width: 320px; height: 44px; display: flex; align-items: center; gap: 14px; padding: 0 8px 0 14px; font-size: 13px; color: #44464d; }
+.aie .reviewrow .rej { color: var(--mute); }
+.aie .btn-accept { margin-left: auto; height: 30px; border-radius: 9px; background: #1d1e22; color: #fff; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px; font-size: 13px; font-weight: 500; }
+.aie .btn-accept kbd { background: transparent; color: #cfd1d6; border-color: #4a4c54; }
+.aie .resolved { font-size: 13px; color: #44464d; padding: 0 14px; height: 44px; display: flex; align-items: center; gap: 8px; width: 213px; }
+.aie .resolved svg { width: 15px; height: 15px; color: #2f8f5f; }
+.aie .m-done { width: 213px; height: 44px; border-radius: 12px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .aie .layer, .aie .lbody, .aie .tok-dim { transition-duration: 1ms; }
+  .aie .layer.show, .aie .ins { animation-duration: 1ms; }
+  .aie .spin { animation: none; }
+}

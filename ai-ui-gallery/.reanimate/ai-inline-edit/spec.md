@@ -1,0 +1,2 @@
+Target: Arc UI AI inline edit, select paragraph -> menu -> Shorten -> stream diff -> review bar. Destination: src/clones/ai-inline-edit. Fidelity: motion-faithful.
+Rows (ref ms from recording start, real clock): menu fade-in 4px rise ~400 ms (-592); pick at ~283; layer 322x286 -> 213x44 ~550 ms decelerating; text dims 0.4-0.9 s; first diff token ~2.7 s; uneven token bursts to ~6.5 s; layer morphs 302->320x44 at 6.61 s into "N of N changes / Reject all / Accept all".

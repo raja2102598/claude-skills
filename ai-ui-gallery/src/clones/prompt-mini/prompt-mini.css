@@ -1,0 +1,351 @@
+/* Compact phone prompt: clone-local styles (plain CSS, so the shared dev server never waits on a Tailwind rescan).
+   Palette, font, icons, artwork and copy are our own; layout proportions and motion follow .reanimate/prompt-mini/spec.md. */
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap");
+
+.pm-root {
+  --pm-screen: #0f1013;
+  --pm-card: #121318;
+  --pm-line: #2c2e36;
+  --pm-fill: #24262d;
+  --pm-fill-hi: #2d3038;
+  --pm-ink: #f3f3f6;
+  --pm-muted: #8a8c97;
+  --pm-faint: #6f727d;
+  --pm-accent: #7b61ff;
+  --pm-accent-ink: #a594ff;
+  --pm-accent-dim: #352c6e;
+  --pm-accent-tint: #201c3a;
+  --pm-rec: #ff5f6d;
+  /* 1 - 2^(-10x): the exponential ease-out every height and settle tween in the reference follows. */
+  --pm-expo: linear(0, 0.2929 5%, 0.5 10%, 0.6464 15%, 0.75 20%, 0.8232 25%, 0.875 30%, 0.9116 35%, 0.9375 40%,
+    0.9558 45%, 0.9688 50%, 0.9844 60%, 0.9922 70%, 0.9961 80%, 1);
+  position: absolute;
+  inset: 0;
+  background: var(--pm-screen);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 21px;
+  color: var(--pm-ink);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* The composer: bottom edge pinned 45px above the screen foot, height driven from JS (motion value). */
+.pm-card {
+  position: absolute;
+  left: 12px;
+  bottom: 45px;
+  width: 369px;
+  box-sizing: border-box;
+  border: 1px solid var(--pm-line);
+  border-radius: 22.5px;
+  background: var(--pm-card);
+  overflow: hidden;
+}
+
+.pm-content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* ---------- buttons ---------- */
+.pm-row {
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  height: 41px;
+  padding: 0 7px 7px;
+}
+.pm-pill .pm-row {
+  padding: 7px;
+}
+.pm-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pm-fill);
+  color: var(--pm-ink);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.pm-btn:focus-visible,
+.pm-chip:focus-visible {
+  outline: 2px solid var(--pm-accent);
+  outline-offset: 2px;
+}
+.pm-btn svg {
+  width: 19px;
+  height: 19px;
+  stroke-width: 1.9;
+}
+.pm-btn-x {
+  animation: pm-fade-in 200ms ease-out both;
+}
+.pm-mic {
+  margin-left: auto;
+}
+.pm-mic[data-rec="true"] {
+  background: var(--pm-accent-tint);
+  color: var(--pm-accent-ink);
+}
+.pm-primary {
+  position: relative;
+  width: 41px;
+  height: 41px;
+  margin-left: 8px;
+  background: var(--pm-accent);
+  color: #fff;
+}
+.pm-primary[data-dim="true"] {
+  background: var(--pm-accent-dim);
+  color: rgba(255, 255, 255, 0.45);
+  cursor: default;
+}
+.pm-primary > span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition-property: opacity;
+  transition-timing-function: ease-out;
+}
+.pm-primary .pm-stop {
+  width: 13px;
+  height: 13px;
+  border-radius: 3.5px;
+  background: currentColor;
+}
+
+/* ---------- pill ---------- */
+.pm-pill-input {
+  flex: 1;
+  min-width: 0;
+  height: 39px;
+  margin-left: 8px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: var(--pm-ink);
+  font: inherit;
+  outline: none;
+}
+.pm-pill-input::placeholder {
+  color: var(--pm-muted);
+}
+
+/* ---------- expanded ---------- */
+.pm-chip {
+  flex: none;
+  height: 39px;
+  margin-left: 8px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pm-fill);
+  color: var(--pm-ink);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.pm-chip em {
+  margin-left: 5px;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--pm-faint);
+}
+
+.pm-attach {
+  box-sizing: content-box;
+  height: 58px;
+  padding: 12px 12px 0;
+}
+.pm-tile {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1c1d23;
+}
+.pm-tile-in {
+  animation: pm-tile-in 120ms ease-out 30ms both;
+}
+.pm-tile-out {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  animation: pm-tile-out 170ms var(--pm-expo) both;
+  pointer-events: none;
+}
+.pm-tile > svg.pm-art {
+  position: absolute;
+  inset: 0;
+}
+.pm-veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 8, 12, 0.45);
+  transition: opacity 215ms var(--pm-expo);
+}
+.pm-veil[data-blank="true"] {
+  background: transparent;
+}
+.pm-ring {
+  position: absolute;
+  inset: 0;
+  transition: opacity 215ms var(--pm-expo);
+}
+.pm-ring circle {
+  fill: none;
+  stroke-width: 2.1;
+}
+.pm-ring .pm-arc {
+  stroke: #fff;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 120ms ease-out;
+}
+.pm-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(16, 16, 22, 0.78);
+  color: #fff;
+  cursor: pointer;
+}
+.pm-badge svg {
+  width: 10px;
+  height: 10px;
+  stroke-width: 2.6;
+}
+
+/* Text zone: the textarea (or its placeholder) and the voice row share one slot and cross-fade. */
+.pm-zone {
+  position: relative;
+  margin: 20px 0 13px;
+}
+.pm-layer {
+  transition-property: opacity;
+  transition-timing-function: ease-out;
+}
+.pm-text {
+  position: relative;
+  padding: 0 19px;
+}
+.pm-mirror {
+  visibility: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  min-height: 21px;
+}
+.pm-text textarea {
+  position: absolute;
+  inset: 0 19px;
+  width: calc(100% - 38px);
+  padding: 0;
+  border: 0;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  color: var(--pm-ink);
+  font: inherit;
+  outline: none;
+}
+.pm-text textarea::placeholder {
+  color: var(--pm-muted);
+}
+.pm-voice {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 15px;
+  transform: translateY(-2px);
+  pointer-events: none;
+}
+.pm-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--pm-rec);
+  animation: pm-pulse 1100ms ease-in-out 120ms infinite;
+}
+.pm-time {
+  margin-left: 9px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.pm-wave {
+  position: absolute;
+  left: 76px;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 4.7px;
+  height: 26px;
+  margin-top: -13px;
+}
+.pm-wave i {
+  display: block;
+  width: 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--pm-accent-ink);
+}
+.pm-wave i.pm-new {
+  animation: pm-bar-in 80ms ease-out both;
+}
+
+@keyframes pm-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pm-tile-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+@keyframes pm-tile-out {
+  to {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+@keyframes pm-bar-in {
+  from {
+    transform: scaleY(0.45);
+  }
+}
+@keyframes pm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.38;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-root *,
+  .pm-root *::before {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+}

@@ -1,0 +1,166 @@
+/* Assistant modal clone. Geometry and motion from the captured reference (.reanimate/assistant-surface/spec.md):
+   open 300 ms / close 200 ms, cubic-bezier(.32,.72,0,1), fade + scale .95 + 8px rise, origin bottom-right;
+   composer footer follows 100 ms later. Keyframes (not WAAPI) so both clocks behave the same. */
+@import url("https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600&display=swap");
+
+.as-root {
+  --as-bg: oklch(0.992 0.002 106);
+  --as-fg: oklch(0.145 0.004 106);
+  --as-muted: oklch(0.556 0.007 106);
+  --as-soft: oklch(0.968 0.004 106);
+  --as-line: oklch(0.145 0.004 106 / 0.1);
+  --as-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--as-bg);
+  border: 1px solid oklch(0.92 0.004 106);
+  border-radius: 6px;
+  font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+  color: var(--as-fg);
+  -webkit-font-smoothing: antialiased;
+}
+.as-root * { box-sizing: border-box; }
+
+.as-launcher {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid oklch(0.145 0.004 106 / 0.07);
+  background: oklch(0.972 0.003 106);
+  color: var(--as-fg);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 120ms ease, background-color 150ms;
+}
+.as-launcher:hover { background: var(--as-bg); }
+.as-launcher:active { transform: scale(0.94); }
+.as-launcher:focus-visible { outline: 2px solid oklch(0.145 0.004 106 / 0.4); outline-offset: 2px; }
+.as-launcher svg { grid-area: 1 / 1; width: 20px; height: 20px; transition: transform 200ms var(--as-ease), opacity 200ms var(--as-ease); }
+.as-launcher .as-ico-bot { transform: rotate(0) scale(1); opacity: 1; }
+.as-launcher .as-ico-chev { transform: rotate(-90deg) scale(0.6); opacity: 0; }
+.as-launcher[aria-expanded="true"] .as-ico-bot { transform: rotate(90deg) scale(0.6); opacity: 0; }
+.as-launcher[aria-expanded="true"] .as-ico-chev { transform: rotate(0) scale(1); opacity: 1; }
+
+.as-dialog {
+  position: absolute;
+  right: 16px;
+  bottom: 76px; /* launcher 44 + 16 gap + 16 inset */
+  width: 420px;
+  height: 216px;
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  border-radius: 12px;
+  background: var(--as-bg);
+  box-shadow: 0 0 0 1px var(--as-line), 0 16px 48px -24px rgb(0 0 0 / 0.25);
+  transform-origin: 100% 100%;
+}
+.as-dialog[data-state="open"] { animation: as-in 300ms var(--as-ease) both; }
+.as-dialog[data-state="closed"] { animation: as-out 200ms var(--as-ease) both; pointer-events: none; }
+@keyframes as-in { from { opacity: 0; transform: translateY(8px) scale(0.95); } to { opacity: 1; transform: none; } }
+@keyframes as-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px) scale(0.95); } }
+
+.as-head {
+  height: 44px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 0 14px;
+  border-bottom: 1px solid var(--as-line);
+}
+.as-title { flex: 1; margin: 0; font-size: 13px; font-weight: 500; }
+.as-tools { display: flex; gap: 2px; }
+.as-tool {
+  width: 28px; height: 28px; border-radius: 6px; border: 0; background: none; padding: 0;
+  display: grid; place-items: center; color: var(--as-muted); cursor: pointer;
+}
+.as-tool:hover:not(:disabled) { background: var(--as-soft); color: var(--as-fg); }
+.as-tool:disabled { opacity: 0.5; cursor: default; }
+.as-tool svg { width: 14px; height: 14px; }
+
+.as-body { flex: 1; min-height: 0; position: relative; }
+.as-foot {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 0 26px 25px;
+  background: var(--as-bg);
+}
+.as-dialog[data-state="open"] .as-foot { animation: as-foot-in 300ms var(--as-ease) 100ms both; }
+@keyframes as-foot-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.as-composer {
+  border: 1px solid oklch(0.145 0.004 106 / 0.25);
+  border-radius: 16px;
+  background: oklch(0.968 0.004 106 / 0.3);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 150ms;
+}
+.as-composer:focus-within { border-color: oklch(0.145 0.004 106 / 0.45); }
+.as-input {
+  width: 100%; min-height: 40px; padding: 4px 10px; resize: none; border: 0; outline: 0; background: transparent;
+  font: inherit; font-size: 16px; line-height: 24px; color: var(--as-fg); caret-color: var(--as-fg);
+}
+.as-input::placeholder { color: oklch(0.556 0.007 106 / 0.6); }
+.as-actions { display: flex; align-items: center; justify-content: space-between; height: 28px; }
+.as-round {
+  width: 28px; height: 28px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; cursor: pointer;
+}
+.as-round svg { width: 16px; height: 16px; }
+.as-attach { background: none; color: var(--as-muted); }
+.as-attach:hover { background: oklch(0.556 0.007 106 / 0.15); color: var(--as-fg); }
+.as-send { background: var(--as-fg); color: var(--as-bg); transition: opacity 150ms; }
+.as-send:disabled { opacity: 0.5; cursor: default; }
+
+.as-msgs { padding: 16px 16px 0; font-size: 14px; line-height: 22px; display: flex; flex-direction: column; gap: 10px; }
+.as-me { align-self: flex-end; background: var(--as-soft); border-radius: 14px; padding: 6px 12px; max-width: 80%; }
+.as-ai { color: var(--as-fg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .as-dialog, .as-dialog .as-foot, .as-launcher svg { animation: none !important; transition: none !important; }
+}
+
+.as-tip {
+  position: absolute;
+  right: 68px;
+  bottom: 26px;
+  height: 24px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  background: oklch(0.145 0.004 106);
+  color: oklch(0.985 0 0);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(4px);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.as-tip::after {
+  content: "";
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: inherit;
+  transform: translateY(-50%) rotate(45deg);
+  border-radius: 2px;
+  z-index: -1;
+}
+.as-launcher:hover ~ .as-tip, .as-launcher:focus-visible ~ .as-tip { opacity: 1; transform: none; transition-delay: 350ms; }
+/* the label shows briefly as the panel closes (pointer is on the launcher), then fades while the icon swaps */
+.as-tip[data-flash] { animation: as-tip-flash 200ms ease-out both; }
+@keyframes as-tip-flash { 0% { opacity: 1; transform: none; } 25% { opacity: 1; } 100% { opacity: 0; transform: none; } }

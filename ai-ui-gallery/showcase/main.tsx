@@ -95,12 +95,20 @@ function App() {
         <h1>AI UI Gallery</h1>
         <p className="sc-lede">
           Agent and AI components rebuilt frame by frame. Each one beat every other catalog’s version of the same idea,
-          then was recorded next to its reference and tuned until the timing matched. {entries.length} of 51 concepts are
-          done; the rest are still being cloned.
+          then was recorded next to its reference and tuned until the timing matched.{" "}
+          {loaded
+            ? (() => {
+                const concepts = new Set(loaded.map((e) => e.meta.concept)).size;
+                return concepts >= 51
+                  ? `${loaded.length} clones cover all 51 concepts.`
+                  : `${loaded.length} clones cover ${concepts} of 51 concepts; the rest are still being cloned.`;
+              })()
+            : `${entries.length} clones.`}
         </p>
         <p className="sc-note">
           <strong>Motion-faithful</strong> clones match trigger, sequence, timing and easing, with original colours,
-          fonts, icons and copy, because the reference is a paid component. Each clone plays when it scrolls into view.
+          fonts, icons and copy, because the reference is a paid component. <strong>Pixel-faithful</strong> clones also
+          match the look, because the reference is open source. Each clone plays when it scrolls into view.
         </p>
         {loaded && (
           <nav className="sc-nav" aria-label="Clones">

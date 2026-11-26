@@ -1,0 +1,173 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap");
+
+.gu-root {
+  --bg: #121110;
+  --card: #1a1816;
+  --inset: #151412;
+  --line: #2a2622;
+  --line-soft: #221f1c;
+  --ink: #f2ede6;
+  --ink2: #b3aa9d;
+  --ink3: #7d756a;
+  --accent: #3fb6a0;
+  --accent-ink: #07211c;
+  --ok: #54c79a;
+  --mono: "Geist Mono", ui-monospace, Menlo, monospace;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  width: 1136px;
+  height: 600px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  font-size: 14px;
+}
+.gu-root * { box-sizing: border-box; }
+
+.gu-head { position: absolute; inset: 0 0 auto 0; height: 66px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; z-index: 3; }
+.gu-orb { display: block; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffd9a0 0%, #f2a65a 45%, #c4623a 100%); box-shadow: inset 0 -3px 6px rgba(120,40,20,.35); position: relative; flex: none; }
+.gu-orb::before, .gu-orb::after { content: ""; position: absolute; top: 38%; width: 11%; height: 17%; border-radius: 50%; background: rgba(60,20,10,.7); }
+.gu-orb::before { left: 33%; } .gu-orb::after { right: 33%; }
+.gu-who { display: flex; align-items: center; gap: 12px; }
+.gu-who b { font-weight: 500; font-size: 14px; display: block; line-height: 1.2; }
+.gu-who span { color: var(--ink3); font-size: 12.5px; }
+.gu-wallet { display: flex; align-items: center; gap: 10px; background: #1b1917; border: 1px solid var(--line-soft); border-radius: 999px; padding: 6px 14px 6px 6px; }
+.gu-wallet i { width: 24px; height: 24px; border-radius: 50%; background: #0c0b0a; display: grid; place-items: center; color: #e8a24a; }
+.gu-wallet code { font-family: var(--mono); font-size: 12px; color: var(--ink3); }
+.gu-wallet b { font-weight: 500; font-size: 15px; font-variant-numeric: tabular-nums; }
+
+/* empty state */
+.gu-empty { position: absolute; left: 216px; top: 150px; width: 520px; }
+.gu-empty.leaving { animation: gu-out 125ms var(--ease) forwards; pointer-events: none; }
+.gu-empty .gu-orb { width: 40px; height: 40px; margin-bottom: 40px; }
+.gu-empty h2 { margin: 0; font-size: 30px; font-weight: 500; letter-spacing: -0.03em; }
+.gu-empty p { margin: 14px 0 0; color: var(--ink3); font-size: 15px; line-height: 1.55; width: 440px; }
+.gu-sugg { position: absolute; left: 0; top: 215px; display: flex; gap: 12px; width: 712px; }
+.gu-sugg button { all: unset; box-sizing: border-box; cursor: pointer; flex: 1; height: 134px; border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; justify-content: flex-end; position: relative; background: transparent; transition: background 160ms, border-color 160ms; }
+.gu-sugg button:hover { background: #181614; border-color: #3a342e; }
+.gu-sugg .ic { position: absolute; left: 16px; top: 16px; width: 36px; height: 36px; border-radius: 50%; background: #1f1c19; display: grid; place-items: center; color: var(--ink2); }
+.gu-sugg .ar { position: absolute; right: 16px; top: 16px; color: var(--ink3); }
+.gu-sugg strong { font-weight: 500; font-size: 14.5px; }
+.gu-sugg small { color: var(--ink3); font-size: 12.5px; margin-top: 4px; }
+
+/* thread */
+.gu-thread { position: absolute; left: 0; right: 0; top: 66px; height: 606px; overflow: hidden; z-index: 2; padding: 30px 0 18px 218px; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 6px); mask-image: linear-gradient(to bottom, transparent 0, #000 6px); }
+.gu-col { width: 700px; display: flex; flex-direction: column; gap: 25px; }
+.gu-user { align-self: flex-end; background: var(--accent); color: var(--accent-ink); padding: 10px 17px; border-radius: 18px 18px 6px 18px; font-size: 15px; font-weight: 500; animation: gu-rise 250ms var(--ease) both; margin-right: 0; }
+.gu-asst { display: flex; gap: 14px; align-items: flex-start; animation: gu-fade 300ms ease both; }
+.gu-asst .gu-orb { width: 24px; height: 24px; margin-top: 1px; }
+.gu-body { flex: 1; min-width: 0; }
+.gu-steps { display: flex; flex-direction: column; gap: 2px; }
+.gu-step { display: flex; align-items: center; gap: 8px; height: 20px; font-size: 13px; animation: gu-rise-s 250ms var(--ease) both; }
+.gu-step b { font-weight: 500; }
+.gu-step em { font-style: normal; color: var(--ink3); }
+.gu-dot { width: 16px; height: 16px; flex: none; position: relative; display: grid; place-items: center; }
+.gu-dot .spin { width: 13px; height: 13px; border-radius: 50%; border: 1.6px solid #4a443d; border-top-color: var(--ink2); animation: gu-spin 800ms linear infinite; }
+.gu-dot .ok { position: absolute; inset: 0; border-radius: 50%; background: var(--ink); color: #121110; display: grid; place-items: center; animation: gu-pop 360ms var(--ease) both; }
+.gu-text { margin-top: 11px; font-size: 15px; line-height: 1.5; }
+.gu-w { display: inline-block; white-space: pre; animation: gu-word 260ms var(--ease) both; }
+
+/* generated card */
+.gu-cardwrap { margin-top: 13px; animation: gu-card-in 460ms var(--ease) both; }
+.gu-card { width: 382px; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 14px; }
+.gu-ch { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 12px; }
+.gu-ch .l { display: flex; align-items: center; gap: 10px; }
+.gu-ch .ico { width: 30px; height: 30px; border-radius: 50%; background: #23201d; display: grid; place-items: center; color: var(--ink2); }
+.gu-ch b { font-weight: 500; font-size: 15px; display: block; line-height: 1.15; }
+.gu-ch small { color: var(--ink3); font-size: 12px; display: flex; align-items: center; gap: 5px; }
+.gu-chain { width: 9px; height: 9px; border-radius: 50%; background: #e8a24a; display: inline-block; }
+.gu-pill { height: 28px; border-radius: 999px; padding: 0 11px 0 8px; background: #23201d; font-size: 12.5px; display: flex; align-items: center; gap: 6px; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 60px; justify-content: center; }
+.gu-pill.ok { color: var(--ok); }
+.gu-pill > span { display: inline-flex; animation: gu-swap 300ms var(--ease) both; align-items: center; gap: 6px; }
+.gu-ring { width: 14px; height: 14px; transform: rotate(-90deg); }
+.gu-ring circle { fill: none; stroke-width: 2; }
+.gu-ring .bg { stroke: #3a352f; }
+.gu-ring .fg { stroke: var(--ink); stroke-dasharray: 37.7; stroke-dashoffset: 0; animation: gu-ring 30s linear forwards; }
+.gu-spin-s { width: 12px; height: 12px; border-radius: 50%; border: 1.6px solid #4a443d; border-top-color: var(--ink); animation: gu-spin 800ms linear infinite; }
+
+.gu-swap { border: 1px solid var(--line); background: var(--inset); border-radius: 16px; padding: 4px 14px; }
+.gu-leg { display: flex; align-items: center; gap: 12px; height: 66px; }
+.gu-tok { width: 32px; height: 32px; border-radius: 50%; position: relative; display: grid; place-items: center; flex: none; font-size: 11px; font-weight: 600; }
+.gu-tok.a { background: #0c0b0a; color: #e8a24a; border: 1px solid #2e2924; }
+.gu-tok.b { background: #2563c9; color: #fff; }
+.gu-tok i { position: absolute; right: -3px; bottom: -3px; width: 13px; height: 13px; border-radius: 50%; background: #1d1a17; border: 1.5px solid var(--inset); display: grid; place-items: center; }
+.gu-tok i::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #e8a24a; }
+.gu-leg .t { flex: 1; }
+.gu-leg .t small { display: block; color: var(--ink2); font-size: 12px; }
+.gu-leg .t b { font-weight: 500; font-size: 17px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.gu-leg .t b span { font-size: 14px; font-weight: 500; margin-left: 3px; }
+.gu-leg .usd { color: var(--ink3); font-size: 12.5px; font-variant-numeric: tabular-nums; align-self: flex-end; margin-bottom: 14px; }
+.gu-between { display: flex; align-items: center; gap: 14px; height: 2px; position: relative; }
+.gu-between i { width: 22px; height: 22px; border-radius: 50%; background: #1f1c19; border: 1px solid var(--line); display: grid; place-items: center; color: var(--ink2); position: relative; z-index: 1; }
+.gu-between::after { content: ""; position: absolute; left: 44px; right: 0; top: 0; height: 1px; background: var(--line); }
+.gu-rows { padding: 12px 2px 4px; display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+.gu-rows div { display: flex; justify-content: space-between; color: var(--ink3); }
+.gu-rows b { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.gu-rows b.tick { animation: gu-tick 520ms var(--ease); }
+
+.gu-collapse { display: grid; grid-template-rows: 1fr; }
+.gu-collapse > div { overflow: hidden; min-height: 0; }
+.gu-collapse.in { animation: gu-grow 520ms var(--ease) both; }
+.gu-collapse.out { animation: gu-shrink 360ms var(--ease) both; }
+.gu-actions { display: flex; gap: 8px; padding-top: 12px; }
+.gu-actions button { all: unset; box-sizing: border-box; cursor: pointer; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 14px; font-weight: 500; transition: filter 150ms, background 150ms; }
+.gu-actions .no { width: 100px; background: #23201d; color: var(--ink2); }
+.gu-actions .no:hover { background: #2b2723; }
+.gu-actions .yes { flex: 1; background: var(--accent); color: var(--accent-ink); }
+.gu-actions .yes:hover { filter: brightness(1.08); }
+.gu-actions button:active { transform: scale(0.98); }
+
+.gu-prog { padding-top: 16px; }
+.gu-stepper { display: flex; align-items: flex-start; justify-content: space-between; position: relative; padding: 0 18px; }
+.gu-stepper .line { position: absolute; left: 54px; right: 54px; top: 11px; height: 1px; background: var(--line); }
+.gu-stepper .line i { display: block; height: 100%; width: 0; background: var(--ink); transition: width 700ms var(--ease); }
+.gu-st { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; color: var(--ink3); position: relative; z-index: 1; width: 72px; transition: color 200ms; }
+.gu-st.on { color: var(--ink); }
+.gu-st .c { width: 22px; height: 22px; border-radius: 50%; background: var(--card); border: 1px solid var(--line); display: grid; place-items: center; transition: background 220ms, border-color 220ms; }
+.gu-st.cur .c { border-color: #5a534b; }
+.gu-st.done .c { background: var(--ink); border-color: var(--ink); color: #121110; animation: gu-pop 360ms var(--ease) both; }
+.gu-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line-soft); font-size: 12px; color: var(--ink3); }
+.gu-foot code { font-family: var(--mono); font-size: 12px; }
+.gu-foot span { display: flex; align-items: center; gap: 5px; }
+
+.gu-declined { padding-top: 12px; font-size: 12.5px; color: var(--ink3); display: flex; align-items: center; gap: 6px; }
+
+/* composer */
+.gu-composer { position: absolute; left: 218px; bottom: 22px; width: 700px; height: 52px; border: 1px solid var(--line); border-radius: 18px; background: #151413; display: flex; align-items: center; padding: 0 10px 0 18px; color: var(--ink3); font-size: 14.5px; justify-content: space-between; }
+.gu-composer i { width: 32px; height: 32px; border-radius: 50%; background: #2a2622; display: grid; place-items: center; color: var(--ink3); }
+.gu-composer button { all: unset; cursor: pointer; }
+
+@keyframes gu-spin { to { transform: rotate(360deg); } }
+@keyframes gu-fade { from { opacity: 0; } }
+@keyframes gu-out { to { opacity: 0; } }
+@keyframes gu-rise { from { opacity: 0; transform: translateY(7.5px); } }
+@keyframes gu-rise-s { from { opacity: 0; transform: translateY(4px); } }
+@keyframes gu-pop { from { opacity: 0; transform: scale(.4); } 60% { opacity: 1; } }
+@keyframes gu-word { from { opacity: 0; filter: blur(5px); } }
+@keyframes gu-card-in { from { opacity: 0; transform: translateY(11px); filter: blur(6px); } }
+@keyframes gu-swap { from { opacity: 0; transform: translateY(5px); filter: blur(3px); } }
+@keyframes gu-ring { to { stroke-dashoffset: 37.7; } }
+@keyframes gu-tick { 0% { opacity: .2; filter: blur(3px); } }
+@keyframes gu-grow { from { grid-template-rows: 0fr; opacity: 0; } to { grid-template-rows: 1fr; opacity: 1; } }
+@keyframes gu-shrink { from { grid-template-rows: 1fr; opacity: 1; } to { grid-template-rows: 0fr; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .gu-root * { animation-duration: 1ms !important; transition-duration: 1ms !important; } }
+.gu-tickb { animation: gu-tick 520ms var(--ease); display: inline-block; }
+
+/* thinking line (shown between the bubble and the first tool row) */
+.gu-think { height: 24px; display: flex; align-items: center; font-size: 13px; color: var(--ink3); }
+.gu-think i { font-style: normal; animation: gu-dots 1.2s ease-in-out infinite; }
+.gu-think i:nth-child(2) { animation-delay: .15s; } .gu-think i:nth-child(3) { animation-delay: .3s; }
+@keyframes gu-dots { 0%, 100% { opacity: .25; } 40% { opacity: 1; } }
+.gu-actions .no { transition: width 260ms var(--ease), opacity 200ms, margin 260ms var(--ease), background 150ms; }
+.gu-actions .no.gone { width: 0; opacity: 0; margin-right: -8px; overflow: hidden; }
+
+/* the reference composer sits below the visible stage; fade ours out when the turn starts */
+.gu-composer { transition: opacity 200ms; }
+.gu-root[data-started] .gu-composer { opacity: 0; }
+.gu-collapse.snap { animation: gu-fade 200ms ease both; }
+.gu-foot span { opacity: 0; transition: opacity 250ms; }
+.gu-foot span.show { opacity: 1; }
+.gu-done { margin-top: 16px; height: 52px; font-size: 15px; line-height: 22.5px; animation: gu-fade 300ms ease both; }
+.gu-ring.freeze .fg { animation-play-state: paused; }

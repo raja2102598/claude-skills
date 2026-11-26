@@ -47,7 +47,7 @@ clone crop `[data-stage]` (669x403).
 | 9 | header: seconds counter | per frame | — | now, 1 decimal | — | right-aligned in a "26.4s" sizer |
 | 10 | header: tokens counter | per frame | — | Σ tokens_i · clamp((now−s_i)/d_i, 0, 1), floored, thousands sep | linear per span | waiting spans carry no tokens |
 | 11 | header: cost | per frame | — | tokens x rate, 2 decimals | — | |
-| 12 | "Running" label | while playing | 2.4 s loop | text shimmer | — | own shimmer |
+| 12 | "Running" label | while playing | 2.4 s loop | muted text, an ink band sweeps left → right in ~1.2 s, then ~1.2 s rest | ≈ linear | phase set at page load (not reset by Restart) |
 | 13 | header swap at the end | now ≥ 26.4 | out 100 ms, in 150 ms | running layer → finished layer (check icon, agents, time, speed-up, cost) | out ease-standard, in ease-enter | crossfade, same grid cell |
 | 14 | playhead settles | now ≥ 26.4 | 200 ms | opacity .5 → 0 | ease-standard | knob stays at 26.4 |
 | 15 | play/pause glyph | end of run (pause → play) | play in 150 ms, pause out 100 ms | opacity | ease-standard | |

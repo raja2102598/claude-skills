@@ -8,7 +8,7 @@ How each clone in this gallery was made. It also briefs the agent that clones on
 into concepts. A concept is one idea (an agent plan, a model picker, a thinking line) offered by
 several catalogs. For each concept:
 
-**Speed mode (from 24 Nov 2026):** up to 8 agents share 4 CPUs. Keep the candidate review to one
+**Speed mode (from 24 Nov 2026):** up to 14 agents share 4 CPUs. Keep the candidate review to one
 screenshot plus one short capture per candidate, cap reanimate at 3 rounds, and report any row that
 still fails with its numbers instead of running a 4th round. Real-clock probes are noisier under this
 load; prefer the virtual clock and the `getAnimations()` durations and easings.

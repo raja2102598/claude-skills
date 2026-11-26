@@ -8,7 +8,7 @@ import {
   type RefObject,
 } from "react";
 import { flushSync } from "react-dom";
-import { Check, CircleAlert, Copy, LoaderCircle, Sparkle, ThumbsDown, ThumbsUp, X } from "lucide-react";
+import { CircleAlert, Copy, LoaderCircle, Sparkle, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import "./message.css";
 
 /*
@@ -311,7 +311,9 @@ function CopyAction({ text }: { text: string }) {
           <Copy size={16} strokeWidth={1.75} />
         </span>
         <span className="mf-layer" data-state={state(copied)} data-mf="check-glyph">
-          <Check size={16} strokeWidth={2} />
+          <svg className="mf-copy-check" width={16} height={16} viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M4 12 9 17 20 6" pathLength={1} stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </span>
       </span>
     </IconAction>
